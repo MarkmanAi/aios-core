@@ -78,13 +78,8 @@ sync-*.sh                     # Agent sync scripts
 !.cursor/rules/agents/
 
 # AI assistant files
-CLAUDE.md
-.claude
-!.claude/commands/
-!.claude/commands/AIOS/
-!.claude/commands/AIOS/agents/
-!.claude/CLAUDE.md
-!.claude/rules/
+# .claude/ — tracked for Claude Code configuration
+# Private commands excluded via specific rules above (mmosMapper/, hybridOps/)
 .gemini
 
 # AI Session Artifacts (Story 6.1.2.6 - Decision Logging)
