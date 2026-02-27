@@ -1,0 +1,1979 @@
+{
+  "project": "markman-aios",
+  "mappedAt": "2026-02-22T01:37:27.530Z",
+  "version": "1.0",
+  "structure": {
+    "type": "directory",
+    "files": [
+      ".coderabbit.yaml",
+      ".gitattributes",
+      ".gitignore",
+      ".prettierrc",
+      ".releaserc.json",
+      ".tsbuildinfo",
+      "CHANGELOG.md",
+      "CODE_OF_CONDUCT.md",
+      "CONTRIBUTING.md",
+      "eslint.config.js",
+      "jest.config.js",
+      "LICENSE",
+      "package-lock.json",
+      "package.json",
+      "README.md",
+      "tsconfig.json"
+    ],
+    "children": {
+      "apps": {
+        "type": "directory",
+        "children": {
+          "dashboard": {
+            "type": "directory",
+            "files": [
+              ".gitignore",
+              "components.json",
+              "eslint.config.mjs",
+              "next.config.ts",
+              "package-lock.json",
+              "package.json",
+              "postcss.config.mjs",
+              "README.md",
+              "tsconfig.json",
+              "vitest.config.ts"
+            ],
+            "children": {
+              "docs": {
+                "type": "directory",
+                "purpose": "Documentation",
+                "files": [
+                  "QA-REVIEW-PROMPT.md",
+                  "QA-REVIEW-REPORT.md"
+                ]
+              },
+              "public": {
+                "type": "directory",
+                "purpose": "Static assets",
+                "files": [
+                  "file.svg",
+                  "globe.svg",
+                  "next.svg",
+                  "vercel.svg",
+                  "window.svg"
+                ]
+              },
+              "src": {
+                "type": "directory",
+                "purpose": "Application source code",
+                "children": {
+                  "app": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "components": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "hooks": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "lib": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "stores": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "types": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "__tests__": {
+                    "type": "directory",
+                    "truncated": true
+                  }
+                }
+              }
+            }
+          },
+          "monitor-server": {
+            "type": "directory",
+            "files": [
+              "package.json",
+              "README.md"
+            ],
+            "children": {
+              "server": {
+                "type": "directory",
+                "purpose": "Server-side code",
+                "files": [
+                  "db.ts",
+                  "server.ts",
+                  "types.ts"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "bin": {
+        "type": "directory",
+        "purpose": "CLI/executable scripts",
+        "files": [
+          "aios-init.js",
+          "aios-minimal.js",
+          "aios.js"
+        ],
+        "children": {
+          "modules": {
+            "type": "directory",
+            "files": [
+              "env-config.js",
+              "mcp-installer.js"
+            ]
+          },
+          "utils": {
+            "type": "directory",
+            "purpose": "Utility functions",
+            "files": [
+              "install-errors.js",
+              "install-transaction.js",
+              "pro-detector.js"
+            ]
+          }
+        }
+      },
+      "docs": {
+        "type": "directory",
+        "purpose": "Documentation",
+        "files": [
+          "agent-reference-guide.md",
+          "aios-nomenclature-specification.md",
+          "CHANGELOG.md",
+          "community.md",
+          "core-architecture.md",
+          "docker-mcp-setup.md",
+          "DOCUMENTATION-ROADMAP.md",
+          "ENVIRONMENT.md",
+          "FEATURE_PROCESS.md",
+          "getting-started.md",
+          "git-workflow-guide.md",
+          "GUIDING-PRINCIPLES.md",
+          "how-to-contribute-with-pull-requests.md",
+          "ide-integration.md",
+          "meta-agent-commands.md",
+          "migration-guide.md",
+          "npx-install.md",
+          "performance-tuning-guide.md",
+          "README.md",
+          "REPO_PATH_MAP_v2.md",
+          "... and 6 more"
+        ],
+        "filesCount": 26,
+        "children": {
+          "agents": {
+            "type": "directory",
+            "files": [
+              "archetype-rationale.md",
+              "persona-definitions.md",
+              "persona-definitions.yaml"
+            ]
+          },
+          "analysis": {
+            "type": "directory",
+            "files": [
+              "aios-vs-speckit-comparison.md",
+              "sdd-adoption-executive-report.md"
+            ]
+          },
+          "api": {
+            "type": "directory",
+            "purpose": "API routes/endpoints",
+            "files": [
+              "squads-api.md"
+            ]
+          },
+          "architecture": {
+            "type": "directory",
+            "files": [
+              "ADE-AGENT-CHANGES.md",
+              "ADE-ARCHITECT-HANDOFF.md",
+              "ade-architecture.md",
+              "ADE-EPIC1-HANDOFF.md",
+              "ADE-EPIC2-HANDOFF.md",
+              "ADE-EPIC3-HANDOFF.md",
+              "ADE-EPIC4-HANDOFF.md",
+              "ADE-EPIC5-HANDOFF.md",
+              "ADE-EPIC6-HANDOFF.md",
+              "ADE-EPIC7-HANDOFF.md",
+              "ADE-EPIC8-HANDOFF.md",
+              "agent-config-audit.md",
+              "agent-responsibility-matrix.md",
+              "agent-tool-integration-guide.md",
+              "ARCHITECTURE-INDEX.md",
+              "AUTO-CLAUDE-ANALYSIS-COMPLETE.md",
+              "AUTO-CLAUDE-COMPARISON.md",
+              "AUTO-CLAUDE-DASHBOARD-ANALYSIS.md",
+              "ci-cd.md",
+              "CLAUDE-MD-V3-CHANGES.md",
+              "... and 27 more"
+            ],
+            "filesCount": 47,
+            "children": {
+              "adr": {
+                "type": "directory",
+                "files": [
+                  "ADR-002-migration-map.md",
+                  "ADR-COLLAB-1-current-state-audit.md",
+                  "ADR-COLLAB-2-proposed-configuration.md",
+                  "adr-hcs-health-check-system.md",
+                  "adr-isolated-vm-decision.md"
+                ]
+              }
+            }
+          },
+          "community": {
+            "type": "directory",
+            "files": [
+              "README-community-snippet-core.md",
+              "README-community-snippet-mcp.md",
+              "README-community-snippet-squads.md"
+            ]
+          },
+          "es": {
+            "type": "directory",
+            "files": [
+              "agent-reference-guide.md",
+              "aios-nomenclature-specification.md",
+              "CHANGELOG.md",
+              "community.md",
+              "core-architecture.md",
+              "docker-mcp-setup.md",
+              "DOCUMENTATION-ROADMAP.md",
+              "ENVIRONMENT.md",
+              "FEATURE_PROCESS.md",
+              "getting-started.md",
+              "git-workflow-guide.md",
+              "GUIDING-PRINCIPLES.md",
+              "how-to-contribute-with-pull-requests.md",
+              "ide-integration.md",
+              "meta-agent-commands.md",
+              "migration-guide.md",
+              "npx-install.md",
+              "performance-tuning-guide.md",
+              "README.md",
+              "roadmap.md",
+              "... and 5 more"
+            ],
+            "filesCount": 25,
+            "children": {
+              "agents": {
+                "type": "directory",
+                "files": [
+                  "archetype-rationale.md",
+                  "persona-definitions.md"
+                ]
+              },
+              "api": {
+                "type": "directory",
+                "purpose": "API routes/endpoints",
+                "files": [
+                  "squads-api.md"
+                ]
+              },
+              "architecture": {
+                "type": "directory",
+                "files": [
+                  "ADE-AGENT-CHANGES.md",
+                  "ADE-ARCHITECT-HANDOFF.md",
+                  "ade-architecture.md",
+                  "ADE-EPIC1-HANDOFF.md",
+                  "ADE-EPIC2-HANDOFF.md",
+                  "ADE-EPIC3-HANDOFF.md",
+                  "agent-config-audit.md",
+                  "agent-responsibility-matrix.md",
+                  "agent-tool-integration-guide.md",
+                  "ARCHITECTURE-INDEX.md",
+                  "ci-cd.md",
+                  "coding-standards.md",
+                  "contribution-workflow-research.md",
+                  "dashboard-architecture.md",
+                  "dashboard-realtime.md",
+                  "hcs-check-specifications.md",
+                  "hcs-execution-modes.md",
+                  "hcs-self-healing-spec.md",
+                  "high-level-architecture.md",
+                  "introduction.md",
+                  "... and 10 more"
+                ],
+                "filesCount": 30,
+                "children": {
+                  "adr": {
+                    "type": "directory",
+                    "truncated": true
+                  }
+                }
+              },
+              "community": {
+                "type": "directory",
+                "files": [
+                  "README-community-snippet-core.md",
+                  "README-community-snippet-mcp.md",
+                  "README-community-snippet-squads.md"
+                ]
+              },
+              "framework": {
+                "type": "directory",
+                "files": [
+                  "coding-standards.md",
+                  "README.md",
+                  "source-tree.md",
+                  "tech-stack.md"
+                ]
+              },
+              "guides": {
+                "type": "directory",
+                "files": [
+                  "ade-guide.md",
+                  "agent-selection-guide.md",
+                  "api-reference.md",
+                  "build-recovery-guide.md",
+                  "contextual-greeting-system-guide.md",
+                  "contributing-squads.md",
+                  "development-setup.md",
+                  "ide-sync-guide.md",
+                  "installation-troubleshooting.md",
+                  "llm-routing.md",
+                  "mcp-global-setup.md",
+                  "permission-modes.md",
+                  "project-status-feature.md",
+                  "quality-dashboard.md",
+                  "quality-gates.md",
+                  "README.md",
+                  "security-hardening.md",
+                  "service-discovery.md",
+                  "squad-migration.md",
+                  "squads-guide.md",
+                  "... and 5 more"
+                ],
+                "filesCount": 25,
+                "children": {
+                  "hybridOps": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "mcp": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "squad-examples": {
+                    "type": "directory",
+                    "truncated": true
+                  }
+                }
+              },
+              "installation": {
+                "type": "directory",
+                "files": [
+                  "faq.md",
+                  "linux.md",
+                  "macos.md",
+                  "README.md",
+                  "troubleshooting.md",
+                  "v2.1-quick-start.md",
+                  "windows.md"
+                ]
+              },
+              "platforms": {
+                "type": "directory",
+                "files": [
+                  "antigravity.md",
+                  "claude-code.md",
+                  "cline.md",
+                  "cursor.md",
+                  "gemini-cli.md",
+                  "github-copilot.md",
+                  "README.md",
+                  "roo-code.md",
+                  "windsurf.md"
+                ]
+              },
+              "specifications": {
+                "type": "directory",
+                "files": [
+                  "docs-agent-technical-specification.md"
+                ]
+              }
+            }
+          },
+          "examples": {
+            "type": "directory",
+            "children": {
+              "squads": {
+                "type": "directory",
+                "children": {
+                  "basic-squad": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "multi-agent-squad": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "squad-with-tools": {
+                    "type": "directory",
+                    "truncated": true
+                  }
+                }
+              }
+            }
+          },
+          "framework": {
+            "type": "directory",
+            "files": [
+              "coding-standards.md",
+              "README.md",
+              "source-tree.md",
+              "tech-stack.md"
+            ]
+          },
+          "guides": {
+            "type": "directory",
+            "files": [
+              "ade-guide.md",
+              "agent-selection-guide.md",
+              "api-reference.md",
+              "build-recovery-guide.md",
+              "contextual-greeting-system-guide.md",
+              "contributing-squads.md",
+              "development-setup.md",
+              "ide-sync-guide.md",
+              "installation-troubleshooting.md",
+              "llm-routing.md",
+              "mcp-global-setup.md",
+              "permission-modes.md",
+              "project-status-feature.md",
+              "quality-dashboard.md",
+              "quality-gates.md",
+              "README.md",
+              "security-hardening.md",
+              "service-discovery.md",
+              "squad-migration.md",
+              "squads-guide.md",
+              "... and 5 more"
+            ],
+            "filesCount": 25,
+            "children": {
+              "coderabbit": {
+                "type": "directory",
+                "files": [
+                  "README.md"
+                ]
+              },
+              "hybridOps": {
+                "type": "directory",
+                "files": [
+                  "hybrid-ops-pv.yaml",
+                  "workflow-diagram.md"
+                ]
+              },
+              "mcp": {
+                "type": "directory",
+                "files": [
+                  "desktop-commander.md",
+                  "docker-gateway-tutorial.md"
+                ]
+              },
+              "squad-examples": {
+                "type": "directory",
+                "files": [
+                  "data-processor-squad.yaml",
+                  "README.md",
+                  "simple-agent.yaml"
+                ]
+              }
+            }
+          },
+          "installation": {
+            "type": "directory",
+            "files": [
+              "faq.md",
+              "linux.md",
+              "macos.md",
+              "README.md",
+              "troubleshooting.md",
+              "v2.1-quick-start.md",
+              "windows.md"
+            ]
+          },
+          "legal": {
+            "type": "directory",
+            "files": [
+              "privacy.md",
+              "terms.md"
+            ]
+          },
+          "migration": {
+            "type": "directory",
+            "files": [
+              "v2.0-to-v2.1.md"
+            ]
+          },
+          "platforms": {
+            "type": "directory",
+            "files": [
+              "antigravity.md",
+              "claude-code.md",
+              "cline.md",
+              "cursor.md",
+              "gemini-cli.md",
+              "github-copilot.md",
+              "README.md",
+              "roo-code.md",
+              "windsurf.md"
+            ]
+          },
+          "prd": {
+            "type": "directory",
+            "files": [
+              "aios-agent-foundation-refactor.md"
+            ]
+          },
+          "pt": {
+            "type": "directory",
+            "files": [
+              "agent-reference-guide.md",
+              "aios-nomenclature-specification.md",
+              "CHANGELOG.md",
+              "code-of-conduct.md",
+              "community.md",
+              "contributing.md",
+              "core-architecture.md",
+              "docker-mcp-setup.md",
+              "DOCUMENTATION-ROADMAP.md",
+              "ENVIRONMENT.md",
+              "FEATURE_PROCESS.md",
+              "getting-started.md",
+              "git-workflow-guide.md",
+              "GUIDING-PRINCIPLES.md",
+              "how-to-contribute-with-pull-requests.md",
+              "ide-integration.md",
+              "meta-agent-commands.md",
+              "migration-guide.md",
+              "npx-install.md",
+              "performance-tuning-guide.md",
+              "... and 7 more"
+            ],
+            "filesCount": 27,
+            "children": {
+              "agents": {
+                "type": "directory",
+                "files": [
+                  "archetype-rationale.md",
+                  "persona-definitions.md"
+                ]
+              },
+              "api": {
+                "type": "directory",
+                "purpose": "API routes/endpoints",
+                "files": [
+                  "squads-api.md"
+                ]
+              },
+              "architecture": {
+                "type": "directory",
+                "files": [
+                  "ADE-ARCHITECT-HANDOFF.md",
+                  "ade-architecture.md",
+                  "ADE-EPIC1-HANDOFF.md",
+                  "ADE-EPIC2-HANDOFF.md",
+                  "ADE-EPIC3-HANDOFF.md",
+                  "agent-config-audit.md",
+                  "agent-responsibility-matrix.md",
+                  "agent-tool-integration-guide.md",
+                  "ARCHITECTURE-INDEX.md",
+                  "ci-cd.md",
+                  "coding-standards.md",
+                  "contribution-workflow-research.md",
+                  "dashboard-architecture.md",
+                  "dashboard-realtime.md",
+                  "hcs-check-specifications.md",
+                  "hcs-execution-modes.md",
+                  "hcs-self-healing-spec.md",
+                  "high-level-architecture.md",
+                  "introduction.md",
+                  "mcp-api-keys-management.md",
+                  "... and 9 more"
+                ],
+                "filesCount": 29,
+                "children": {
+                  "adr": {
+                    "type": "directory",
+                    "truncated": true
+                  }
+                }
+              },
+              "community": {
+                "type": "directory",
+                "files": [
+                  "README-community-snippet-core.md",
+                  "README-community-snippet-mcp.md",
+                  "README-community-snippet-squads.md"
+                ]
+              },
+              "framework": {
+                "type": "directory",
+                "files": [
+                  "coding-standards.md",
+                  "README.md",
+                  "source-tree.md",
+                  "tech-stack.md"
+                ]
+              },
+              "guides": {
+                "type": "directory",
+                "files": [
+                  "ade-guide.md",
+                  "agent-selection-guide.md",
+                  "api-reference.md",
+                  "build-recovery-guide.md",
+                  "contextual-greeting-system-guide.md",
+                  "contributing-squads.md",
+                  "development-setup.md",
+                  "ide-sync-guide.md",
+                  "installation-troubleshooting.md",
+                  "llm-routing.md",
+                  "mcp-global-setup.md",
+                  "permission-modes.md",
+                  "project-status-feature.md",
+                  "quality-dashboard.md",
+                  "quality-gates.md",
+                  "README.md",
+                  "security-hardening.md",
+                  "service-discovery.md",
+                  "squad-migration.md",
+                  "squads-guide.md",
+                  "... and 5 more"
+                ],
+                "filesCount": 25,
+                "children": {
+                  "hybridOps": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "mcp": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "squad-examples": {
+                    "type": "directory",
+                    "truncated": true
+                  }
+                }
+              },
+              "installation": {
+                "type": "directory",
+                "files": [
+                  "faq.md",
+                  "linux.md",
+                  "macos.md",
+                  "README.md",
+                  "troubleshooting.md",
+                  "v2.1-quick-start.md",
+                  "windows.md"
+                ]
+              },
+              "platforms": {
+                "type": "directory",
+                "files": [
+                  "antigravity.md",
+                  "claude-code.md",
+                  "cline.md",
+                  "cursor.md",
+                  "gemini-cli.md",
+                  "github-copilot.md",
+                  "roo-code.md",
+                  "windsurf.md"
+                ]
+              },
+              "specifications": {
+                "type": "directory",
+                "files": [
+                  "docs-agent-technical-specification.md"
+                ]
+              }
+            }
+          },
+          "reports": {
+            "type": "directory",
+            "files": [
+              "devops-infrastructure-report.md"
+            ]
+          },
+          "security": {
+            "type": "directory",
+            "files": [
+              "MANIFEST_SIGNING.md",
+              "PR_SECURITY_CHECKLIST.md"
+            ]
+          },
+          "specifications": {
+            "type": "directory",
+            "files": [
+              "docs-agent-technical-specification.md"
+            ]
+          }
+        }
+      },
+      "packages": {
+        "type": "directory",
+        "children": {
+          "aios-install": {
+            "type": "directory",
+            "files": [
+              ".releaserc.json",
+              "CHANGELOG.md",
+              "jest.config.js",
+              "package.json",
+              "README.md"
+            ],
+            "children": {
+              "bin": {
+                "type": "directory",
+                "purpose": "CLI/executable scripts",
+                "files": [
+                  "aios-install.js",
+                  "edmcp.js"
+                ]
+              },
+              "src": {
+                "type": "directory",
+                "purpose": "Application source code",
+                "files": [
+                  "dep-checker.js",
+                  "installer.js",
+                  "os-detector.js"
+                ],
+                "children": {
+                  "edmcp": {
+                    "type": "directory",
+                    "truncated": true
+                  }
+                }
+              }
+            }
+          },
+          "gemini-aios-extension": {
+            "type": "directory",
+            "files": [
+              "extension.json",
+              "README.md"
+            ],
+            "children": {
+              "commands": {
+                "type": "directory",
+                "files": [
+                  "aios-agents.js",
+                  "aios-status.js",
+                  "aios-validate.js"
+                ]
+              },
+              "hooks": {
+                "type": "directory",
+                "purpose": "Custom React/Vue hooks",
+                "files": [
+                  "hooks.json"
+                ]
+              }
+            }
+          },
+          "installer": {
+            "type": "directory",
+            "files": [
+              "package.json"
+            ],
+            "children": {
+              "src": {
+                "type": "directory",
+                "purpose": "Application source code",
+                "children": {
+                  "config": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "detection": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "installer": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "merger": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "updater": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "utils": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "wizard": {
+                    "type": "directory",
+                    "truncated": true
+                  }
+                }
+              },
+              "tests": {
+                "type": "directory",
+                "purpose": "Test files",
+                "children": {
+                  "integration": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "unit": {
+                    "type": "directory",
+                    "truncated": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "scripts": {
+        "type": "directory",
+        "purpose": "Build/utility scripts",
+        "files": [
+          "check-markdown-links.py",
+          "dashboard-parallel-dev.sh",
+          "dashboard-parallel-phase3.sh",
+          "dashboard-parallel-phase4.sh",
+          "generate-install-manifest.js",
+          "install-monitor-hooks.sh",
+          "sign-manifest.ps1",
+          "sign-manifest.sh",
+          "validate-manifest.js"
+        ]
+      },
+      "squads": {
+        "type": "directory",
+        "files": [
+          ".gitkeep"
+        ],
+        "children": {
+          "mmos-squad": {
+            "type": "directory",
+            "files": [
+              "jest.config.js",
+              "package.json",
+              "README.md",
+              "requirements.txt",
+              "squad.yaml"
+            ],
+            "children": {
+              "adapters": {
+                "type": "directory",
+                "files": [
+                  "index.js",
+                  "mcp-adapter.js",
+                  "project-adapter.js",
+                  "source-adapter.js",
+                  "storage-adapter.js"
+                ]
+              },
+              "agents": {
+                "type": "directory",
+                "files": [
+                  "charlie-synthesis-expert.md",
+                  "cognitive-analyst.md",
+                  "data-importer.md",
+                  "debate.md",
+                  "emulator.md",
+                  "identity-analyst.md",
+                  "mind-mapper.md",
+                  "mind-pm.md",
+                  "research-specialist.md",
+                  "system-prompt-architect.md"
+                ]
+              },
+              "config": {
+                "type": "directory",
+                "purpose": "Configuration files",
+                "files": [
+                  "debate-frameworks.yaml"
+                ]
+              },
+              "data": {
+                "type": "directory",
+                "files": [
+                  ".gitkeep",
+                  "fidelity-benchmarks.yaml",
+                  "interaction-patterns.md",
+                  "mmos-kb.md",
+                  "README.md"
+                ]
+              },
+              "lib": {
+                "type": "directory",
+                "purpose": "Library/utility code",
+                "files": [
+                  "db_persister.py",
+                  "debate_engine.py",
+                  "gemini_analyzer.py",
+                  "map_mind.py",
+                  "metadata_manager.py",
+                  "run_debate_cli.py",
+                  "sources_importer.py",
+                  "workflow_detector.py",
+                  "workflow_orchestrator.py",
+                  "workflow_preprocessor.py"
+                ]
+              },
+              "minds": {
+                "type": "directory",
+                "files": [
+                  "MIGRATION_MANIFEST.yaml",
+                  "ROLLBACK.md"
+                ],
+                "children": {
+                  "adriano_de_marqui": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "alan_nicolas": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "alex_hormozi": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "andrej_karpathy": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "brad_frost": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "cagan_patton": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "daniel_kahneman": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "don_norman": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "elon_musk": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "eugene_schwartz": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "guillermo_rauch": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "jeff_patton": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "jesus_cristo": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "joao_lozano": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "jose_amorim": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "kapil_gupta": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "kent_beck": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "marty_cagan": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "mitchell_hashimoto": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "napoleon_hill": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "paul_graham": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "pedro_valerio": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "ray_kurzweil": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "sam_altman": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "seth_godin": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "steve_jobs": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "thiago_finch": {
+                    "type": "directory",
+                    "truncated": true
+                  }
+                }
+              },
+              "scripts": {
+                "type": "directory",
+                "purpose": "Build/utility scripts",
+                "files": [
+                  "emulator.py",
+                  "import_sources_cli.py",
+                  "python-wrapper.js"
+                ]
+              },
+              "tasks": {
+                "type": "directory",
+                "files": [
+                  "activate-clone.md",
+                  "auto-detect-workflow.md",
+                  "brownfield-update.md",
+                  "cognitive-analysis.md",
+                  "communication-templates-extraction.md",
+                  "contradictions-synthesis.md",
+                  "core-essence-extraction.md",
+                  "detect-workflow-mode.md",
+                  "execute-mmos-pipeline.md",
+                  "frameworks-identifier-analysis.md",
+                  "import-mind-sources.md",
+                  "index.md",
+                  "knowledge-base-chunking.md",
+                  "map-mind.md",
+                  "mind-story.md",
+                  "mind-validation.md",
+                  "preview-sources-import.md",
+                  "reexecute-mind.md",
+                  "reexecute-phase.md",
+                  "research-collection.md",
+                  "... and 7 more"
+                ],
+                "filesCount": 27
+              },
+              "tests": {
+                "type": "directory",
+                "purpose": "Test files",
+                "children": {
+                  "adapters": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "e2e": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "fixtures": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "integration": {
+                    "type": "directory",
+                    "truncated": true
+                  },
+                  "unit": {
+                    "type": "directory",
+                    "truncated": true
+                  }
+                }
+              }
+            }
+          },
+          "squad-creator": {
+            "type": "directory",
+            "files": [
+              "CHANGELOG.md",
+              "config.yaml",
+              "extract-sop.md",
+              "package.json",
+              "README.md",
+              "squad-creator.md"
+            ],
+            "children": {
+              "agents": {
+                "type": "directory",
+                "files": [
+                  "oalanicolas.md",
+                  "sop-extractor.md",
+                  "squad-architect.md"
+                ]
+              },
+              "checklists": {
+                "type": "directory",
+                "files": [
+                  ".gitkeep",
+                  "agent-depth-checklist.md",
+                  "agent-quality-gate.md",
+                  "deep-research-quality.md",
+                  "executor-matrix-checklist.md",
+                  "mind-validation.md",
+                  "quality-gate-checklist.md",
+                  "smoke-test-agent.md",
+                  "sop-validation.md",
+                  "squad-checklist.md",
+                  "task-anatomy-checklist.md"
+                ]
+              },
+              "config": {
+                "type": "directory",
+                "purpose": "Configuration files",
+                "files": [
+                  ".gitkeep",
+                  "squad-config.yaml"
+                ]
+              },
+              "data": {
+                "type": "directory",
+                "files": [
+                  ".gitkeep",
+                  "best-practices.md",
+                  "core-heuristics.md",
+                  "decision-heuristics-framework.md",
+                  "executor-matrix-framework.md",
+                  "quality-dimensions-framework.md",
+                  "squad-analytics-guide.md",
+                  "squad-kb.md",
+                  "squad-registry.yaml",
+                  "squad-type-definitions.yaml",
+                  "tier-system-framework.md"
+                ]
+              },
+              "docs": {
+                "type": "directory",
+                "purpose": "Documentation",
+                "files": [
+                  "RFC-001-deterministic-refactoring.md",
+                  "session-report-2026-02-01.md",
+                  "sop-extraction-process.md",
+                  "validation-report-2026-02-01.md"
+                ]
+              },
+              "scripts": {
+                "type": "directory",
+                "purpose": "Build/utility scripts",
+                "files": [
+                  "dependency_check.py",
+                  "generate-squad-greeting.js",
+                  "inventory.py",
+                  "naming_validator.py",
+                  "quality_gate.py",
+                  "refresh-registry.py",
+                  "scoring.py",
+                  "squad-analytics.py",
+                  "validate-all.sh",
+                  "validate-squad.sh",
+                  "yaml_validator.py"
+                ]
+              },
+              "tasks": {
+                "type": "directory",
+                "files": [
+                  "create-agent.md",
+                  "create-squad.md",
+                  "create-task.md",
+                  "create-template.md",
+                  "create-workflow.md",
+                  "deep-research-pre-agent.md",
+                  "extract-sop.md",
+                  "extract-thinking-dna.md",
+                  "extract-voice-dna.md",
+                  "install-commands.md",
+                  "qa-after-creation.md",
+                  "refresh-registry.md",
+                  "squad-analytics.md",
+                  "sync-ide-command.md",
+                  "update-mind.md",
+                  "validate-squad.md"
+                ]
+              },
+              "templates": {
+                "type": "directory",
+                "files": [
+                  ".gitkeep",
+                  "agent-tmpl.md",
+                  "config-tmpl.yaml",
+                  "pop-extractor-prompt.md",
+                  "quality-gate-tmpl.yaml",
+                  "readme-tmpl.md",
+                  "research-output-tmpl.md",
+                  "research-prompt-tmpl.md",
+                  "task-tmpl.md",
+                  "template-tmpl.yaml",
+                  "workflow-tmpl.yaml"
+                ]
+              },
+              "utils": {
+                "type": "directory",
+                "purpose": "Utility functions",
+                "files": [
+                  ".gitkeep"
+                ]
+              },
+              "workflows": {
+                "type": "directory",
+                "files": [
+                  ".gitkeep",
+                  "mind-research-loop.md",
+                  "research-then-create-agent.md",
+                  "validate-squad.yaml",
+                  "wf-clone-mind.yaml",
+                  "wf-create-squad.yaml"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "tests": {
+        "type": "directory",
+        "purpose": "Test files",
+        "files": [
+          "epic-verification.test.js",
+          "setup.js",
+          "story-update-hook.test.js"
+        ],
+        "children": {
+          "agents": {
+            "type": "directory",
+            "files": [
+              "backward-compatibility.test.js"
+            ]
+          },
+          "clickup": {
+            "type": "directory",
+            "files": [
+              "status-sync.test.js"
+            ]
+          },
+          "config": {
+            "type": "directory",
+            "purpose": "Configuration files",
+            "files": [
+              "config-cli.test.js",
+              "config-resolver.test.js",
+              "env-interpolator.test.js",
+              "merge-utils.test.js"
+            ],
+            "children": {
+              "fixtures": {
+                "type": "directory",
+                "files": [
+                  "app-config.yaml",
+                  "framework-config.yaml",
+                  "legacy-core-config.yaml",
+                  "local-config.yaml",
+                  "pro-config.yaml",
+                  "project-config.yaml"
+                ]
+              }
+            }
+          },
+          "core": {
+            "type": "directory",
+            "files": [
+              "agent-config-enrichment.test.js",
+              "agent-invoker.test.js",
+              "autonomous-build-loop.test.js",
+              "build-orchestrator.test.js",
+              "build-state-manager.test.js",
+              "cli-commands.test.js",
+              "context-aware-greetings.test.js",
+              "context-injector.test.js",
+              "dashboard-integration.test.js",
+              "elicitation-engine.test.js",
+              "epic-executors.test.js",
+              "execution-test-helpers.js",
+              "executor-assignment.test.js",
+              "gate-evaluator.test.js",
+              "greeting-preference-manager.test.js",
+              "master-orchestrator.test.js",
+              "parallel-monitor.test.js",
+              "permission-mode-integration.test.js",
+              "rate-limit-manager.test.js",
+              "recovery-handler.test.js",
+              "... and 11 more"
+            ],
+            "filesCount": 31,
+            "children": {
+              "config": {
+                "type": "directory",
+                "purpose": "Configuration files",
+                "files": [
+                  "config-resolver.test.js",
+                  "migrate-config.test.js"
+                ]
+              },
+              "events": {
+                "type": "directory",
+                "files": [
+                  "dashboard-emitter-bob.test.js"
+                ]
+              },
+              "execution": {
+                "type": "directory",
+                "files": [
+                  "parallel-executor.test.js"
+                ]
+              },
+              "orchestration": {
+                "type": "directory",
+                "files": [
+                  "bob-orchestrator.test.js",
+                  "bob-status-writer.test.js",
+                  "brownfield-handler.test.js",
+                  "data-lifecycle-manager.test.js",
+                  "epic-context-accumulator.test.js",
+                  "gemini-model-selector.test.js",
+                  "greenfield-handler.test.js",
+                  "lock-manager.test.js",
+                  "message-formatter.test.js",
+                  "session-state.test.js",
+                  "task-complexity-classifier.test.js",
+                  "terminal-spawner.test.js",
+                  "workflow-executor-callbacks.test.js"
+                ]
+              },
+              "ui": {
+                "type": "directory",
+                "files": [
+                  "observability-panel.test.js"
+                ]
+              }
+            }
+          },
+          "e2e": {
+            "type": "directory",
+            "purpose": "End-to-end tests",
+            "files": [
+              "story-creation-clickup.test.js"
+            ]
+          },
+          "fixtures": {
+            "type": "directory",
+            "files": [
+              "tool-invalid.yaml",
+              "tool-v1.0-simple.yaml",
+              "tool-v2.0-complex.yaml"
+            ]
+          },
+          "health-check": {
+            "type": "directory",
+            "files": [
+              "engine.test.js",
+              "healers.test.js",
+              "health-check.test.js",
+              "reporters.test.js"
+            ]
+          },
+          "hooks": {
+            "type": "directory",
+            "purpose": "Custom React/Vue hooks",
+            "children": {
+              "unified": {
+                "type": "directory",
+                "files": [
+                  "hook-interface.test.js"
+                ]
+              }
+            }
+          },
+          "ide-sync": {
+            "type": "directory",
+            "files": [
+              "agent-parser.test.js",
+              "transformers.test.js",
+              "validator.test.js"
+            ]
+          },
+          "infrastructure": {
+            "type": "directory",
+            "files": [
+              "plan-tracker.test.js",
+              "project-status-loader.test.js",
+              "worktree-manager.test.js"
+            ],
+            "children": {
+              "ai-providers": {
+                "type": "directory",
+                "files": [
+                  "ai-provider-factory.test.js"
+                ]
+              }
+            }
+          },
+          "installer": {
+            "type": "directory",
+            "files": [
+              "aios-core-installer.test.js",
+              "brownfield-upgrader.test.js",
+              "dependency-installer.test.js",
+              "file-hasher.test.js",
+              "generate-manifest.test.js",
+              "mcp-installation.test.js",
+              "post-install-validator.test.js",
+              "v21-path-validation.test.js",
+              "v21-structure.test.js"
+            ]
+          },
+          "integration": {
+            "type": "directory",
+            "files": [
+              "agent-activation-performance.test.js",
+              "contextual-greeting.test.js",
+              "decision-logging-yolo-workflow.test.js",
+              "formatter-integration.test.js",
+              "full-migration.test.js",
+              "greeting-preference-integration.test.js",
+              "greeting-system-integration.test.js",
+              "human-review-orchestration.test.js",
+              "install-transaction.test.js",
+              "mcp-setup.test.js",
+              "npx.test.js",
+              "performance.test.js",
+              "quality-gate-pipeline.test.js",
+              "search-smoke.test.js",
+              "test-utilities-part-1.js",
+              "test-utilities-part-2.js",
+              "test-utilities-part-3.js",
+              "wizard-ide-flow.test.js",
+              "wizard-validation-flow.test.js"
+            ],
+            "children": {
+              "llm-routing": {
+                "type": "directory",
+                "files": [
+                  "llm-routing.test.js"
+                ]
+              },
+              "squad": {
+                "type": "directory",
+                "files": [
+                  "squad-analyze-extend.test.js",
+                  "squad-designer-integration.test.js",
+                  "squad-download-publish.test.js",
+                  "squad-migration.test.js"
+                ]
+              },
+              "windows": {
+                "type": "directory",
+                "files": [
+                  "shell-compat.test.js",
+                  "windows-10.test.js",
+                  "windows-11.test.js"
+                ]
+              },
+              "workflow-intelligence": {
+                "type": "directory",
+                "files": [
+                  "pattern-learning.test.js",
+                  "wis-integration.test.js"
+                ]
+              }
+            }
+          },
+          "license": {
+            "type": "directory",
+            "files": [
+              "degradation.test.js",
+              "errors.test.js",
+              "feature-gate.test.js",
+              "integration.test.js",
+              "license-api.test.js",
+              "license-cache.test.js",
+              "license-crypto.test.js",
+              "performance.test.js",
+              "security.test.js"
+            ]
+          },
+          "macos": {
+            "type": "directory",
+            "files": [
+              "MANUAL-TESTING-GUIDE.md",
+              "README.md",
+              "run-all-tests.sh",
+              "test-apple-silicon-installation.sh",
+              "test-error-recovery.sh",
+              "test-homebrew-integration.sh",
+              "test-intel-installation.sh",
+              "test-line-endings.sh",
+              "test-path-handling.sh",
+              "test-performance.sh",
+              "test-permissions.sh",
+              "test-security.sh",
+              "test-shell-compatibility.sh"
+            ]
+          },
+          "packages": {
+            "type": "directory",
+            "children": {
+              "aios-install": {
+                "type": "directory",
+                "files": [
+                  "dep-checker.test.js",
+                  "edge-cases.test.js",
+                  "edmcp.test.js",
+                  "installer.test.js",
+                  "integration.test.js",
+                  "os-detector.test.js"
+                ]
+              }
+            }
+          },
+          "performance": {
+            "type": "directory",
+            "files": [
+              "decision-logging-benchmark.test.js",
+              "tools-system-benchmark.test.js"
+            ]
+          },
+          "pro": {
+            "type": "directory",
+            "files": [
+              "pro-detector.test.js"
+            ]
+          },
+          "regression": {
+            "type": "directory",
+            "files": [
+              "tools-migration.test.js"
+            ]
+          },
+          "security": {
+            "type": "directory",
+            "files": [
+              "core-security.test.js"
+            ]
+          },
+          "template-engine": {
+            "type": "directory",
+            "files": [
+              "prd-v2.test.js",
+              "template-engine.test.js"
+            ]
+          },
+          "templates": {
+            "type": "directory",
+            "files": [
+              "dbdr.test.js",
+              "pmdr.test.js"
+            ]
+          },
+          "tools": {
+            "type": "directory",
+            "files": [
+              "backward-compatibility.test.js",
+              "clickup-helpers.test.js",
+              "clickup-validators.test.js",
+              "google-workspace-helpers.test.js",
+              "google-workspace-validators.test.js",
+              "n8n-helpers.test.js",
+              "n8n-validators.test.js",
+              "schema-detection.test.js",
+              "supabase-helpers.test.js",
+              "supabase-validators.test.js",
+              "validation-performance.test.js",
+              "validators.test.js"
+            ]
+          },
+          "unit": {
+            "type": "directory",
+            "files": [
+              "cli.test.js",
+              "context-detector.test.js",
+              "decision-context.test.js",
+              "decision-log-generator.test.js",
+              "decision-log-indexer.test.js",
+              "decision-recorder.test.js",
+              "dev-context-loader.test.js",
+              "format-duration.test.js",
+              "generate-greeting.test.js",
+              "git-config-detector.test.js",
+              "greeting-builder.test.js",
+              "greeting-preference.test.js",
+              "info-cli.test.js",
+              "list-cli.test.js",
+              "migration-analyze.test.js",
+              "migration-backup.test.js",
+              "migration-execute.test.js",
+              "output-formatter.test.js",
+              "search-cli.test.js",
+              "security-utils.test.js",
+              "... and 4 more"
+            ],
+            "filesCount": 24,
+            "children": {
+              "config": {
+                "type": "directory",
+                "purpose": "Configuration files",
+                "files": [
+                  "ide-configs.test.js"
+                ]
+              },
+              "documentation-integrity": {
+                "type": "directory",
+                "files": [
+                  "brownfield-analyzer.test.js",
+                  "config-generator.test.js",
+                  "doc-generator.test.js",
+                  "gitignore-generator.test.js",
+                  "mode-detector.test.js"
+                ]
+              },
+              "manifest": {
+                "type": "directory",
+                "files": [
+                  "manifest-generator.test.js",
+                  "manifest-validator.test.js"
+                ]
+              },
+              "mcp": {
+                "type": "directory",
+                "files": [
+                  "global-config-manager.test.js",
+                  "symlink-manager.test.js"
+                ]
+              },
+              "quality": {
+                "type": "directory",
+                "files": [
+                  "metrics-collector.test.js",
+                  "metrics-hook.test.js",
+                  "seed-metrics.test.js"
+                ]
+              },
+              "quality-gates": {
+                "type": "directory",
+                "files": [
+                  "focus-area-recommender.test.js",
+                  "human-review-orchestrator.test.js",
+                  "layer1-precommit.test.js",
+                  "layer2-pr-automation.test.js",
+                  "notification-manager.test.js",
+                  "quality-gate-manager.test.js"
+                ]
+              },
+              "squad": {
+                "type": "directory",
+                "files": [
+                  "squad-analyzer.test.js",
+                  "squad-designer.test.js",
+                  "squad-downloader.test.js",
+                  "squad-extender.test.js",
+                  "squad-generator-blueprint.test.js",
+                  "squad-generator-integration.test.js",
+                  "squad-generator.test.js",
+                  "squad-loader.test.js",
+                  "squad-migrator.test.js",
+                  "squad-publisher.test.js",
+                  "squad-validator.test.js"
+                ],
+                "children": {
+                  "fixtures": {
+                    "type": "directory",
+                    "truncated": true
+                  }
+                }
+              },
+              "wizard": {
+                "type": "directory",
+                "files": [
+                  "ide-config-generator.test.js",
+                  "ide-selector.test.js"
+                ],
+                "children": {
+                  "validation": {
+                    "type": "directory",
+                    "truncated": true
+                  }
+                }
+              },
+              "workflow-intelligence": {
+                "type": "directory",
+                "files": [
+                  "pattern-capture.test.js",
+                  "pattern-store.test.js",
+                  "pattern-validator.test.js",
+                  "suggestion-engine.test.js"
+                ]
+              }
+            }
+          },
+          "updater": {
+            "type": "directory",
+            "files": [
+              "aios-updater.test.js"
+            ]
+          },
+          "wizard": {
+            "type": "directory",
+            "files": [
+              "feedback.test.js",
+              "index.test.js",
+              "integration.test.js",
+              "questions.test.js",
+              "validators.test.js"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "services": [
+    {
+      "name": "aios-install",
+      "type": "package",
+      "directory": "packages\\aios-install",
+      "entrypoint": null,
+      "dependencies": [
+        "@clack/prompts",
+        "chalk",
+        "commander",
+        "execa",
+        "fs-extra",
+        "js-yaml",
+        "ora",
+        "semver"
+      ]
+    },
+    {
+      "name": "gemini-aios-extension",
+      "type": "package",
+      "directory": "packages\\gemini-aios-extension",
+      "entrypoint": null,
+      "dependencies": []
+    },
+    {
+      "name": "installer",
+      "type": "package",
+      "directory": "packages\\installer",
+      "entrypoint": null,
+      "dependencies": [
+        "@clack/prompts",
+        "chalk",
+        "fs-extra"
+      ]
+    },
+    {
+      "name": "dashboard",
+      "type": "app",
+      "directory": "apps\\dashboard",
+      "entrypoint": null,
+      "dependencies": [
+        "@dnd-kit/core",
+        "@dnd-kit/sortable",
+        "@dnd-kit/utilities",
+        "@radix-ui/react-context-menu",
+        "@radix-ui/react-dialog",
+        "@radix-ui/react-slot",
+        "class-variance-authority",
+        "clsx",
+        "gray-matter",
+        "lucide-react",
+        "next",
+        "react",
+        "react-dom",
+        "swr",
+        "tailwind-merge",
+        "zustand"
+      ]
+    },
+    {
+      "name": "monitor-server",
+      "type": "app",
+      "directory": "apps\\monitor-server",
+      "entrypoint": null,
+      "dependencies": []
+    },
+    {
+      "name": "@synkra/aios-install",
+      "type": "workspace",
+      "directory": "packages\\aios-install",
+      "entrypoint": "src/installer.js",
+      "dependencies": [
+        "@clack/prompts",
+        "chalk",
+        "commander",
+        "execa",
+        "fs-extra",
+        "js-yaml",
+        "ora",
+        "semver"
+      ]
+    },
+    {
+      "name": "@aios/installer",
+      "type": "workspace",
+      "directory": "packages\\installer",
+      "entrypoint": "src/index.js",
+      "dependencies": [
+        "@clack/prompts",
+        "chalk",
+        "fs-extra"
+      ]
+    }
+  ],
+  "patterns": {
+    "stateManagement": "zustand",
+    "apiCalls": "swr",
+    "errorHandling": null,
+    "testing": "jest"
+  },
+  "conventions": {
+    "fileNaming": "kebabCase (418 files)",
+    "componentNaming": "mixed",
+    "imports": "relative paths",
+    "exports": "named exports preferred",
+    "indentation": null,
+    "quotes": null,
+    "linting": "Prettier",
+    "language": "TypeScript",
+    "typeChecking": "strict"
+  },
+  "dependencies": {
+    "runtime": [
+      "@clack/prompts",
+      "@kayvan/markdown-tree-parser",
+      "ansi-to-html",
+      "chalk",
+      "cli-progress",
+      "commander",
+      "execa",
+      "fs-extra",
+      "glob",
+      "handlebars",
+      "inquirer",
+      "js-yaml",
+      "ora",
+      "picocolors",
+      "semver",
+      "validator"
+    ],
+    "dev": [
+      "@semantic-release/changelog",
+      "@semantic-release/git",
+      "@types/jest",
+      "@typescript-eslint/eslint-plugin",
+      "@typescript-eslint/parser",
+      "ajv",
+      "ajv-formats",
+      "eslint",
+      "husky",
+      "jest",
+      "lint-staged",
+      "mocha",
+      "prettier",
+      "semantic-release",
+      "typescript",
+      "yaml-lint"
+    ],
+    "peer": [],
+    "optional": [],
+    "packageManager": "npm",
+    "monorepo": true,
+    "workspaces": [
+      "packages/*"
+    ],
+    "nodeVersion": ">=18.0.0"
+  },
+  "stats": {
+    "totalFiles": 939,
+    "codeFiles": 332,
+    "testFiles": 225,
+    "components": 3,
+    "configFiles": 14
+  },
+  "configFiles": [
+    {
+      "name": ".prettierrc",
+      "path": ".prettierrc"
+    },
+    {
+      "name": "package.json",
+      "path": "apps\\dashboard\\package.json"
+    },
+    {
+      "name": "tsconfig.json",
+      "path": "apps\\dashboard\\tsconfig.json"
+    },
+    {
+      "name": "vitest.config.ts",
+      "path": "apps\\dashboard\\vitest.config.ts"
+    },
+    {
+      "name": "package.json",
+      "path": "apps\\monitor-server\\package.json"
+    },
+    {
+      "name": "jest.config.js",
+      "path": "jest.config.js"
+    },
+    {
+      "name": "package.json",
+      "path": "package.json"
+    },
+    {
+      "name": "jest.config.js",
+      "path": "packages\\aios-install\\jest.config.js"
+    },
+    {
+      "name": "package.json",
+      "path": "packages\\aios-install\\package.json"
+    },
+    {
+      "name": "package.json",
+      "path": "packages\\installer\\package.json"
+    },
+    {
+      "name": "jest.config.js",
+      "path": "squads\\mmos-squad\\jest.config.js"
+    },
+    {
+      "name": "package.json",
+      "path": "squads\\mmos-squad\\package.json"
+    },
+    {
+      "name": "package.json",
+      "path": "squads\\squad-creator\\package.json"
+    },
+    {
+      "name": "tsconfig.json",
+      "path": "tsconfig.json"
+    }
+  ]
+}

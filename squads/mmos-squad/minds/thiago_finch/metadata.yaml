@@ -8,9 +8,11 @@ mind:
   completed_at: "2025-10-25T16:00:00"
   source_type: "public"
   pipeline_status: "completed"
-  pipeline_version: "3.5"
-  fidelity_score: 8.7
+  pipeline_version: "3.6"
+  fidelity_score: 9.0
   production_ready: true
+  last_enriched: "2026-02-23"
+  enrichment_source: "squad-creator agent DNA (thiago_finch.md) — refined Voice DNA, Thinking DNA, Values Hierarchy, Gold Layer contradictions"
 
 workflow:
   type: "greenfield"

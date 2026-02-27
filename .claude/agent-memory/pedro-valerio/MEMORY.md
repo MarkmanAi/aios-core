@@ -1,9 +1,9 @@
 # @pedro-valerio Memory - Process Absolutist
 
 ## Quick Stats
-- Workflows auditados: 0
+- Workflows auditados: 1
 - Veto conditions criadas: 0
-- Gaps identificados: 0
+- Gaps identificados: 3
 
 ---
 
@@ -14,6 +14,7 @@
 
 ## Workflows Auditados
 <!-- Formato: [DATA] workflow-name: PASS/FAIL (issues) -->
+- [2026-02-23] Neo Implementation (20 files + 1 edit): PASS WITH CONCERNS (compliance score inconsistency 27/45/47, 4 WARN files, neo-validate-new lacks veto_if_fail)
 
 ---
 
@@ -34,6 +35,9 @@
 
 ## Gaps de Processo Identificados
 <!-- Problemas encontrados em workflows -->
+- [2026-02-23] I-001: compliance_score 3 different values (27/45/47) across gaps.yaml and MEMORY.md - P3 violation
+- [2026-02-23] I-002: INFRA gaps still open after implementation - needs *health run
+- [2026-02-23] I-003: neo-validate-new has no veto_if_fail - executor could skip blocking
 
 ---
 

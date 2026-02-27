@@ -110,6 +110,35 @@ Use prefixo `*` para comandos:
 
 ---
 
+## Matrix Vision
+
+The AIOS is an **autonomous organization**, not just software. Every agent is an employee, every squad is a department, every workflow is a business process, every mind is an external consultant.
+
+**Full reference:** `.neo/CONSTITUICAO_MATRIX.md`
+
+**Organizational rules:**
+
+| Rule | Severity | Enforcement |
+|------|----------|-------------|
+| Every new agent, squad, mind, or workflow MUST be positioned in the organizational chart BEFORE creation | WARN | `@neo` validates; will evolve to BLOCK |
+| Separation of Concerns: who does ≠ who validates | BLOCK | Inviolable principle |
+| No Invention: zero fabricated information | BLOCK | Inviolable principle |
+
+**Key resources:**
+
+| Resource | Path |
+|----------|------|
+| Live org chart | `.neo/ORGANOGRAMA.md` |
+| Constitution | `.neo/CONSTITUICAO_MATRIX.md` |
+| Inventory | `.neo/data/inventory.yaml` |
+| Principles | `.neo/data/principles.md` |
+
+**Organizational architect:** `@neo` — activate before creating any new organizational component.
+
+> **Cross-reference:** Constitution Article II — Agent Authority (NON-NEGOTIABLE)
+
+---
+
 ## Story-Driven Development
 
 1. **Trabalhe a partir de stories** - Todo desenvolvimento começa com uma story em `docs/stories/`

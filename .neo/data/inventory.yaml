@@ -1,0 +1,262 @@
+# ============================================================
+# AIOS Organization Inventory
+# ============================================================
+# Maintained by:  Neo — The Matrix Architect
+# Location:       .neo/data/inventory.yaml
+# Update rule:    Neo MUST update this file after every
+#                 organizational change (hire, clone, create-dept)
+# Validated against: MarkmanAi/aios-core — 6,315 real files (REPO_PATH_MAP_v2 — 2026-02-22)
+# Last validated: 2026-02-21
+# ============================================================
+
+meta:
+  organization: MarkmanAi/aios-core
+  total_files: 6315          # find . -type f | wc -l (REPO_PATH_MAP_v2 — 2026-02-22)
+  constitution: .neo/CONSTITUICAO_MATRIX.md
+  organograma: .neo/ORGANOGRAMA.md
+  last_updated: "2026-02-21"
+  updated_by: neo
+
+# ------------------------------------------------------------
+# HEADCOUNT — Agents
+# ------------------------------------------------------------
+headcount:
+
+  agents_core: 12
+  # Path: .aios-core/development/agents/
+  # aios-master, analyst, architect, data-engineer, dev,
+  # devops, pm, po, qa, sm, squad-creator, ux-design-expert
+
+  agents_claude_code: 25
+  # Path: .claude/agents/
+  # aios-analyst, aios-architect, aios-data-engineer, aios-dev,
+  # aios-devops, aios-pm, aios-po, aios-qa, aios-sm, aios-ux,
+  # copy-chief, cyber-chief, data-chief, db-sage, design-chief,
+  # design-system, legal-chief, neo (bridge), oalanicolas, pedro-valerio,
+  # sop-extractor, squad, story-chief, tools-orchestrator,
+  # traffic-masters-chief
+
+  agents_mmos: 10
+  # Path: squads/mmos-squad/agents/
+  # charlie-synthesis-expert, cognitive-analyst, data-importer,
+  # debate, emulator, identity-analyst, mind-mapper, mind-pm,
+  # research-specialist, system-prompt-architect
+
+  agents_squad_creator: 4
+  # Path: squads/squad-creator/agents/
+  # oalanicolas, sop-extractor, squad-architect, thiago_finch
+
+  total_agents: 51
+  # NOTE: Neo is NOT counted here — he exists OUTSIDE the org hierarchy.
+  # However, his bridge file (.claude/agents/neo.md) IS counted in the
+  # claude_code agent tally above (slot 25).
+  # 12 core + 25 claude_code + 10 mmos + 4 squad_creator = 51
+  #
+  # AUDIT NOTE: The 3 squad_creator agents (oalanicolas,
+  # sop-extractor, squad-architect) overlap in function with
+  # the 2 homonym Claude Code agents (oalanicolas, sop-extractor).
+  # They live in different paths and serve different scopes.
+  # Total unique agents across all paths: 49.
+  # Previously documented as 46 (squad_creator agents not counted).
+  # This file reflects the real repo count: 49.
+  total_agents_note: "51 real agents across all paths (12+25+10+4). thiago_finch added to squad-creator 2026-02-23. neo.md bridge counted in claude_code tally. Legacy docs cited 46 — squad-creator agents were undercounted."
+
+  minds_cloned: 27
+  # Path: squads/mmos-squad/minds/ (directories only, excl. .yaml/.md files)
+  # adriano_de_marqui, alan_nicolas, alex_hormozi, andrej_karpathy,
+  # brad_frost, cagan_patton, daniel_kahneman, don_norman,
+  # elon_musk, eugene_schwartz, guillermo_rauch, jeff_patton,
+  # jesus_cristo, joao_lozano, jose_amorim, kapil_gupta,
+  # kent_beck, marty_cagan, mitchell_hashimoto, napoleon_hill,
+  # paul_graham, pedro_valerio, ray_kurzweil, sam_altman,
+  # seth_godin, steve_jobs, thiago_finch
+
+# ------------------------------------------------------------
+# PROCEDURES — Tasks (SOPs)
+# ------------------------------------------------------------
+procedures:
+
+  tasks_core: 195
+  # Path: .aios-core/development/tasks/
+  # 194 .md files + 1 .yaml file (health-check.yaml) = 195 total
+  # Note: blocks/ is a subdirectory — not counted as task
+  # Source: REPO_PATH_MAP_v2 (2026-02-22T01:44:45Z)
+
+  tasks_mmos: 27
+  # Path: squads/mmos-squad/tasks/
+
+  tasks_squad_creator: 16
+  # Path: squads/squad-creator/tasks/
+
+  tasks_neo: 7
+  # Path: .neo/tasks/ (to be created)
+  # neo-hire-agent, neo-hire-consultant, neo-create-dept,
+  # neo-audit, neo-validate-new, neo-health-check, neo-reorg
+
+  total_tasks: 245
+  # 195 core + 27 mmos + 16 squad_creator + 7 neo = 245
+  # NOTE: 238 = pre-Neo count (organizational tasks only).
+  #       245 = post-Neo count (238 + 7 Neo operational tasks).
+  #       Legacy docs cited 236 — off by 2 from pre-Neo count.
+
+# ------------------------------------------------------------
+# PROCESSES — Workflows & Governance
+# ------------------------------------------------------------
+processes:
+
+  workflows: 14
+  # Path: .aios-core/development/workflows/
+  # (14 .yaml files, README.md excluded)
+  # auto-worktree, brownfield-discovery, brownfield-fullstack,
+  # brownfield-service, brownfield-ui, design-system-build-quality,
+  # development-cycle, epic-orchestration, greenfield-fullstack,
+  # greenfield-service, greenfield-ui, qa-loop,
+  # spec-pipeline, story-development-cycle
+
+  hooks: 9
+  # Path: .claude/hooks/
+  # (9 functional files, README.md excluded)
+  # enforce-architecture-first.py, install-hooks.sh,
+  # mind-clone-governance.py, pre-commit-mmos-guard.sh,
+  # pre-commit-version-check.sh, read-protection.py,
+  # slug-validation.py, sql-governance.py, write-path-validation.py
+
+# ------------------------------------------------------------
+# INFRASTRUCTURE — Kernel & Runtime
+# ------------------------------------------------------------
+infrastructure:
+
+  kernel_module_dirs: 18
+  # Path: .aios-core/core/ (directories only)
+  # config, docs, elicitation, events, execution, health-check,
+  # ideation, manifest, mcp, memory, migration, orchestration,
+  # permissions, quality-gates, registry, session, ui, utils
+
+  orchestration_modules: 32
+  # Path: .aios-core/core/orchestration/
+
+  execution_modules: 11
+  # Path: .aios-core/core/execution/
+
+  quality_gate_modules: 10
+  # Path: .aios-core/core/quality-gates/
+
+  memory_modules: 5
+  # Path: .aios-core/core/memory/
+
+  adapters: 5
+  # Path: squads/mmos-squad/adapters/
+
+  skills: 8
+  # Path: .claude/skills/
+  # 3 skill-pack directories: architect-first/, mcp-builder/, skill-creator/
+  # 5 standalone .md files: clone-mind.md, course-generation-workflow.md,
+  #   enhance-workflow.md, ralph.md, squad.md
+
+  team_presets: 5
+  # Path: .aios-core/development/agent-teams/
+  # team-all, team-fullstack, team-ide-minimal, team-no-ui, team-qa-focused
+
+# ------------------------------------------------------------
+# DEPARTMENTS — Squads
+# ------------------------------------------------------------
+departments:
+
+  squads: 2
+  names:
+    - mmos-squad        # squads/mmos-squad/
+    - squad-creator     # squads/squad-creator/
+
+# ------------------------------------------------------------
+# NEO META — Neo's own footprint (not counted in org totals)
+# ------------------------------------------------------------
+neo_footprint:
+
+  tasks: 7              # .neo/tasks/
+  templates: 3          # .neo/templates/
+  data_files: 3         # .neo/data/ (this file + gaps.yaml + principles.md)
+  constitution: 1       # .neo/CONSTITUICAO_MATRIX.md
+  organograma: 1        # .neo/ORGANOGRAMA.md
+  memory: 1             # .neo/memory/MEMORY.md (single source — no mirror)
+  bridge: 1             # .claude/agents/neo.md
+  command: 1            # .claude/commands/neo/neo.md
+  public_doc: 1         # docs/architecture/matrix-vision.md
+  note: "Neo exists OUTSIDE the organizational hierarchy. His 7 operational tasks ARE included in total_tasks (as a separate tasks_neo category). His bridge file IS counted in claude_code agents. Neo himself is NOT counted in total_agents."
+
+# ------------------------------------------------------------
+# DISCREPANCIES vs LEGACY DOCUMENTATION
+# (Documented here for transparency — do not delete)
+# ------------------------------------------------------------
+discrepancies:
+
+  - field: total_agents
+    legacy_value: 46
+    real_value: 51
+    delta: +5
+    reason: "squad-creator agents (oalanicolas, sop-extractor, squad-architect, thiago_finch) were undercounted in legacy docs. neo.md bridge added 2026-02-23. Real count: 12+25+10+4=51."
+
+  - field: tasks_core
+    legacy_value: 193
+    real_value: 195
+    delta: +2
+    reason: "health-check.yaml (1 yaml) + 1 additional .md discovered in REPO_PATH_MAP_v2 scan (2026-02-22). Real count: 194 .md + 1 .yaml = 195."
+
+  - field: total_tasks
+    legacy_value: 236
+    real_value: 238
+    delta: +2
+    reason: "Cascades from tasks_core discrepancy. Before Neo tasks: 238, not 236. Source: REPO_PATH_MAP_v2."
+
+  - field: workflows
+    legacy_value: 14
+    real_value: 14
+    delta: 0
+    reason: "Confirmed correct. 15 files in dir, 1 README.md excluded = 14 workflows."
+
+  - field: hooks
+    legacy_value: 9
+    real_value: 9
+    delta: 0
+    reason: "Confirmed correct. 10 files in dir, 1 README.md excluded = 9 hooks."
+
+  - field: minds
+    legacy_value: 27
+    real_value: 27
+    delta: 0
+    reason: "Confirmed correct. 29 entries in dir, 2 non-dir files excluded (MIGRATION_MANIFEST.yaml, ROLLBACK.md)."
+
+  - field: total_files
+    legacy_value: 3730
+    real_value: 6315
+    delta: +2585
+    reason: "REPO_PATH_MAP_v2 (2026-02-22T01:44:45Z) scan returned 6315. The zip snapshot used initially was dated 2026-02-21 and reflected an older state. v2 is authoritative."
+
+  - field: kernel_module_dirs
+    legacy_value: 17
+    real_value: 18
+    delta: +1
+    reason: "Legacy counted 17. Real repo has 18 directories in .aios-core/core/ (docs/ and utils/ were missed or added since)."
+
+  - field: orchestration_modules
+    legacy_value: 30
+    real_value: 32
+    delta: +2
+    reason: "Real count from ls .aios-core/core/orchestration/ = 32."
+
+  - field: quality_gate_modules
+    legacy_value: 9
+    real_value: 10
+    delta: +1
+    reason: "Real count from ls .aios-core/core/quality-gates/ = 10."
+
+  - field: memory_modules
+    legacy_value: 4
+    real_value: 5
+    delta: +1
+    reason: "Real count from ls .aios-core/core/memory/ = 5."
+
+  - field: skills
+    legacy_value: 5
+    real_value: 8
+    delta: +3
+    reason: "Legacy counted 5. Real repo has 8 entries in .claude/skills/ (3 dirs + 5 .md files). Dirs: architect-first/, mcp-builder/, skill-creator/. New .md files: course-generation-workflow.md, enhance-workflow.md, ralph.md added since legacy count."

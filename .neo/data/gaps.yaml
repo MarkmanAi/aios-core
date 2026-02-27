@@ -1,0 +1,451 @@
+# ============================================================
+# AIOS Organization — Gap Registry
+# ============================================================
+# Maintained by:  Neo — The Matrix Architect
+# Location:       .neo/data/gaps.yaml
+# Update rule:    Updated by Neo on every *health and *audit run
+# Validated against: MarkmanAi/aios-core scan — 2026-02-21
+# ============================================================
+
+meta:
+  last_updated: "2026-02-21"
+  last_health_check: "2026-02-21"
+  validated_by: neo
+  note: "Pre-populated on Neo's creation date from direct repo scan. Not an empty template."
+
+# ------------------------------------------------------------
+# SCHEMA — Field definitions (reference)
+# ------------------------------------------------------------
+# id:                  Unique identifier. Format: GAP-{CATEGORY}-{NNN}
+#                      Categories: INFRA | DOC | ORG | MIND | PRINCIPLE
+# type:                Gap type (see type_enum below)
+# component:           Name of affected component
+# path:                Filesystem path of affected component
+# description:         What is wrong and why it matters
+# priority:            critical | high | medium | low
+# recommended_action:  Exact next action to resolve
+# identified_by:       Who/what found this gap
+# identified_on:       ISO date
+# resolved_on:         ISO date when resolved, or null
+# status:              open | in_progress | resolved | wont_fix
+
+# type_enum:
+#   meta_layer_missing:    A required .neo/ layer component doesn't exist
+#   doc_inconsistency:     Documentation number/claim doesn't match repo reality
+#   undocumented_agent:    Agent exists in repo but is absent from org documentation
+#   missing_component:     Required file/directory doesn't exist yet
+#   mind_incomplete:       Mind pipeline missing required stage output
+#   principle_at_risk:     Setup that could lead to principle violation
+#   squad_incomplete:      Squad missing required structure
+
+# compliance_score formula (calculated by Neo on *health):
+#   base: 100
+#   deductions: critical=-10 | high=-5 | medium=-2 | low=-1
+#   open_gaps_only: resolved gaps do not deduct
+#   floor: 0
+
+# ------------------------------------------------------------
+# GAPS — Infrastructure
+# ------------------------------------------------------------
+gaps:
+
+  # === INFRA: Neo Meta-Layer ===
+
+  - id: GAP-INFRA-001
+    type: meta_layer_missing
+    component: ".neo/ (entire meta-layer)"
+    path: ".neo/"
+    description: |
+      The .neo/ directory does not exist in the repository. This is the
+      control room of the Matrix Architect — without it, Neo has no
+      persistent memory, no constitution, no organograma, no SOPs.
+      The entire organizational governance layer is missing.
+    priority: critical
+    recommended_action: "Execute Neo implementation plan — 6 phases as defined in Blueprint v2"
+    blocks: ["GAP-INFRA-002", "GAP-INFRA-003", "GAP-INFRA-004"]
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: "2026-02-23"
+    status: resolved
+
+  - id: GAP-INFRA-002
+    type: missing_component
+    component: "Matrix Vision section in CLAUDE.md"
+    path: ".claude/CLAUDE.md"
+    description: |
+      CLAUDE.md has no Matrix Vision section. This means every Claude Code
+      session starts without the organizational context — agents don't know
+      the AIOS is an organization, not just software. The rule "position
+      before creating" is invisible to the system.
+    priority: high
+    recommended_action: "Add Matrix Vision section to CLAUDE.md (see FILE 10 in Ready Files)"
+    depends_on: GAP-INFRA-001
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: "2026-02-23"
+    status: resolved
+
+  - id: GAP-INFRA-003
+    type: missing_component
+    component: "matrix-vision.md"
+    path: "docs/architecture/matrix-vision.md"
+    description: |
+      Public architecture document for the organizational vision doesn't
+      exist. docs/architecture/ has 40+ documents but none describes the
+      AIOS as an organization.
+    priority: medium
+    recommended_action: "Create docs/architecture/matrix-vision.md (see FILE 9 in Ready Files)"
+    depends_on: GAP-INFRA-001
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: "2026-02-23"
+    status: resolved
+
+  - id: GAP-INFRA-004
+    type: missing_component
+    component: ".claude/commands/neo/"
+    path: ".claude/commands/neo/neo.md"
+    description: |
+      Neo's slash command doesn't exist. .claude/commands/ has command
+      directories for AIOS/, mmos-squad/, mmosMapper/, and Ralph/ — but
+      no neo/ entry. Users cannot invoke /neo as a slash command.
+    priority: high
+    recommended_action: "Create .claude/commands/neo/neo.md (see FILE 8 in Ready Files)"
+    depends_on: GAP-INFRA-001
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: "2026-02-23"
+    status: resolved
+
+  - id: GAP-INFRA-005
+    type: missing_component
+    component: ".claude/agent-memory/neo/"
+    path: ".claude/agent-memory/neo/"
+    description: |
+      Neo's agent-memory path doesn't exist. However, per Decision D1
+      (single memory source), Neo's memory lives ONLY at .neo/memory/MEMORY.md.
+      This gap is retained for documentation but may be reclassified as wont_fix
+      if the single-source pattern proves sufficient.
+    priority: low
+    recommended_action: "Monitor — if Claude Code cannot persist Neo memory from .neo/memory/, create mirror at .claude/agent-memory/neo/MEMORY.md"
+    depends_on: GAP-INFRA-001
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: null
+    status: open
+    note: "Downgraded from alta to baixa — Decision D1 established single memory source"
+
+  - id: GAP-INFRA-006
+    type: missing_component
+    component: "neo-position-check.py hook"
+    path: ".claude/hooks/neo-position-check.py"
+    description: |
+      No automated hook enforces the "position before create" rule.
+      Currently this is a WARN-level rule in CLAUDE.md Matrix Vision section.
+      A hook would make it a BLOCK-level enforcement.
+    priority: low
+    recommended_action: "Deferred to post-MVP. Create hook after Neo is operational and the positioning workflow is validated manually."
+    identified_by: neo
+    identified_on: "2026-02-23"
+    resolved_on: null
+    status: open
+    note: "Decision D4 — hook deferred to avoid premature automation"
+
+  # === NEW: Found in 2026-02-23 health check ===
+
+  - id: GAP-DOC-004
+    type: doc_inconsistency
+    component: "agents_claude_code count"
+    path: ".neo/data/inventory.yaml"
+    description: |
+      inventory.yaml records 24 Claude Code agents. Real repo now has 25
+      (.claude/agents/neo.md bridge was added). Total agents should be 50, not 49.
+    priority: medium
+    recommended_action: "Update inventory.yaml: agents_claude_code=25, total_agents=50."
+    delta: "+1 agent (neo.md bridge)"
+    identified_by: neo
+    identified_on: "2026-02-23"
+    resolved_on: "2026-02-23"
+    status: resolved
+
+  # === DOC: Documentation Inconsistencies ===
+
+  - id: GAP-DOC-001
+    type: doc_inconsistency
+    component: "total_agents headcount"
+    path: ".neo/data/inventory.yaml"
+    description: |
+      Legacy documentation cited 46 total agents. Real repo has 49.
+      The 3 missing agents are in squads/squad-creator/agents/:
+      oalanicolas, sop-extractor, squad-architect.
+    priority: high
+    recommended_action: "Org chart and any documentation referencing '46 agents' must be updated to 49."
+    delta: "+3 agents undercounted"
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: "2026-02-23"
+    status: resolved
+    note: "inventory.yaml and ORGANOGRAMA.md both corrected to 49 during Neo creation."
+
+  - id: GAP-DOC-002
+    type: doc_inconsistency
+    component: "skills count"
+    path: ".claude/skills/"
+    description: |
+      Legacy documentation cited 5 skills. Real repo has 8 entries.
+    priority: low
+    recommended_action: "Update any documentation citing '5 skills' to '8 skills'."
+    delta: "+3 skills undercounted"
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: null
+    status: open
+
+  - id: GAP-DOC-003
+    type: doc_inconsistency
+    component: "kernel_module_dirs count"
+    path: ".aios-core/core/"
+    description: |
+      Legacy documentation cited 17 kernel modules. Real repo has 18.
+      Also: orchestration 32 (not 30), quality-gates 10 (not 9), memory 5 (not 4).
+    priority: low
+    recommended_action: "Update kernel counts in all documentation to match real values."
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: null
+    status: open
+
+  # === ORG: Organizational ===
+
+  - id: GAP-ORG-001
+    type: undocumented_agent
+    component: "squad-architect"
+    path: "squads/squad-creator/agents/squad-architect.md"
+    description: |
+      squad-architect exists in repo but was absent from all legacy org charts.
+    priority: medium
+    recommended_action: "Add squad-architect to ORGANOGRAMA.md at Level 4B."
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: "2026-02-23"
+    status: resolved
+    note: "squad-architect already present in ORGANOGRAMA.md Level 4B — gap was already resolved, now formally closed."
+
+  # === MIND: Incomplete Mind Pipelines ===
+
+  - id: GAP-MIND-001
+    type: mind_incomplete
+    component: "brad_frost"
+    path: "squads/mmos-squad/minds/brad_frost/"
+    description: "Original gap description was OUTDATED. Real state: 4 artifacts + system-prompt.md (Generalista v1.0) marked Status: PRODUCTION, created 2025-11-13. All 8 DNA Mental layers integrated. Pipeline complete."
+    priority: high
+    pipeline_state: "PRODUCTION APPROVED ✅"
+    recommended_action: "Resolved. Optional: move system-prompt.md to system_prompts/ subfolder for structural consistency with other minds."
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: "2026-02-23"
+    status: resolved
+    note: "Gap was based on incorrect scan. system-prompt.md exists at mind root with Status: PRODUCTION."
+
+  - id: GAP-MIND-002
+    type: mind_incomplete
+    component: "joao_lozano"
+    path: "squads/mmos-squad/minds/joao_lozano/"
+    description: "Pipeline complete. All 8 artifacts created. system-prompt-generalista.md (757 lines). Self-evaluation validation score 9.0/10 (90%). All 8 modules preserved. APPROVED 2026-02-23. Gap 1 (L8 productive struggles) is medium severity enhancement, non-blocking."
+    priority: high
+    pipeline_state: "PRODUCTION APPROVED ✅"
+    recommended_action: "Resolved. Optional v1.1 enhancement: add Shadow Awareness section (Ciclo de Dispersao Atencional) to improve L8 paradox fidelity."
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: "2026-02-23"
+    status: resolved
+    note: "Validation report: 9.0/10. All 10 Atlas Neural techniques preserved. 8/8 modules present. Production approved."
+
+  - id: GAP-MIND-003
+    type: mind_incomplete
+    component: "thiago_finch"
+    path: "squads/mmos-squad/minds/thiago_finch/"
+    description: "Pipeline completo. 80 sources, 5 artifacts (dna-mental-layers-1-5, dna-mental-layers-6-8, frameworks-communication, identity-core, system-prompt-generalista), fidelity_score 9.0, production_ready: true. Last enriched 2026-02-23 via squad-creator agent DNA."
+    priority: high
+    pipeline_state: "PRODUCTION APPROVED ✅"
+    recommended_action: "Resolved. Optional: move system-prompt-generalista.md from artifacts/ to system_prompts/ for consistency."
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: "2026-02-23"
+    status: resolved
+    note: "metadata.yaml confirms pipeline_status: completed, production_ready: true, fidelity_score: 9.0. Enriched 2026-02-23."
+
+  - id: GAP-MIND-004
+    type: mind_incomplete
+    component: "marty_cagan"
+    path: "squads/mmos-squad/minds/marty_cagan/"
+    description: "Original flag OUTDATED. Pipeline was complete since 2025-10-30. Artifacts exist (values-analysis.yaml, obsessions-map.yaml, cognitive-spec.yaml, identity-core.yaml). 3 system prompts. 87% fidelity. PRODUCTION APPROVED. Only gap: KB incomplete (1/55 chunks — non-blocking)."
+    priority: high
+    pipeline_state: "PRODUCTION APPROVED — KB partial (optional expansion)"
+    recommended_action: "Resolved. Optional: expand KB from 1 to 55 chunks (baixa prioridade)."
+    principle_risk: null
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: "2026-02-23"
+    status: resolved
+    note: "Gap was based on incorrect repo scan at creation time. Mind Mapper confirmed pipeline complete on 2026-02-23."
+
+  - id: GAP-MIND-005
+    type: mind_incomplete
+    component: "kent_beck"
+    path: "squads/mmos-squad/minds/kent_beck/"
+    description: "Repaired 2026-02-24. Original ultra-condensed pipeline (MMOS v3.5) violated P3+P4. Full 5-phase repair completed: 5 primary sources (1.94MB), 10-file analysis (L1-L8), L6-L8 human checkpoint, fidelity test (93%), generalista v1.0 + dev-workflow v1.1 system prompts."
+    priority: high
+    pipeline_state: "PRODUCTION APPROVED ✅"
+    recommended_action: "Resolved. Optional: add talks/interviews as future sources when available."
+    principle_risk: null
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: "2026-02-24"
+    status: resolved
+    note: "Repair completed 2026-02-24. P3: 5 primary books (1.94MB). P4: L6-L8 checkpoint recorded. P7: layer-8-paradoxes.md + Vulnerability-is-safety paradox. Fidelity 93% (was 53%). PRODUCTION APPROVED."
+
+  - id: GAP-MIND-006
+    type: mind_incomplete
+    component: "mitchell_hashimoto"
+    path: "squads/mmos-squad/minds/mitchell_hashimoto/"
+    description: "Ultra-condensed pipeline (MMOS v3.5, 2025-01-14). Same pattern as kent_beck. Opção B approved 2026-02-23."
+    priority: high
+    pipeline_state: "ultra_condensed — repair in progress (Opção B)"
+    recommended_action: |
+      FASE 1: research-specialist — collect 3+ primary sources (HashiCorp blog, HashiConf talks, direct interviews)
+      FASE 2: cognitive-analyst — restructure into standard /analysis/ folder (10 files)
+      FASE 3: human checkpoint — L6-L8 validation
+      FASE 4: identity-analyst — blind fidelity test (4 scenarios)
+      FASE 5: system-prompt-architect — update system prompt from primary sources
+    principle_risk: "P3-mind-triangulation (secondary sources only) + P4-human-checkpoint (missing)"
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: null
+    status: in_progress
+    note: "Opção B (Repair) approved by human 2026-02-23. Delegated to mind-mapper."
+
+  - id: GAP-MIND-007
+    type: mind_incomplete
+    component: "cagan_patton"
+    path: "squads/mmos-squad/minds/cagan_patton/"
+    description: "Gap was based on incorrect scan. Pipeline complete since 2025-10-30. All 8 layers, 3 system prompts, 20 KB chunks. Fidelity 97.8% (EXCEEDS TARGET). L6-L8 checkpoint approved by human 2026-02-23."
+    priority: medium
+    pipeline_state: "PRODUCTION APPROVED ✅"
+    recommended_action: "Resolved. Optional v1.1: increase sources from 12 to 20+ (pragmatic count was sufficient but triangulation could be stronger)."
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: "2026-02-23"
+    status: resolved
+    note: "Gap was OUTDATED — same pattern as GAP-MIND-004 (marty_cagan). Pipeline was complete at creation time."
+
+  - id: GAP-MIND-008
+    type: mind_incomplete
+    component: "don_norman"
+    path: "squads/mmos-squad/minds/don_norman/"
+    description: "1 system_prompt, 1 source, 0 artifacts. Single source fails triangulation."
+    priority: medium
+    pipeline_state: "source_and_system_prompt — artifacts missing, insufficient sources"
+    recommended_action: "Collect 2+ additional sources. Then run full artifact pipeline."
+    principle_risk: "P3-mind-triangulation (1 source < required 3)"
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: null
+    status: open
+
+  - id: GAP-MIND-009
+    type: mind_incomplete
+    component: "guillermo_rauch"
+    path: "squads/mmos-squad/minds/guillermo_rauch/"
+    description: "1 system_prompt, 1 source, 0 artifacts. Same pattern as don_norman."
+    priority: medium
+    pipeline_state: "source_and_system_prompt — artifacts missing, insufficient sources"
+    recommended_action: "Collect 2+ additional sources. Then run artifact pipeline."
+    principle_risk: "P3-mind-triangulation (1 source < required 3)"
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: null
+    status: open
+
+  - id: GAP-MIND-010
+    type: mind_incomplete
+    component: "jeff_patton"
+    path: "squads/mmos-squad/minds/jeff_patton/"
+    description: "Pipeline complete. All 8 DNA layers done (94.25% fidelity). Synthesis complete. 2 system prompts (generalista + prd-decomposer). All 4 human checkpoints approved 2026-02-23. Score 4.8/5.0."
+    priority: medium
+    pipeline_state: "PRODUCTION APPROVED ✅"
+    recommended_action: "Resolved. Optional: add contradiction/ambiguity handling in v1.1 (minor gaps from fidelity test)."
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: "2026-02-23"
+    status: resolved
+    note: "Human checkpoints 3+4 approved 2026-02-23. metadata.yaml updated. All checklist items satisfied."
+
+  - id: GAP-MIND-011
+    type: mind_incomplete
+    component: "pedro_valerio (mind)"
+    path: "squads/mmos-squad/minds/pedro_valerio/"
+    description: "Pipeline complete. 26 KB chunks (196KB), 29 artifacts. Generalista v1.0 (94%) + specialist v1.0 (92%). Self-evaluation validation score 9.0/10 (90%). L2 (linguistic) and L6 (values) scored 10/10. All 5 paradoxes present. APPROVED 2026-02-23."
+    priority: medium
+    pipeline_state: "PRODUCTION APPROVED ✅"
+    recommended_action: "Resolved. Optional v1.1: add psychometric calibration section (DISC/MBTI) + daily structure (12-14h, 1 dia familia). Non-blocking."
+    principle_risk: null
+    identified_by: neo
+    identified_on: "2026-02-21"
+    resolved_on: "2026-02-23"
+    status: resolved
+    note: "Validation report: 9.0/10 (90%). L2 linguistic + L6 values = 10/10 each. All 5 Layer 8 paradoxes validated. Production approved."
+
+# ------------------------------------------------------------
+# SUMMARY — Updated by Neo on every *health run
+# ------------------------------------------------------------
+summary:
+  total_gaps: 22
+  open: 7
+  in_progress: 1
+  resolved: 14
+  wont_fix: 0
+  last_updated: "2026-02-24"
+
+  by_priority:
+    # OPEN gaps only (2026-02-24 after kent_beck resolved):
+    critical: 0    # all resolved
+    high: 1        # GAP-MIND-006 (mitchell_hashimoto — fabricated, P3+P7 risk)
+    medium: 2      # GAP-MIND-008,009 (don_norman, guillermo_rauch — source gaps)
+    low: 4         # GAP-INFRA-005,006 | GAP-DOC-002,003
+
+  by_type:
+    meta_layer_missing: 0   # resolved
+    missing_component: 2    # INFRA-005,006
+    doc_inconsistency: 2    # DOC-002,003
+    undocumented_agent: 0   # resolved
+    mind_incomplete: 4      # MIND-006 (high) + MIND-008,009 (medium) + MIND-005 resolved
+    principle_at_risk: 0
+    squad_incomplete: 0
+
+  resolved_this_check:
+    - GAP-INFRA-001  # .neo/ meta-layer deployed
+    - GAP-INFRA-002  # CLAUDE.md Matrix Vision added
+    - GAP-INFRA-003  # docs/architecture/matrix-vision.md created
+    - GAP-INFRA-004  # .claude/commands/neo/ created
+    - GAP-DOC-001    # Agent count corrected
+    - GAP-DOC-004    # inventory.yaml: agents_claude_code=25, total=50
+    - GAP-ORG-001    # squad-architect confirmed in ORGANOGRAMA.md Level 4B
+    - GAP-MIND-004   # marty_cagan — PRODUCTION APPROVED (pipeline complete since 2025-10-30)
+    - GAP-MIND-010   # jeff_patton — PRODUCTION APPROVED 2026-02-23 (94.25% fidelity)
+    - GAP-MIND-003   # thiago_finch — PRODUCTION APPROVED (fidelity 9.0, enriched 2026-02-23)
+    - GAP-MIND-001   # brad_frost — PRODUCTION (system-prompt Generalista v1.0 confirmed 2026-02-23)
+    - GAP-MIND-002   # joao_lozano — PRODUCTION APPROVED 2026-02-23 (9.0/10)
+    - GAP-MIND-011   # pedro_valerio — PRODUCTION APPROVED 2026-02-23 (9.0/10, L2+L6=10/10)
+    - GAP-MIND-007   # cagan_patton — PRODUCTION APPROVED 2026-02-23 (97.8% fidelity, L6-L8 human checkpoint approved)
+
+  # Formula: 100 - (critical*10) - (high*5) - (medium*2) - (low*1)
+  # Open: MIND-006 (high=1) + MIND-008,009 (medium=2) + INFRA-005,006,DOC-002,003 (low=4)
+  # = 100 - (1*5) - (2*2) - (4*1) = 100 - 5 - 4 - 4 = 87
+  compliance_score: 87
+  compliance_score_note: "87/100 — up from 82. kent_beck PRODUCTION APPROVED (93% fidelity, 5 primary sources, L6-L8 checkpoint 2026-02-24). 8 minds now production. Remaining high: mitchell_hashimoto (fabricated clone, P3+P7). Remaining medium: don_norman + guillermo_rauch (source collection needed)."
+
+  highest_roi_action: "Resolve mitchell_hashimoto (GAP-MIND-006) — fabricated system prompt violates P3+P7. Must restart from sources."
+  quick_wins:
+    - "GAP-MIND-008: don_norman — collect 2 more sources (has 1), then run pipeline"
+    - "GAP-MIND-009: guillermo_rauch — collect 2 more sources (has 1), then pipeline"

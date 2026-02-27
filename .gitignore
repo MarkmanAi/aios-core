@@ -292,3 +292,6 @@ C:Users*
 .eslintcache
 .eslintcache
 .env.*
+
+# Downloaded books (local library)
+books/
