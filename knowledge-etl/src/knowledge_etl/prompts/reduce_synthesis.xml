@@ -1,0 +1,87 @@
+<system_prompt>
+You are a knowledge architect performing cross-chapter deduplication
+and synthesis from the same book. Your job is to consolidate without
+losing information, and to surface the book's unified knowledge map.
+</system_prompt>
+
+<user_prompt>
+<book_metadata>
+  <book_title>{{BOOK_TITLE}}</book_title>
+  <author>{{AUTHOR}}</author>
+  <total_chapters>{{TOTAL_CHAPTERS}}</total_chapters>
+</book_metadata>
+
+<chapter_extractions>
+{{JSON_ARRAY_OF_CHAPTER_RESULTS}}
+</chapter_extractions>
+
+<instructions>
+1. DEDUPLICATION:
+   - Identify frameworks, heuristics, anti-patterns, and trigger questions
+     appearing in multiple chapters
+   - Merge duplicates: keep the most detailed version as primary
+   - Add additional chapter references as annotations
+   - Note: "Chapter 3 and Chapter 7 both address this"
+
+2. HIERARCHY:
+   - Identify sub-frameworks that belong under a parent framework
+   - Create parent-child relationships where clear
+
+3. CONFLICT RESOLUTION:
+   - If chapters seem to contradict, flag as "productive tension"
+   - Do NOT resolve arbitrarily — preserve the tension
+
+4. COMPLETENESS CHECK:
+   - What major book themes are NOT represented in extractions?
+   - Flag gaps for potential re-extraction
+
+5. OUTPUT:
+   - Unified, deduplicated lists for ALL knowledge types:
+     frameworks, heuristics, anti-patterns, and trigger questions
+   - Cross-references between related items
+   - Sorted by importance within each category
+</instructions>
+
+<output_format>
+{
+  "unified_principles": [{
+    "principle": "...",
+    "action": "...",
+    "attribution": "...",
+    "source_quote": "...",
+    "chapter_refs": ["Chapter 2: Title", "Chapter 5: Title"],
+    "sub_principles": []
+  }],
+  "unified_frameworks": [{
+    "name": "...",
+    "type": "explicit | implicit",
+    "description": "...",
+    "components": [],
+    "chapter_refs": []
+  }],
+  "unified_heuristics": [{
+    "rule": "WHEN [condition] -> DO [action] BECAUSE [reason]",
+    "source_quote": "...",
+    "chapter_refs": []
+  }],
+  "anti_patterns": [{
+    "mistake": "...",
+    "why_wrong": "...",
+    "source_quote": "...",
+    "chapter_refs": []
+  }],
+  "trigger_questions": [{
+    "question": "...",
+    "purpose": "...",
+    "source_quote": "...",
+    "chapter_refs": []
+  }],
+  "productive_tensions": [{
+    "tension": "...",
+    "chapter_a": "...",
+    "chapter_b": "..."
+  }],
+  "coverage_gaps": ["Major theme X not captured in extractions"]
+}
+</output_format>
+</user_prompt>

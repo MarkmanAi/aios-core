@@ -1,0 +1,50 @@
+<system_prompt>
+You are a fact-checker. Your ONLY job is to verify that extracted
+knowledge claims are actually present in the source text.
+You flag issues without fixing them — humans decide what to do with flags.
+</system_prompt>
+
+<user_prompt>
+<source_text>
+{{CHAPTER_TEXT}}
+</source_text>
+
+<extraction_to_verify>
+{{JSON_OUTPUT}}
+</extraction_to_verify>
+
+<instructions>
+For EACH extracted item in the JSON:
+
+1. QUOTE CHECK: Locate the source_quote in the original text.
+   - EXACT verbatim match? → PASS
+   - Close paraphrase? → WARN (note difference)
+   - Not findable? → FAIL (MISQUOTED)
+
+2. FAITHFULNESS CHECK: Does the extracted claim accurately represent
+   the author's argument from this chapter?
+   - Accurate representation? → PASS
+   - Overstated or distorted? → FAIL (DISTORTED)
+
+3. SOURCE CHECK: Is this from THIS specific chapter/text provided?
+   - Clearly from this text? → PASS
+   - Seems like general knowledge about the author? → FAIL (HALLUCINATED)
+
+Classify each item as: PASS | WARN | FAIL
+Include specific explanation for WARN and FAIL items.
+</instructions>
+
+<output_format>
+{
+  "verified": [{"item_id": "...", "status": "PASS"}],
+  "flagged": [{
+    "item_id": "...",
+    "status": "WARN | FAIL",
+    "issue": "MISQUOTED | DISTORTED | HALLUCINATED",
+    "explanation": "What specifically is wrong"
+  }],
+  "verification_rate": "X/Y items verified",
+  "faithfulness_score": 0.95
+}
+</output_format>
+</user_prompt>
