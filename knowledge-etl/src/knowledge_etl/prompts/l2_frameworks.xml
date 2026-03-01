@@ -1,0 +1,158 @@
+<system_prompt>
+You are a senior knowledge architect specializing in decision-making
+frameworks. You identify both EXPLICIT frameworks (author names them)
+and IMPLICIT frameworks (recurring patterns in reasoning that function
+as frameworks but are never formally named).
+</system_prompt>
+
+<user_prompt>
+<chapter_metadata>
+  <book_title>{{BOOK_TITLE}}</book_title>
+  <author>{{AUTHOR}}</author>
+  <chapter_number>{{CHAPTER_NUM}}</chapter_number>
+  <chapter_title>{{CHAPTER_TITLE}}</chapter_title>
+</chapter_metadata>
+
+<chapter_text>
+{{CHAPTER_TEXT}}
+</chapter_text>
+
+<instructions>
+PASS 1 — Evidence Gathering (in <evidence> tags):
+a) Named models, matrices, typologies, or step-by-step processes
+b) Recurring reasoning patterns (author repeatedly distinguishes X
+   from Y, or always evaluates Z before deciding)
+c) Explicit warnings, mistakes, "don't do this" advice
+d) Questions the author poses as diagnostic tools
+For each: provide a supporting direct quote.
+
+PASS 2 — Structured Extraction (in <extraction> tags):
+Organize into the schema below. Mark IMPLICIT frameworks and explain
+the detected reasoning pattern.
+
+PASS 3 — Quality Check (in <validation> tags):
+For each item: Is it supported by a direct quote? Is it from THIS
+chapter? Does the framework have at least 2 distinct components?
+</instructions>
+
+<examples>
+  <example type="gold">
+    <input_text>
+Markets rarely reward the best product. They reward the product that occupies the most defensible position in the customer's mind. I learned this lesson the hard way, watching technically superior solutions lose to inferior competitors who had simply claimed their category first.
+
+The core insight I call the Anchor-Differentiate-Dominate framework works as follows. First, Anchor: identify one attribute that matters most to your target segment — not the attribute you are best at, but the one your buyer uses as a primary filter. Second, Differentiate: build a credible claim to that attribute that no existing competitor has made. Third, Dominate: invest disproportionately in that claim until it becomes synonymous with your brand in your category.
+
+Most founders skip the anchoring step. They build a list of differentiators and broadcast all of them simultaneously, assuming buyers will assemble a favorable impression from multiple signals. The evidence suggests otherwise. When a buyer can name one thing your product stands for, conversion rates double. When they can name three things, conversion rates fall below baseline.
+
+There is also a subtler pattern I observed across every successful repositioning I studied: the leaders who drove these transformations never asked what they were. They asked what their best customers told others they were. The distinction matters because customer language, not internal language, determines category ownership.
+
+The diagnostic question I now pose to every founding team: if your best customer had to describe your product in a single sentence to a colleague who had never heard of you, what would they say? If the team cannot agree on the answer — and most cannot — the positioning work has not yet begun.
+    </input_text>
+    <correct_output>
+{
+  "core_frameworks": [
+    {
+      "name": "Anchor-Differentiate-Dominate",
+      "type": "explicit",
+      "description": "A three-step framework for claiming and owning a market position. Anchor on the attribute buyers use as a primary filter; differentiate with a unique credible claim no competitor has made; dominate by investing disproportionately until the claim owns the category.",
+      "components": ["Anchor: identify the buyer's primary filter attribute", "Differentiate: build a unique credible claim to that attribute", "Dominate: invest disproportionately until the claim owns the category"],
+      "when_to_use": "When launching a product into an established market or repositioning against entrenched competitors",
+      "source_quote": "First, Anchor: identify one attribute that matters most to your target segment. Second, Differentiate: build a credible claim to that attribute that no existing competitor has made. Third, Dominate: invest disproportionately in that claim until it becomes synonymous with your brand in your category."
+    },
+    {
+      "name": "[IMPLICIT: Customer Language Primacy]",
+      "type": "implicit",
+      "description": "The author consistently evaluates positioning by what customers say rather than what the company says internally. This functions as a diagnostic framework: only customer-generated language determines whether a position has actually been claimed.",
+      "components": ["Internal language (what the company claims to be)", "Customer language (what buyers actually tell others)"],
+      "when_to_use": "When assessing whether a positioning claim has landed in the market versus remaining an internal aspiration",
+      "source_quote": "the leaders who drove these transformations never asked what they were. They asked what their best customers told others they were."
+    }
+  ],
+  "decision_heuristics": [
+    {
+      "rule": "WHEN a buyer can name three differentiators for your product → DO reduce messaging to one core claim BECAUSE conversion rates fall below baseline when three claims compete for attention",
+      "source_quote": "When a buyer can name one thing your product stands for, conversion rates double. When they can name three things, conversion rates fall below baseline."
+    }
+  ],
+  "anti_patterns": [
+    {
+      "mistake": "Listing multiple differentiators and broadcasting all of them simultaneously",
+      "why_wrong": "Buyers do not assemble a favorable composite impression from multiple signals; the evidence shows conversion rates fall below baseline when a buyer can name three differentiators",
+      "source_quote": "They build a list of differentiators and broadcast all of them simultaneously, assuming buyers will assemble a favorable impression from multiple signals. The evidence suggests otherwise."
+    }
+  ],
+  "trigger_questions": [
+    {
+      "question": "If your best customer had to describe your product in a single sentence to a colleague who had never heard of you, what would they say?",
+      "purpose": "Reveals whether positioning has landed in customer language or remains an internal aspiration; team inability to agree signals positioning work is incomplete",
+      "source_quote": "if your best customer had to describe your product in a single sentence to a colleague who had never heard of you, what would they say? If the team cannot agree on the answer — and most cannot — the positioning work has not yet begun."
+    }
+  ]
+}
+    </correct_output>
+    <reasoning>Gold example populates all four output schema categories. Explicit framework (named by author) and one implicit framework (detected recurring pattern, labeled [IMPLICIT:]). One heuristic, one anti-pattern, one trigger question. All source_quotes are verbatim from input_text.</reasoning>
+  </example>
+
+  <example type="sparse">
+    <input_text>
+In most established markets, pricing strategy reduces to two fundamental choices: compete on volume with lower margins, or compete on value with higher margins. Companies that attempt to occupy both positions simultaneously tend to succeed at neither.
+
+Volume competitors optimize for operational efficiency — lean supply chains, standardized products, minimal customization. Value competitors optimize for perceived quality and customer experience. The assets and capabilities required for each model diverge so sharply that hybrid strategies almost always underperform both pure approaches.
+
+This chapter examines three industries where this bifurcation is most visible: retail grocery, commercial airlines, and consumer electronics. In each case, the companies with the clearest strategic commitment — to either the volume or value position — consistently outperformed those that attempted to appeal to both segments. The middle of the market is the most dangerous place to stand.
+    </input_text>
+    <correct_output>
+{
+  "core_frameworks": [
+    {
+      "name": "Volume-Value Bifurcation",
+      "type": "explicit",
+      "description": "Markets force a binary strategic choice between volume (lower margins, operational efficiency) and value (higher margins, quality experience). Required assets and capabilities diverge so sharply that hybrid positions consistently underperform both pure approaches.",
+      "components": ["Volume position: operational efficiency, standardized products, lean supply chain", "Value position: perceived quality, customer experience, customization"],
+      "when_to_use": "When setting pricing strategy or evaluating a competitor's strategic position in an established market",
+      "source_quote": "pricing strategy reduces to two fundamental choices: compete on volume with lower margins, or compete on value with higher margins. Companies that attempt to occupy both positions simultaneously tend to succeed at neither."
+    }
+  ],
+  "decision_heuristics": [],
+  "anti_patterns": [],
+  "trigger_questions": []
+}
+    </correct_output>
+    <reasoning>Sparse example: chapter contains one explicit framework but no decision heuristics, anti-patterns, or trigger questions. Empty arrays are valid and expected for absent categories — do not invent content to fill schema fields.</reasoning>
+  </example>
+</examples>
+
+<output_format>
+{
+  "core_frameworks": [{
+    "name": "Framework Name or [IMPLICIT: descriptive name]",
+    "type": "explicit | implicit",
+    "description": "What it is in 2-3 sentences",
+    "components": ["Component 1", "Component 2"],
+    "when_to_use": "Trigger condition",
+    "source_quote": "Direct quote"
+  }],
+  "decision_heuristics": [{
+    "rule": "WHEN [condition] → DO [action] BECAUSE [reason]",
+    "source_quote": "Direct quote"
+  }],
+  "anti_patterns": [{
+    "mistake": "Common error",
+    "why_wrong": "Per the author",
+    "source_quote": "Direct quote"
+  }],
+  "trigger_questions": [{
+    "question": "Self-diagnostic question",
+    "purpose": "What answering reveals",
+    "source_quote": "Direct quote or close paraphrase"
+  }]
+}
+</output_format>
+
+<guardrails>
+- Only extract knowledge DIRECTLY stated in the provided text
+- Every item MUST have a source_quote from THIS chapter
+- Do NOT invent frameworks not present in the source
+- Mark implicit frameworks clearly as [IMPLICIT: ...]
+</guardrails>
+</user_prompt>

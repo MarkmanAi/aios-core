@@ -1,0 +1,96 @@
+<system_prompt>
+You are a literary analyst specializing in productive contradictions —
+the tensions authors hold without resolving, which are often the most
+generative aspects of their thinking. This is the Gold Layer (Layer 8)
+of the MMOS mind-cloning pipeline.
+</system_prompt>
+
+<user_prompt>
+<chapter_metadata>
+  <book_title>{{BOOK_TITLE}}</book_title>
+  <author>{{AUTHOR}}</author>
+  <chapter_number>{{CHAPTER_NUM}}</chapter_number>
+  <chapter_title>{{CHAPTER_TITLE}}</chapter_title>
+</chapter_metadata>
+
+<full_book_text>
+{{FULL_BOOK_TEXT}}
+</full_book_text>
+
+<instructions>
+Run this pass on the FULL BOOK after all chapters are processed.
+This is NOT about errors or inconsistencies — it's about PRODUCTIVE
+TENSIONS the author holds deliberately.
+
+Step 1 — Contradiction Hunt (in <hunting> tags):
+Look for places where:
+- Author argues for X in one context, not-X in another
+- Author advocates simplicity but uses complex frameworks
+- Author promotes one value but demonstrates another
+- Author warns against X but their own method includes X
+
+Step 2 — Classify Each Tension (in <classification> tags):
+For each: Is it PRODUCTIVE (generative insight) or just inconsistent?
+Keep only productive ones.
+
+Step 3 — Output (in <output> tags):
+For each productive contradiction.
+</instructions>
+
+<examples>
+  <example type="gold">
+    <input_text>
+[Chapter 3] Most advice about creativity is wrong. Not slightly wrong — fundamentally, structurally wrong — because it focuses on the output when the problem lives entirely in the input. [...] Read widely, without agenda. Let the connections form on their own schedule, not yours. Cross-domain collision is not a technique. It is a posture.
+
+[Chapter 7] The amateur mistake is accumulating inputs without commitment. I have watched hundreds of aspiring creators cycle endlessly through inspiration — the writing retreat, the reading list, the new framework, the online course. They mistake motion for progress. The discipline of making requires, above all else, the discipline of finishing. Choose your domain. Dig deep. Mastery comes from sustained, focused attention on one thing at a time, not from restless wandering between them.
+
+[Chapter 11] Originality, when it comes, never announces itself. You do not decide to be original. You work, and work, and work — and occasionally the work surprises you. The surprise is proportional to how much you have forgotten about trying to be surprising. The creators who most reliably produce original work are those who have stopped caring about originality entirely, and started caring, obsessively, about craft.
+
+[Chapter 14] I am aware that this conflicts with what I wrote in Chapter 3. A reader pointed this out: you say read everything; you also say focus on one thing. Both. The tension is the point. Wide absorption builds the raw material; deep commitment transforms it. You cannot do them simultaneously. You alternate — sometimes for years — between phases of accumulation and phases of excavation. The mistake is treating either phase as the permanent answer.
+    </input_text>
+    <correct_output>
+{
+  "productive_contradictions": [{
+    "tension": "The author simultaneously advocates for wide, agenda-free cross-domain consumption and for deep, focused commitment to one domain at a time.",
+    "pole_a": {
+      "claim": "Creativity requires promiscuous, agenda-free consumption across unrelated domains — the raw material of cross-domain collision.",
+      "supporting_quote": "Read widely, without agenda. Let the connections form on their own schedule, not yours. Cross-domain collision is not a technique. It is a posture."
+    },
+    "pole_b": {
+      "claim": "Accumulating inputs without commitment is an amateur mistake; mastery and original output require sustained, focused attention on one domain at a time.",
+      "supporting_quote": "The discipline of making requires, above all else, the discipline of finishing. Choose your domain. Dig deep. Mastery comes from sustained, focused attention on one thing at a time, not from restless wandering between them."
+    },
+    "generative_insight": "Neither pole alone produces original work: wide absorption without depth creates restless dilettantism; deep focus without cross-domain input produces refined repetition. The productive model is sequential alternation between phases — wide accumulation, then deep excavation — a rhythm the author eventually names explicitly in Chapter 14.",
+    "authenticity_signal": "A voice that only advocated breadth would comfort perpetual learners who never ship; one that only advocated focus would ignore how breakthrough ideas actually form. The author is real precisely because they hold both in tension and acknowledge the conflict openly rather than smoothing it away."
+  }]
+}
+    </correct_output>
+    <reasoning>Both poles have verbatim supporting_quotes from input_text. The tension is productive (not mere inconsistency) — the author resolves it in Chapter 14 by naming the two as sequential phases rather than alternatives. generative_insight explains WHY holding both makes the thinking richer. authenticity_signal explains what this tension reveals about the author as a real thinker.</reasoning>
+  </example>
+</examples>
+
+<output_format>
+{
+  "productive_contradictions": [{
+    "tension": "Description of the paradox in one sentence",
+    "pole_a": {
+      "claim": "One side of the tension",
+      "supporting_quote": "Direct quote"
+    },
+    "pole_b": {
+      "claim": "The other side",
+      "supporting_quote": "Direct quote"
+    },
+    "generative_insight": "Why holding BOTH sides makes the thinking richer",
+    "authenticity_signal": "This is what makes the author REAL vs a caricature"
+  }]
+}
+</output_format>
+
+<guardrails>
+- Both poles MUST have verbatim quotes from the text
+- Do NOT flag genuine inconsistencies as productive tensions
+- The generative_insight must explain WHY the tension is productive
+- A clone without contradictions is a bot, not a mind
+</guardrails>
+</user_prompt>

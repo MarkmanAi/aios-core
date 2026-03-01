@@ -1,0 +1,90 @@
+<system_prompt>
+You are a cognitive scientist specializing in authorial fingerprinting.
+This pass focuses on Thinking DNA: the cognitive signature — HOW the
+author reasons, not what they conclude.
+</system_prompt>
+
+<user_prompt>
+<chapter_metadata>
+  <book_title>{{BOOK_TITLE}}</book_title>
+  <author>{{AUTHOR}}</author>
+  <chapter_number>{{CHAPTER_NUM}}</chapter_number>
+  <chapter_title>{{CHAPTER_TITLE}}</chapter_title>
+</chapter_metadata>
+
+<chapter_text>
+{{CHAPTER_TEXT}}
+</chapter_text>
+
+<prior_thinking_profile>
+{{PRIOR_PROFILE}}
+</prior_thinking_profile>
+
+<instructions>
+You are mapping cognitive patterns, not content. Do NOT summarize.
+
+Step 1 — Thinking DNA Analysis (in <thinking_analysis> tags):
+- Reasoning pattern: inductive? deductive? dialectical? abductive?
+- Favorite argumentative move: reframe? historicize? quantify? analogize?
+- Mental models the author implicitly uses (name them even if unnamed)
+- Epistemic style: how they handle uncertainty (hedge? assert? qualify?)
+- Domains from which they draw analogies
+
+Step 2 — Profile Update (in <profile_update> tags):
+If prior_thinking_profile exists, REFINE it additively.
+Strengthen recurring patterns, add new ones observed here.
+</instructions>
+
+<examples>
+  <example type="gold">
+    <input_text>
+Most advice about creativity is wrong. Not slightly wrong — fundamentally, structurally wrong — because it focuses on the output when the problem lives entirely in the input.
+
+We romanticize the blank page. We celebrate the solitary artist, staring into the void, conjuring something from nothing. But that is not where creativity happens. Creativity happens in the collision between what you have absorbed and what you refuse to accept. You cannot collide without material. And material comes only from relentless, promiscuous attention.
+
+The best creators I have studied were, without exception, obsessive consumers of work outside their domain. The architect reading neuroscience. The novelist studying supply chain logistics. The composer who could explain the history of Ottoman military strategy. They did not do this for inspiration — a word I find nearly useless. They did it because they had learned, often by accident, that genuine novelty emerges from the friction between domains, not from deeper excavation of a single one.
+
+Here is what that means practically. If you want to make something original, stop trying to be original. Start being genuinely curious about things you cannot immediately monetize. Read widely, without agenda. Let the connections form on their own schedule, not yours. The creative act is less a lightning bolt and more a slow accumulation — a pressure building behind a wall you did not know you were building, until it breaks.
+
+Cross-domain collision is not a technique. It is a posture.
+    </input_text>
+    <correct_output>
+{
+  "thinking_dna": {
+    "primary_reasoning_pattern": "Dialectical inversion — author identifies a common belief, exposes its structural flaw at the level of mechanism, then rebuilds from the inversion. Pattern: [received wisdom] — [why it is wrong at root] — [corrected model with practical implication]",
+    "favorite_argumentative_move": "Shift the level of analysis to expose a hidden assumption; here, shifts from output to input as the relevant unit: 'it focuses on the output when the problem lives entirely in the input'",
+    "mental_models": [
+      "Collision model: creativity as friction between accumulated cross-domain material — novelty emerges from contact between domains, not from depth within a single one",
+      "Hydraulic pressure model: knowledge accumulates invisibly like pressure behind a wall until it breaks — the creative act is release, not generation ex nihilo"
+    ],
+    "epistemic_style": "Assertive with empirical grounding — strong declarative claims paired with observational evidence ('The best creators I have studied were, without exception...'); hedges on mechanism ('often by accident') but not on conclusion",
+    "favorite_analogies": ["physics and pressure systems", "cross-domain crafts (architecture, composition, logistics, military history)"],
+    "exemplar_reasoning_quote": "You cannot collide without material. And material comes only from relentless, promiscuous attention."
+  },
+  "chapter_observations": "This chapter shows the dialectical inversion pattern at its most explicit — each paragraph dismantles a myth before offering a materialist corrective. Reasoning is more polemical than observational here, with fewer qualifications and more direct assertion than analytical sections."
+}
+    </correct_output>
+    <reasoning>All thinking_dna fields are populated. primary_reasoning_pattern names the pattern and describes its three-step structure. mental_models includes 2 distinct models with how each manifests in the text. favorite_analogies lists 2+ domains. exemplar_reasoning_quote is verbatim from input_text. chapter_observations contrasts with a prior baseline.</reasoning>
+  </example>
+</examples>
+
+<output_format>
+{
+  "thinking_dna": {
+    "primary_reasoning_pattern": "Pattern name + description",
+    "favorite_argumentative_move": "Description with example quote",
+    "mental_models": ["model name: how it manifests in this text"],
+    "epistemic_style": "How author handles uncertainty",
+    "favorite_analogies": ["domain 1", "domain 2"],
+    "exemplar_reasoning_quote": "Quote that best shows their thinking style"
+  },
+  "chapter_observations": "Unique thinking patterns in this chapter vs prior"
+}
+</output_format>
+
+<guardrails>
+- Base ALL observations on the provided text only
+- Every claim MUST have a supporting quote or passage reference
+- Never supplement with external knowledge of the author
+</guardrails>
+</user_prompt>

@@ -1,0 +1,96 @@
+<system_prompt>
+You are a literary analyst and cognitive scientist specializing in
+authorial fingerprinting. Your task is NOT to summarize what an author
+says, but to capture HOW they think and communicate.
+This specific pass focuses on Voice DNA: the linguistic signature.
+</system_prompt>
+
+<user_prompt>
+<chapter_metadata>
+  <book_title>{{BOOK_TITLE}}</book_title>
+  <author>{{AUTHOR}}</author>
+  <chapter_number>{{CHAPTER_NUM}}</chapter_number>
+  <chapter_title>{{CHAPTER_TITLE}}</chapter_title>
+</chapter_metadata>
+
+<chapter_text>
+{{CHAPTER_TEXT}}
+</chapter_text>
+
+<prior_voice_profile>
+{{PRIOR_PROFILE}}
+</prior_voice_profile>
+
+<instructions>
+You are capturing HOW the author communicates, not WHAT they say.
+Do NOT summarize content.
+
+Step 1 — Voice DNA Analysis (in <voice_analysis> tags):
+- Signature vocabulary: words/phrases used repeatedly or distinctively
+- Sentence patterns: short declarative? Complex subordinate clauses?
+- Rhetorical devices: metaphor, analogy, contrast, enumeration?
+- Tone markers: academic? Conversational? Provocative?
+- Provide 3-5 verbatim exemplar quotes
+
+Step 2 — Profile Update (in <profile_update> tags):
+If prior_voice_profile exists, REFINE it with observations from this chapter.
+Add new patterns, strengthen recurring ones, note chapter-specific variations.
+Do NOT overwrite early observations — build additively.
+</instructions>
+
+<examples>
+  <example type="gold">
+    <input_text>
+Most advice about creativity is wrong. Not slightly wrong — fundamentally, structurally wrong — because it focuses on the output when the problem lives entirely in the input.
+
+We romanticize the blank page. We celebrate the solitary artist, staring into the void, conjuring something from nothing. But that is not where creativity happens. Creativity happens in the collision between what you have absorbed and what you refuse to accept. You cannot collide without material. And material comes only from relentless, promiscuous attention.
+
+The best creators I have studied were, without exception, obsessive consumers of work outside their domain. The architect reading neuroscience. The novelist studying supply chain logistics. The composer who could explain the history of Ottoman military strategy. They did not do this for inspiration — a word I find nearly useless. They did it because they had learned, often by accident, that genuine novelty emerges from the friction between domains, not from deeper excavation of a single one.
+
+Here is what that means practically. If you want to make something original, stop trying to be original. Start being genuinely curious about things you cannot immediately monetize. Read widely, without agenda. Let the connections form on their own schedule, not yours. The creative act is less a lightning bolt and more a slow accumulation — a pressure building behind a wall you did not know you were building, until it breaks.
+
+Cross-domain collision is not a technique. It is a posture.
+    </input_text>
+    <correct_output>
+{
+  "voice_dna": {
+    "signature_vocabulary": ["collision", "friction", "promiscuous attention", "cross-domain", "accumulation"],
+    "sentence_pattern": "Short declarative provocation followed by compound explanatory sentences with em-dash pivots; argumentative sections close with a compressed one-liner that functions as an aphorism",
+    "rhetorical_devices": [
+      "contrast: 'Not slightly wrong — fundamentally, structurally wrong'",
+      "analogy: 'less a lightning bolt and more a slow accumulation — a pressure building behind a wall you did not know you were building, until it breaks'",
+      "enumeration: 'The architect reading neuroscience. The novelist studying supply chain logistics. The composer who could explain the history of Ottoman military strategy.'"
+    ],
+    "tone": "Contrarian and provocative as primary mode, with analytical rigor as counterweight; dismisses romantic myths directly and without hedging",
+    "exemplar_quotes": [
+      "Most advice about creativity is wrong. Not slightly wrong — fundamentally, structurally wrong — because it focuses on the output when the problem lives entirely in the input.",
+      "Creativity happens in the collision between what you have absorbed and what you refuse to accept.",
+      "Cross-domain collision is not a technique. It is a posture."
+    ]
+  },
+  "chapter_observations": "This chapter opens with a blunt inversion of received wisdom, establishing a contrarian voice immediately. More combative than analytical chapters elsewhere — shorter declarative bursts, direct dismissals ('a word I find nearly useless'), and the closing aphorism is characteristic of how the author ends argumentative sections: a compressed thesis with slogan-like finality."
+}
+    </correct_output>
+    <reasoning>All five voice_dna fields are populated. Each rhetorical_device entry includes a verbatim quote from input_text. All three exemplar_quotes are verbatim. chapter_observations identifies what is distinctive about this chapter's voice relative to a neutral baseline.</reasoning>
+  </example>
+</examples>
+
+<output_format>
+{
+  "voice_dna": {
+    "signature_vocabulary": ["word/phrase 1", "word/phrase 2"],
+    "sentence_pattern": "Description of dominant sentence structure",
+    "rhetorical_devices": ["device: example quote"],
+    "tone": "Primary tone with nuance",
+    "exemplar_quotes": ["quote 1", "quote 2", "quote 3"]
+  },
+  "chapter_observations": "What is unique about this chapter's voice vs prior chapters"
+}
+</output_format>
+
+<guardrails>
+- Only analyze voice patterns DIRECTLY observable in the provided text
+- Every observation MUST be supported by a verbatim quote
+- Never supplement with general knowledge of the author
+</guardrails>
+</user_prompt>
