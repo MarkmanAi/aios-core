@@ -63,12 +63,45 @@ def merge_l2(
     new_triggers = frameworks.get("trigger_questions", [])
 
     # Dedup frameworks against existing
-    existing_items = _parse_existing_items(existing_content)
-    if existing_items and new_frameworks:
+    existing_frameworks = _parse_existing_frameworks(existing_content)
+    if existing_frameworks and new_frameworks:
         new_frameworks = deduplicate(
             new_items=new_frameworks,
-            existing_items=existing_items,
+            existing_items=existing_frameworks,
             text_key="name",
+            llm=llm,
+            cost_tracker=cost_tracker,
+        )
+
+    # Dedup heuristics against existing
+    existing_heuristics = _parse_existing_heuristics(existing_content)
+    if existing_heuristics and new_heuristics:
+        new_heuristics = deduplicate(
+            new_items=new_heuristics,
+            existing_items=existing_heuristics,
+            text_key="rule",
+            llm=llm,
+            cost_tracker=cost_tracker,
+        )
+
+    # Dedup anti-patterns against existing
+    existing_anti_patterns = _parse_existing_anti_patterns(existing_content)
+    if existing_anti_patterns and new_anti_patterns:
+        new_anti_patterns = deduplicate(
+            new_items=new_anti_patterns,
+            existing_items=existing_anti_patterns,
+            text_key="mistake",
+            llm=llm,
+            cost_tracker=cost_tracker,
+        )
+
+    # Dedup triggers against existing
+    existing_triggers = _parse_existing_triggers(existing_content)
+    if existing_triggers and new_triggers:
+        new_triggers = deduplicate(
+            new_items=new_triggers,
+            existing_items=existing_triggers,
+            text_key="question",
             llm=llm,
             cost_tracker=cost_tracker,
         )
@@ -191,10 +224,48 @@ def _escape_xml(text: str) -> str:
     )
 
 
-def _parse_existing_items(content: str) -> list[dict]:
+def _unescape_xml(text: str) -> str:
+    """Unescape XML special characters."""
+    return (
+        text
+        .replace("&amp;", "&")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", '"')
+    )
+
+
+def _parse_existing_frameworks(content: str) -> list[dict]:
     """Parse existing framework names from XML content for dedup."""
     import re
     items: list[dict] = []
     for match in re.finditer(r'<framework name="([^"]+)"', content):
-        items.append({"name": match.group(1).replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")})
+        items.append({"name": _unescape_xml(match.group(1))})
+    return items
+
+
+def _parse_existing_heuristics(content: str) -> list[dict]:
+    """Parse existing heuristic rules from XML content for dedup."""
+    import re
+    items: list[dict] = []
+    for match in re.finditer(r"<heuristic>(.*?)</heuristic>", content, re.DOTALL):
+        items.append({"rule": _unescape_xml(match.group(1).strip())})
+    return items
+
+
+def _parse_existing_anti_patterns(content: str) -> list[dict]:
+    """Parse existing anti-pattern mistakes from XML content for dedup."""
+    import re
+    items: list[dict] = []
+    for match in re.finditer(r"<mistake>(.*?)</mistake>", content, re.DOTALL):
+        items.append({"mistake": _unescape_xml(match.group(1).strip())})
+    return items
+
+
+def _parse_existing_triggers(content: str) -> list[dict]:
+    """Parse existing trigger questions from XML content for dedup."""
+    import re
+    items: list[dict] = []
+    for match in re.finditer(r"<question>(.*?)</question>", content, re.DOTALL):
+        items.append({"question": _unescape_xml(match.group(1).strip())})
     return items

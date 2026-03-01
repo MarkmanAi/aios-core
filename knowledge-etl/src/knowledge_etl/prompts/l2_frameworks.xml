@@ -11,6 +11,7 @@ as frameworks but are never formally named).
   <author>{{AUTHOR}}</author>
   <chapter_number>{{CHAPTER_NUM}}</chapter_number>
   <chapter_title>{{CHAPTER_TITLE}}</chapter_title>
+  <chapter_pages>{{CHAPTER_PAGES}}</chapter_pages>
 </chapter_metadata>
 
 <chapter_text>

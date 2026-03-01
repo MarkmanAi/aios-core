@@ -165,6 +165,11 @@ def _extract_map_reduce(
         chapter_title = chapter_path.stem.replace("-", " ").title()
         chapter_num = chapter_path.stem.split("-")[0]
 
+        # Extract page range from chapter frontmatter (<!-- pages: X-Y -->)
+        import re as _re
+        pages_match = _re.search(r"<!--\s*pages:\s*(\d+-\d+|unknown)\s*-->", chapter_text)
+        chapter_pages = f"pp. {pages_match.group(1)}" if (pages_match and pages_match.group(1) != "unknown") else ""
+
         task_prompt = _fill_template(
             prompt_template,
             book_title=book_title,
@@ -172,6 +177,7 @@ def _extract_map_reduce(
             chapter_num=chapter_num,
             chapter_title=chapter_title,
             chapter_text=chapter_text,
+            chapter_pages=chapter_pages,
         )
 
         console.print(f"  [cyan]L1:[/cyan] {chapter_key}")
@@ -197,6 +203,7 @@ def _fill_template(
     chapter_num: str,
     chapter_title: str,
     chapter_text: str,
+    chapter_pages: str = "",
 ) -> str:
     return (
         template
@@ -205,6 +212,7 @@ def _fill_template(
         .replace("{{CHAPTER_NUM}}", chapter_num)
         .replace("{{CHAPTER_TITLE}}", chapter_title)
         .replace("{{CHAPTER_TEXT}}", chapter_text)
+        .replace("{{CHAPTER_PAGES}}", chapter_pages)
     )
 
 

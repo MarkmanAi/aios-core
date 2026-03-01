@@ -9,7 +9,9 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
+from typing import Any, Type
 
+from pydantic import BaseModel, ValidationError
 from rich.console import Console
 
 from knowledge_etl.config import (
@@ -23,6 +25,35 @@ from knowledge_etl.utils.cost import CostTracker
 from knowledge_etl.utils.llm import LLMClient
 
 console = Console()
+
+
+class VoiceDNA(BaseModel):
+    signature_vocabulary: list[str] = []
+    sentence_pattern: str = ""
+    rhetorical_devices: list[str] = []
+    tone: str = ""
+    exemplar_quotes: list[str] = []
+    chapter_observations: str = ""
+
+
+class ThinkingDNA(BaseModel):
+    primary_reasoning_pattern: str = ""
+    favorite_argumentative_move: str = ""
+    mental_models: list[str] = []
+    epistemic_style: str = ""
+    favorite_analogies: list[str] = []
+
+
+class Contradiction(BaseModel):
+    tension: str
+    pole_a: dict
+    pole_b: dict
+    generative_insight: str
+    authenticity_signal: str = ""
+
+
+class ContradictionsResult(BaseModel):
+    productive_contradictions: list[Contradiction] = []
 
 
 def extract_l3(
@@ -171,7 +202,7 @@ def _refine_voice(
         )
         cost_tracker.record("l3_voice", usage, chapter=chapter_key)
 
-        parsed = _parse_json(text)
+        parsed = _parse_json(text, VoiceDNA)
         if parsed:
             latest_voice = parsed
             prior_profile = json.dumps(parsed, ensure_ascii=False)
@@ -239,7 +270,7 @@ def _refine_thinking(
         )
         cost_tracker.record("l3_thinking", usage, chapter=chapter_key)
 
-        parsed = _parse_json(text)
+        parsed = _parse_json(text, ThinkingDNA)
         if parsed:
             latest_thinking = parsed
             prior_profile = json.dumps(parsed, ensure_ascii=False)
@@ -286,7 +317,7 @@ def _extract_contradictions(
     )
     cost_tracker.record("l3_contradictions", usage)
 
-    parsed = _parse_json(text)
+    parsed = _parse_json(text, ContradictionsResult)
     result = parsed if parsed else {"productive_contradictions": [], "raw": text}
 
     output_path = l3_dir / "contradictions.json"
@@ -324,12 +355,26 @@ def _get_system_prompt(template: str) -> str:
     return match.group(1).strip() if match else "You are an expert authorial analyst."
 
 
-def _parse_json(text: str) -> dict | None:
-    """Parse JSON from LLM response, handling markdown code blocks."""
+def _parse_json(text: str, pydantic_model: Type[BaseModel] | None = None) -> dict | None:
+    """Parse JSON from LLM response, handling markdown code blocks.
+
+    If pydantic_model is provided, validates the parsed data against the schema.
+    On ValidationError, falls back to raw parsed dict with a yellow warning.
+    """
     json_match = re.search(r"\{.*\}", text, re.DOTALL)
     if not json_match:
         return None
     try:
-        return json.loads(json_match.group())
+        data = json.loads(json_match.group())
     except json.JSONDecodeError:
         return None
+
+    if pydantic_model is None:
+        return data
+
+    try:
+        validated = pydantic_model.model_validate(data)
+        return validated.model_dump()
+    except ValidationError as ve:
+        console.print(f"[yellow]L3 schema warning ({pydantic_model.__name__}):[/yellow] {ve.error_count()} field(s) invalid — using raw")
+        return data

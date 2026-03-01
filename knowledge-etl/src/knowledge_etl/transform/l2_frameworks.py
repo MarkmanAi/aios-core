@@ -8,7 +8,9 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
+from typing import Literal
 
+from pydantic import BaseModel, ValidationError
 from rich.console import Console
 
 from knowledge_etl.config import (
@@ -22,6 +24,39 @@ from knowledge_etl.utils.cost import CostTracker
 from knowledge_etl.utils.llm import LLMClient
 
 console = Console()
+
+
+class Framework(BaseModel):
+    name: str
+    type: Literal["explicit", "implicit"]
+    description: str
+    components: list[str] = []
+    when_to_use: str = ""
+    source_quote: str
+
+
+class DecisionHeuristic(BaseModel):
+    rule: str
+    source_quote: str
+
+
+class AntiPattern(BaseModel):
+    mistake: str
+    why_wrong: str
+    source_quote: str
+
+
+class TriggerQuestion(BaseModel):
+    question: str
+    purpose: str
+    source_quote: str
+
+
+class L2Result(BaseModel):
+    core_frameworks: list[Framework] = []
+    decision_heuristics: list[DecisionHeuristic] = []
+    anti_patterns: list[AntiPattern] = []
+    trigger_questions: list[TriggerQuestion] = []
 
 
 def extract_l2(
@@ -76,6 +111,10 @@ def extract_l2(
         chapter_title = chapter_path.stem.replace("-", " ").title()
         chapter_num = chapter_path.stem.split("-")[0]
 
+        # Extract page range from chapter frontmatter (<!-- pages: X-Y -->)
+        pages_match = re.search(r"<!--\s*pages:\s*(\d+-\d+|unknown)\s*-->", chapter_text)
+        chapter_pages = f"pp. {pages_match.group(1)}" if (pages_match and pages_match.group(1) != "unknown") else ""
+
         task_prompt = _fill_template(
             prompt_template,
             book_title=book_title,
@@ -83,6 +122,7 @@ def extract_l2(
             chapter_num=chapter_num,
             chapter_title=chapter_title,
             chapter_text="[See cached book content]" if book_content else chapter_text,
+            chapter_pages=chapter_pages,
         )
 
         console.print(f"  [cyan]L2:[/cyan] {chapter_key}")
@@ -170,6 +210,7 @@ def _fill_template(
     chapter_num: str,
     chapter_title: str,
     chapter_text: str,
+    chapter_pages: str = "",
 ) -> str:
     return (
         template
@@ -178,6 +219,7 @@ def _fill_template(
         .replace("{{CHAPTER_NUM}}", chapter_num)
         .replace("{{CHAPTER_TITLE}}", chapter_title)
         .replace("{{CHAPTER_TEXT}}", chapter_text)
+        .replace("{{CHAPTER_PAGES}}", chapter_pages)
     )
 
 
@@ -193,8 +235,14 @@ def _parse_l2(text: str, output_path: Path) -> dict | None:
         return None
     try:
         data = json.loads(json_match.group())
-        output_path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
-        return data
+        try:
+            validated = L2Result.model_validate(data)
+            result = validated.model_dump()
+        except ValidationError as ve:
+            console.print(f"[yellow]L2 schema warning:[/yellow] {ve.error_count()} field(s) invalid — using raw")
+            result = data
+        output_path.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
+        return result
     except json.JSONDecodeError:
         output_path.write_text(json.dumps({"error": "parse_failed", "raw": text}), encoding="utf-8")
         return None

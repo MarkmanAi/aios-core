@@ -136,6 +136,22 @@ def _extract_metadata(book_path: Path, staging_dir: Path) -> dict:
     return metadata
 
 
+def _extract_page_range(chapter_lines: list[str]) -> tuple[int | None, int | None]:
+    """Extract first and last page numbers from Marker page markers.
+
+    Marker generates comments like: <!-- page:42 -->
+    Returns (min_page, max_page) or (None, None) if no markers found.
+    """
+    pages = []
+    for line in chapter_lines:
+        m = re.search(r"<!--\s*page:(\d+)\s*-->", line)
+        if m:
+            pages.append(int(m.group(1)))
+    if not pages:
+        return None, None
+    return min(pages), max(pages)
+
+
 def _split_chapters(full_text_path: Path, chapters_dir: Path) -> list[Path]:
     """
     Split full_text.md into chapter files based on H1/H2 headers.
@@ -167,7 +183,24 @@ def _split_chapters(full_text_path: Path, chapters_dir: Path) -> list[Path]:
         slug = slugify(title)[:50]
         filename = f"{idx:02d}-{slug}.md"
         chapter_path = chapters_dir / filename
-        chapter_path.write_text("\n".join(chapter_lines), encoding="utf-8")
+
+        # Extract page range from Marker page markers
+        page_start, page_end = _extract_page_range(chapter_lines)
+        if page_start is not None:
+            page_range_str = f"{page_start}-{page_end}"
+            frontmatter = f"<!-- pages: {page_range_str} -->\n\n"
+        else:
+            page_range_str = "unknown"
+            frontmatter = "<!-- pages: unknown -->\n\n"
+
+        chapter_path.write_text(frontmatter + "\n".join(chapter_lines), encoding="utf-8")
         paths.append(chapter_path)
+
+        # Write per-chapter metadata yaml (Q1=2)
+        chapter_yaml_path = chapter_path.with_suffix(".yaml")
+        chapter_yaml_path.write_text(
+            yaml.dump({"page_range": page_range_str}, allow_unicode=True, default_flow_style=False),
+            encoding="utf-8",
+        )
 
     return paths
