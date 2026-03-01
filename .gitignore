@@ -295,3 +295,14 @@ C:Users*
 
 # Downloaded books (local library)
 books/
+
+# ============================================
+# PYTHON ARTIFACTS
+# ============================================
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+*.egg-info/
