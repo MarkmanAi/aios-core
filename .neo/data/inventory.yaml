@@ -104,14 +104,14 @@ procedures:
 # ------------------------------------------------------------
 processes:
 
-  workflows: 14
-  # Path: .aios-core/development/workflows/
-  # (14 .yaml files, README.md excluded)
+  workflows: 15
+  # Path: .aios-core/development/workflows/ (14 yaml) + knowledge-etl/ (1 cross-dept Python pipeline)
   # auto-worktree, brownfield-discovery, brownfield-fullstack,
   # brownfield-service, brownfield-ui, design-system-build-quality,
   # development-cycle, epic-orchestration, greenfield-fullstack,
   # greenfield-service, greenfield-ui, qa-loop,
-  # spec-pipeline, story-development-cycle
+  # spec-pipeline, story-development-cycle,
+  # book-to-intelligence (knowledge-etl/ — cross-dept: Neo KB + MMOS minds)
 
   hooks: 9
   # Path: .claude/hooks/

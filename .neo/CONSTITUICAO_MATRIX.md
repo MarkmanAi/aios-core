@@ -303,6 +303,11 @@ minds/{slug}/
 | **development-cycle** | Ciclo genérico de desenvolvimento |
 | **epic-orchestration** | Orquestração de épicos |
 
+### Workflows Cross-Departamentais
+| Workflow | Propósito |
+|----------|-----------|
+| **book-to-intelligence** | PDF/EPUB → 5 fases (Extract→Assess→Transform→Validate→Load). L1 princípios→`.neo/data/strategic-principles.md`, L2 frameworks→`.neo/kb/strategic/{domain}.md`, L3 DNA autoral→`squads/mmos-squad/minds/{slug}/sources/`. Python CLI (`knowledge-etl/`). Serve Neo + MMOS. Resolve gargalo de fontes para mind cloning. |
+
 **O fluxo sanguíneo universal:** Spec Pipeline → Greenfield/Brownfield → Auto-Worktree → Story Dev Cycle → QA Loop
 
 ## Os Sentidos — 5 Adapters
@@ -429,7 +434,7 @@ Antes de criar qualquer coisa nova na organização, Neo (ou quem estiver criand
 | **TOTAL AGENTES** | **51** |
 | Mentes clonadas | **27** |
 | Tasks (Core + MMOS + Squad-Creator + Neo) | **245** (195 + 27 + 16 + 7) |
-| Workflows | **14** |
+| Workflows | **15** ← +1 book-to-intelligence (2026-02-28) |
 | Hooks de governança | **9** |
 | Skills | **8** |
 | Team presets | **5** |

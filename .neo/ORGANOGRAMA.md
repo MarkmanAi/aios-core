@@ -1,5 +1,5 @@
 # Living Org Chart — AIOS Organization
-## Last updated: 2026-02-24
+## Last updated: 2026-03-01
 ## Maintained by: Neo — The Matrix Architect
 ## Source: REPO_PATH_MAP_v2 (2026-02-22) + CONSTITUICAO_MATRIX.md
 
@@ -222,6 +222,7 @@
 | **Special** | design-system-build-quality | `.aios-core/development/workflows/design-system-build-quality.yaml` |
 | **Special** | development-cycle | `.aios-core/development/workflows/development-cycle.yaml` |
 | **Special** | epic-orchestration | `.aios-core/development/workflows/epic-orchestration.yaml` |
+| **Cross-Dept** | book-to-intelligence | `knowledge-etl/` — L1→`.neo/data/strategic-principles.md`, L2→`.neo/kb/strategic/{domain}.md`, L3→`squads/mmos-squad/minds/{slug}/sources/books/{slug}/` (JSON + `chunks/*.md` RAG-ready) — **OPERATIONAL** [Story 8.2 — 2026-03-01] |
 
 ---
 
@@ -236,6 +237,6 @@
 | **Total Agents** | **51** |
 | Cloned Minds | 27 |
 | Departments | 2 |
-| Workflows | 14 |
+| Workflows | 15 (1 OPERATIONAL: book-to-intelligence) |
 
 *Source: `.neo/data/inventory.yaml` — cross-validated with REPO_PATH_MAP_v2*

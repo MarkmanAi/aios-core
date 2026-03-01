@@ -23,6 +23,10 @@ DELEGATIONS:  [YYYY-MM-DD] TASK: ___ | DELEGATED_TO: ___ | STATUS: pending|compl
 
 ## Decisions
 
+- [2026-02-28] DECISION: Position book-to-intelligence as Cross-Departmental workflow | REASON: Pipeline serves two departments simultaneously — Neo (L1 principles + L2 frameworks → .neo/kb/) and MMOS (L3 authorial DNA → minds/sources/). Single-department classification would misrepresent its role. | ORG IMPACT: Workflows 14→15. Resolves source gargalo for GAP-MIND-006, GAP-MIND-008, GAP-MIND-009. Accelerates mind cloning pipeline.
+
+
+
 - [2026-02-21] DECISION: Create Neo — The Matrix Architect | REASON: AIOS lacked meta-organizational governance. No agent existed outside the org to see it whole. 49 agents operating without positioning enforcement, constitution guardian, or organizational health tracking. | ORG IMPACT: New META layer (.neo/) created at root level — 4th layer alongside .aios-core/, .claude/, and squads/.
 
 - [2026-02-21] DECISION: Neo lives at .neo/ (root level), not inside any existing layer | REASON: .aios-core/ = infrastructure, .claude/ = integration, squads/ = departments. Neo is none of these — Neo is the architect who sees all three from outside. Placing him inside any layer would contradict his purpose. | ORG IMPACT: .neo/ established as the META layer. Precedent set: future meta-organizational tooling lives here.
@@ -91,6 +95,12 @@ DELEGATIONS:  [YYYY-MM-DD] TASK: ___ | DELEGATED_TO: ___ | STATUS: pending|compl
 ---
 
 ## Organizational Evolution
+
+- [2026-03-01] CHANGE: book-to-intelligence workflow status updated to OPERATIONAL | BEFORE: positioned (2026-02-28), technically uncommitted | AFTER: Python package committed (30 files, commit 983ee3c) — pipeline fully executable. Story 8.2: L3 now produces RAG-ready `chunks/*.md` with YAML frontmatter (P2) + prompt cache for STUFF strategy ~60% cost reduction (P4). QA approved (29/29 tests). @devops pushed to main. | ORG IMPACT: ORGANOGRAMA.md workflow entry updated to OPERATIONAL. First cross-departmental workflow to reach production status.
+
+- [2026-02-28] CHANGE: Workflows count updated | BEFORE: 14 | AFTER: 15 | REASON: book-to-intelligence pipeline (knowledge-etl/) formally positioned as Cross-Departmental workflow serving Neo (L1/L2) + MMOS (L3). All 7 principle checks passed.
+
+
 
 - [2026-02-21] CHANGE: AIOS layer architecture expanded | BEFORE: 3 layers (.aios-core/ infrastructure, .claude/ integration, squads/ departments) | AFTER: 4 layers (+ .neo/ meta-organizational) | REASON: No layer existed outside the organization to govern it.
 
