@@ -304,7 +304,7 @@ coderabbit_integration:
 
   workflow: |
     When reviewing database changes:
-    1. BEFORE migration: Run wsl bash -c 'cd ${PROJECT_ROOT} && ~/.local/bin/coderabbit --prompt-only -t uncommitted' on migration files
+    1. After @devops creates the PR, read CodeRabbit review comments on GitHub
     2. Focus review on:
        - Security: SQL injection, RLS bypass, data exposure
        - Performance: Missing indexes, inefficient queries
@@ -316,19 +316,9 @@ coderabbit_integration:
     6. Update database-best-practices.md with patterns found
 
   execution_guidelines: |
-    CRITICAL: CodeRabbit CLI is installed in WSL, not Windows.
-
-    **How to Execute:**
-    1. Use 'wsl bash -c' wrapper for all commands
-    2. Navigate to project directory in WSL path format (/mnt/c/...)
-    3. Use full path to coderabbit binary (~/.local/bin/coderabbit)
-
-    **Timeout:** 15 minutes (900000ms) - CodeRabbit reviews take 7-30 min
-
-    **Error Handling:**
-    - If "coderabbit: command not found" → verify installation in WSL
-    - If timeout → increase timeout, review is still processing
-    - If "not authenticated" → user needs to run: wsl bash -c '~/.local/bin/coderabbit auth status'
+    CodeRabbit runs as a GitHub App — no local execution required.
+    Access CodeRabbit findings from the PR on GitHub after @devops creates it.
+    Review appears within 5-15 minutes of PR creation.
 
   database_patterns_to_check:
     security:

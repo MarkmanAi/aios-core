@@ -232,41 +232,33 @@ dependencies:
 
   coderabbit_integration:
     enabled: true
-    installation_mode: wsl
-    wsl_config:
-      distribution: Ubuntu
-      installation_path: ~/.local/bin/coderabbit
-      working_directory: ${PROJECT_ROOT}
+    installation_mode: github_app
     usage:
-      - Pre-PR quality gate - run before creating pull requests
-      - Pre-push validation - verify code quality before push
-      - Security scanning - detect vulnerabilities before they reach main
-      - Compliance enforcement - ensure coding standards are met
+      - CodeRabbit automatically reviews PRs via GitHub App — no manual trigger needed
+      - Review appears as PR comments within 5-15 minutes of PR creation
+      - '@devops creates the PR; CodeRabbit review is fully automatic'
+      - 'If CRITICAL/HIGH found: @dev fixes, @devops pushes fix commit, CodeRabbit re-reviews'
     quality_gate_rules:
-      CRITICAL: Block PR creation, must fix immediately
-      HIGH: Warn user, recommend fix before merge
+      CRITICAL: Block merge — @dev must fix; push fix commit; CodeRabbit re-reviews automatically
+      HIGH: Warn in PR — recommend fix before merge
       MEDIUM: Document in PR description, create follow-up issue
       LOW: Optional improvements, note in comments
-    commands:
-      pre_push_uncommitted: "wsl bash -c 'cd ${PROJECT_ROOT} && ~/.local/bin/coderabbit --prompt-only -t uncommitted'"
-      pre_pr_against_main: "wsl bash -c 'cd ${PROJECT_ROOT} && ~/.local/bin/coderabbit --prompt-only --base main'"
-      pre_commit_committed: "wsl bash -c 'cd ${PROJECT_ROOT} && ~/.local/bin/coderabbit --prompt-only -t committed'"
     execution_guidelines: |
-      CRITICAL: CodeRabbit CLI is installed in WSL, not Windows.
+      CodeRabbit runs as a GitHub App — no local execution required.
 
-      **How to Execute:**
-      1. Use 'wsl bash -c' wrapper for all commands
-      2. Navigate to project directory in WSL path format (/mnt/c/...)
-      3. Use full path to coderabbit binary (~/.local/bin/coderabbit)
+      **@devops workflow:**
+      1. Push branch: git push -u origin {branch}
+      2. Create PR: gh pr create --title "..." --body "..."
+      3. CodeRabbit GitHub App automatically triggers on PR creation
+      4. Review comments appear on the PR within 5-15 minutes — no action needed
+      5. Share PR link with @qa for manual review after CodeRabbit completes
 
-      **Timeout:** 15 minutes (900000ms) - CodeRabbit reviews take 7-30 min
-
-      **Error Handling:**
-      - If "coderabbit: command not found" → verify wsl_config.installation_path
-      - If timeout → increase timeout, review is still processing
-      - If "not authenticated" → user needs to run: wsl bash -c '~/.local/bin/coderabbit auth status'
-    report_location: docs/qa/coderabbit-reports/
-    integration_point: 'Runs automatically in *pre-push and *create-pr workflows'
+      **If issues found after CodeRabbit review:**
+      - @dev fixes locally and commits
+      - @devops runs: git push (pushes fix commit to same branch)
+      - CodeRabbit automatically re-reviews the updated PR
+    report_location: GitHub PR review comments
+    integration_point: 'Auto-triggered on gh pr create in *create-pr workflow'
 
   pr_automation:
     description: 'Automated PR validation workflow (Story 3.3-3.4)'

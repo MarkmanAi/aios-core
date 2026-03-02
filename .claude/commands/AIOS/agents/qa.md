@@ -171,92 +171,66 @@ dependencies:
 
   coderabbit_integration:
     enabled: true
-    installation_mode: wsl
-    wsl_config:
-      distribution: Ubuntu
-      installation_path: ~/.local/bin/coderabbit
-      working_directory: ${PROJECT_ROOT}
+    installation_mode: github_app
     usage:
-      - Pre-review automated scanning before human QA analysis
-      - Security vulnerability detection (SQL injection, XSS, hardcoded secrets)
-      - Code quality validation (complexity, duplication, patterns)
-      - Performance anti-pattern detection
+      - Read CodeRabbit PR review comments before starting manual review
+      - CodeRabbit runs automatically on PR creation via GitHub App — no local CLI needed
+      - Incorporate CodeRabbit findings into gate decision
+      - CRITICAL/HIGH CodeRabbit issues directly affect gate status
 
-    # Self-Healing Configuration (Story 6.3.3)
+    # Self-Healing Configuration
     self_healing:
       enabled: true
       type: full
       max_iterations: 3
-      timeout_minutes: 30
-      trigger: review_start
+      trigger: pr_review
       severity_filter:
         - CRITICAL
         - HIGH
       behavior:
-        CRITICAL: auto_fix # Auto-fix (3 attempts max)
-        HIGH: auto_fix # Auto-fix (3 attempts max)
-        MEDIUM: document_as_debt # Create tech debt issue
-        LOW: ignore # Note in review, no action
+        CRITICAL: block_gate    # Gate = FAIL until resolved by @dev + re-review
+        HIGH: concerns_gate     # Gate = CONCERNS, recommend fix before merge
+        MEDIUM: document_as_debt
+        LOW: ignore
 
     severity_handling:
-      CRITICAL: Block story completion, must fix immediately
-      HIGH: Report in QA gate, recommend fix before merge
+      CRITICAL: 'Gate = FAIL — @dev must fix, @devops pushes fix, CodeRabbit re-reviews'
+      HIGH: 'Gate = CONCERNS — recommend fix before merge'
       MEDIUM: Document as technical debt, create follow-up issue
       LOW: Optional improvements, note in review
 
     workflow: |
-      Full Self-Healing Loop for QA Review:
+      QA CodeRabbit review workflow:
+      1. Confirm @devops has created the PR for this story
+      2. Navigate to the PR on GitHub
+      3. Read CodeRabbit review comments (appear within 5-15 min of PR creation)
+      4. Classify findings by severity
+      5. Incorporate into gate decision:
+         - CRITICAL → Gate = FAIL (must fix before merge)
+         - HIGH     → Gate = CONCERNS (recommend fix)
+         - MEDIUM   → Document as tech debt
+         - LOW      → Note in review, no action
 
-      iteration = 0
-      max_iterations = 3
+      If CRITICAL/HIGH issues found:
+        - Notify @dev to fix
+        - @devops pushes fix commit → CodeRabbit automatically re-reviews
+        - QA re-checks PR after fix push
 
-      WHILE iteration < max_iterations:
-        1. Run: wsl bash -c 'cd /mnt/c/.../@synkra/aios-core && ~/.local/bin/coderabbit --prompt-only -t committed --base main'
-        2. Parse output for all severity levels
-
-        critical_issues = filter(output, severity == "CRITICAL")
-        high_issues = filter(output, severity == "HIGH")
-        medium_issues = filter(output, severity == "MEDIUM")
-
-        IF critical_issues.length == 0 AND high_issues.length == 0:
-          - IF medium_issues.length > 0:
-              - Create tech debt issues for each MEDIUM
-          - Log: "✅ QA passed - no CRITICAL/HIGH issues"
-          - BREAK (ready to approve)
-
-        IF CRITICAL or HIGH issues found:
-          - Attempt auto-fix for each CRITICAL issue
-          - Attempt auto-fix for each HIGH issue
-          - iteration++
-          - CONTINUE loop
-
-      IF iteration == max_iterations AND (CRITICAL or HIGH issues remain):
-        - Log: "❌ Issues remain after 3 iterations"
-        - Generate detailed QA gate report
-        - Set gate decision: FAIL
-        - HALT and require human intervention
-
-    commands:
-      qa_pre_review_uncommitted: "wsl bash -c 'cd ${PROJECT_ROOT} && ~/.local/bin/coderabbit --prompt-only -t uncommitted'"
-      qa_story_review_committed: "wsl bash -c 'cd ${PROJECT_ROOT} && ~/.local/bin/coderabbit --prompt-only -t committed --base main'"
     execution_guidelines: |
-      CRITICAL: CodeRabbit CLI is installed in WSL, not Windows.
+      CodeRabbit runs as a GitHub App — no local execution required.
 
-      **How to Execute:**
-      1. Use 'wsl bash -c' wrapper for all commands
-      2. Navigate to project directory in WSL path format (/mnt/c/...)
-      3. Use full path to coderabbit binary (~/.local/bin/coderabbit)
+      **How to access CodeRabbit review:**
+      1. Confirm PR exists (activate @devops to create PR if not)
+      2. Open PR on GitHub: github.com/{owner}/{repo}/pulls
+      3. CodeRabbit review appears as a PR review within 5-15 min of creation
+      4. Look for the CodeRabbit bot review — it includes severity labels
 
-      **Timeout:** 30 minutes (1800000ms) - Full review may take longer
-
-      **Self-Healing:** Max 3 iterations for CRITICAL and HIGH issues
-
-      **Error Handling:**
-      - If "coderabbit: command not found" → verify wsl_config.installation_path
-      - If timeout → increase timeout, review is still processing
-      - If "not authenticated" → user needs to run: wsl bash -c '~/.local/bin/coderabbit auth status'
-    report_location: docs/qa/coderabbit-reports/
-    integration_point: 'Runs automatically in *review and *gate workflows'
+      **If PR not yet created:**
+      - Activate @devops: "*create-pr" to push branch and open PR
+      - Wait for CodeRabbit review to appear (5-15 min)
+      - Then proceed with manual QA review
+    report_location: GitHub PR review comments
+    integration_point: 'Read PR comments before *review and *gate workflows'
 
   git_restrictions:
     allowed_operations:
@@ -378,5 +352,3 @@ Type `*help` to see all commands.
 - **CodeRabbit** - Automated pre-review
 
 ---
----
-*AIOS Agent - Synced from .aios-core/development/agents/qa.md*

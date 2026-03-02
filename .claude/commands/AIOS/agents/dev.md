@@ -293,77 +293,60 @@ dependencies:
 
   coderabbit_integration:
     enabled: true
-    installation_mode: wsl
-    wsl_config:
-      distribution: Ubuntu
-      installation_path: ~/.local/bin/coderabbit
-      working_directory: ${PROJECT_ROOT}
+    installation_mode: github_app
     usage:
-      - Pre-commit quality check - run before marking story complete
-      - Catch issues early - find bugs, security issues, code smells during development
-      - Enforce standards - validate adherence to coding standards automatically
-      - Reduce rework - fix issues before QA review
+      - CodeRabbit reviews PRs automatically via GitHub App — no local CLI needed
+      - Review results appear as PR comments within 5-15 minutes of PR creation
+      - '@dev reads CodeRabbit findings from the PR after @devops creates it'
+      - Fix CRITICAL/HIGH issues → @devops pushes fix commit → CodeRabbit re-reviews automatically
 
-    # Self-Healing Configuration (Story 6.3.3)
+    # Self-Healing Configuration
     self_healing:
       enabled: true
       type: light
       max_iterations: 2
-      timeout_minutes: 15
-      trigger: story_completion
+      trigger: pr_review
       severity_filter:
         - CRITICAL
       behavior:
-        CRITICAL: auto_fix # Auto-fix immediately
-        HIGH: document_only # Document in story Dev Notes
-        MEDIUM: ignore # Skip
-        LOW: ignore # Skip
+        CRITICAL: fix_and_push  # Fix in new commit, @devops pushes, CodeRabbit re-reviews
+        HIGH: document_only     # Document in story Dev Notes
+        MEDIUM: ignore
+        LOW: ignore
 
     workflow: |
-      Before marking story "Ready for Review" - Self-Healing Loop:
+      CodeRabbit reviews automatically after @devops creates the PR.
+      @dev workflow when CodeRabbit findings arrive on the PR:
 
-      iteration = 0
-      max_iterations = 2
+      IF CRITICAL issues found:
+        - Fix the issue in a new commit
+        - Notify @devops to push the fix commit
+        - CodeRabbit automatically re-reviews the updated PR
+        - Repeat until no CRITICAL issues remain (max 2 fix cycles)
 
-      WHILE iteration < max_iterations:
-        1. Run: wsl bash -c 'cd /mnt/c/.../@synkra/aios-core && ~/.local/bin/coderabbit --prompt-only -t uncommitted'
-        2. Parse output for CRITICAL issues
+      IF HIGH issues found:
+        - Document in story Dev Notes
+        - Recommend fix before merge
 
-        IF no CRITICAL issues:
-          - Document any HIGH issues in story Dev Notes
-          - Log: "✅ CodeRabbit passed - no CRITICAL issues"
-          - BREAK (ready for review)
+      IF no CRITICAL/HIGH issues:
+        - Story remains Ready for Review
+        - @qa proceeds with manual review
 
-        IF CRITICAL issues found:
-          - Attempt auto-fix for each CRITICAL issue
-          - iteration++
-          - CONTINUE loop
-
-      IF iteration == max_iterations AND CRITICAL issues remain:
-        - Log: "❌ CRITICAL issues remain after 2 iterations"
-        - HALT and report to user
-        - DO NOT mark story complete
-
-    commands:
-      dev_pre_commit_uncommitted: "wsl bash -c 'cd ${PROJECT_ROOT} && ~/.local/bin/coderabbit --prompt-only -t uncommitted'"
     execution_guidelines: |
-      CRITICAL: CodeRabbit CLI is installed in WSL, not Windows.
+      CodeRabbit runs as a GitHub App — no local execution required.
 
-      **How to Execute:**
-      1. Use 'wsl bash -c' wrapper for all commands
-      2. Navigate to project directory in WSL path format (/mnt/c/...)
-      3. Use full path to coderabbit binary (~/.local/bin/coderabbit)
+      **How it works:**
+      1. @devops pushes branch and creates PR via gh pr create
+      2. CodeRabbit GitHub App detects the PR automatically
+      3. Review comments appear on the PR within 5-15 minutes
+      4. Read findings at: github.com/{owner}/{repo}/pulls
 
-      **Timeout:** 15 minutes (900000ms) - CodeRabbit reviews take 7-30 min
-
-      **Self-Healing:** Max 2 iterations for CRITICAL issues only
-
-      **Error Handling:**
-      - If "coderabbit: command not found" → verify wsl_config.installation_path
-      - If timeout → increase timeout, review is still processing
-      - If "not authenticated" → user needs to run: wsl bash -c '~/.local/bin/coderabbit auth status'
-    report_location: docs/qa/coderabbit-reports/
-    integration_point: 'Part of story completion workflow in develop-story.md'
+      **If CRITICAL issues found:**
+      1. Fix locally and commit
+      2. Activate @devops to push the fix commit
+      3. CodeRabbit automatically re-reviews the updated PR
+    report_location: GitHub PR review comments
+    integration_point: 'Triggered automatically by @devops PR creation'
 
   decision_logging:
     enabled: true
@@ -551,5 +534,3 @@ Type `*help` to see all commands, or `*explain` to learn more.
 - **@github-devops (Gage)** - Pushes my commits
 
 ---
----
-*AIOS Agent - Synced from .aios-core/development/agents/dev.md*

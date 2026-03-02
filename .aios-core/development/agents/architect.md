@@ -319,34 +319,22 @@ dependencies:
         focus: Style consistency, minor optimizations
 
     workflow: |
-      When reviewing architectural changes:
-      1. Run: wsl bash -c 'cd ${PROJECT_ROOT} && ~/.local/bin/coderabbit --prompt-only -t uncommitted' (for ongoing work)
-      2. Or: wsl bash -c 'cd ${PROJECT_ROOT} && ~/.local/bin/coderabbit --prompt-only --base main' (for feature branches)
-      3. Focus on issues that impact:
+      When reviewing architectural changes, read CodeRabbit PR findings after @devops creates the PR.
+      Focus on issues that impact:
          - System scalability
          - Security posture
          - Cross-stack consistency
          - Developer experience
          - Performance characteristics
-      4. Prioritize CRITICAL and HIGH issues
-      5. Provide architectural context for each issue
-      6. Recommend patterns from technical-preferences.md
-      7. Document decisions in architecture docs
+      Prioritize CRITICAL and HIGH issues.
+      Provide architectural context for each issue.
+      Recommend patterns from technical-preferences.md.
+      Document decisions in architecture docs.
 
     execution_guidelines: |
-      CRITICAL: CodeRabbit CLI is installed in WSL, not Windows.
-
-      **How to Execute:**
-      1. Use 'wsl bash -c' wrapper for all commands
-      2. Navigate to project directory in WSL path format (/mnt/c/...)
-      3. Use full path to coderabbit binary (~/.local/bin/coderabbit)
-
-      **Timeout:** 15 minutes (900000ms) - CodeRabbit reviews take 7-30 min
-
-      **Error Handling:**
-      - If "coderabbit: command not found" → verify installation in WSL
-      - If timeout → increase timeout, review is still processing
-      - If "not authenticated" → user needs to run: wsl bash -c '~/.local/bin/coderabbit auth status'
+      CodeRabbit runs as a GitHub App — no local execution required.
+      Access CodeRabbit findings from the PR on GitHub after @devops creates it.
+      Review appears within 5-15 minutes of PR creation.
 
     architectural_patterns_to_check:
       - API consistency (REST conventions, error handling, pagination)

@@ -314,44 +314,35 @@ github:
     # - docs:, chore:, test:, etc. → No release
 
 # ============================================
-# SECTION 9: CodeRabbit Integration (Story 6.3.3)
+# SECTION 9: CodeRabbit Integration
 # MASTER TOGGLE: When enabled=false, ALL CodeRabbit behavior is disabled
+# Integration mode: GitHub App (auto-reviews PRs on creation, no local CLI)
 # ============================================
 coderabbit_integration:
-  enabled: true  # CodeRabbit CLI installed on this machine
-  installation_mode: wsl
-  wsl_config:
-    distribution: Ubuntu
-    installation_path: ~/.local/bin/coderabbit
-    working_directory: ${PROJECT_ROOT}
+  enabled: true
+  installation_mode: github_app  # Runs as GitHub App, not local CLI
 
   # Self-healing configuration
   self_healing:
     enabled: true
     type: full
     max_iterations: 3
-    timeout_minutes: 30
 
   # Severity handling by agent type
   severity_handling:
-    CRITICAL: auto_fix        # Block and auto-fix (must resolve)
-    HIGH: auto_fix            # Auto-fix (recommend fix)
+    CRITICAL: block_and_fix   # Gate = FAIL; @dev fixes, @devops pushes, re-reviews
+    HIGH: concerns             # Gate = CONCERNS; recommend fix before merge
     MEDIUM: document_as_debt  # Create tech debt issue
     LOW: ignore               # Note in review, no action
 
-  # Graceful degradation for machines without CodeRabbit
-  graceful_degradation:
-    skip_if_not_installed: true
-    fallback_message: "CodeRabbit CLI not found. Skipping automated review. Install via: pip install coderabbit-cli"
+  # How to access CodeRabbit results
+  access:
+    trigger: automatic        # Triggers on PR creation/update via GitHub App
+    location: GitHub PR review comments
+    timing: 5-15 minutes after PR creation
+    workflow: '@devops creates PR → CodeRabbit reviews → @qa reads PR comments'
 
-  # CLI commands (WSL wrapper for Windows)
-  commands:
-    qa_pre_review_uncommitted: |
-      wsl bash -c 'cd ${PROJECT_ROOT} && ~/.local/bin/coderabbit --prompt-only -t uncommitted'
-    qa_story_review_committed: |
-      wsl bash -c 'cd ${PROJECT_ROOT} && ~/.local/bin/coderabbit --prompt-only -t committed --base main'
-
-  report_location: docs/qa/coderabbit-reports/
+  report_location: GitHub PR review comments
 
 # ============================================
 # SECTION 10: Squads System (replaced Expansion Packs in OSR-8)
