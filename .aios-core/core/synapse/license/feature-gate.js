@@ -18,7 +18,7 @@ const FeatureGate = {
    * @param {string} featureId - Feature identifier (e.g. 'pro.memory.synapse')
    * @param {string} name - Human-readable feature name
    */
-  require: (featureId, name) => {
+  require: (_featureId, _name) => {
     // Epic 1: no-op. Epic 2 replaces this with real gate check.
     // Contract: void return, NEVER throws.
   },
@@ -29,7 +29,7 @@ const FeatureGate = {
    * @param {string} featureId - Feature identifier
    * @returns {boolean} true
    */
-  isEnabled: (featureId) => true,
+  isEnabled: (_featureId) => true,
 
   /**
    * Reset internal state. Test cleanup hook.
