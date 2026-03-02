@@ -1,0 +1,51 @@
+schema: 1
+story: "10.1"
+story_title: "SYNAPSE -- Blocker Resolution: Feature Gate Stub & Dependency Prep"
+gate: PASS
+status_reason: >
+  All 6 acceptance criteria satisfied. Directory structure matches PRD spec.
+  Feature-gate stub implements exact interface contract. 13/13 tests passing.
+  js-yaml confirmed in package.json. Test path deviation from AC-3 is justified
+  (pre-existing PRO license test at tests/license/feature-gate.test.js).
+  Re-review confirmed ESLint runs 0 errors, 0 warnings on Story 10.1 files — AC-6 fully cleared.
+reviewer: "Quinn (Test Architect)"
+updated: "2026-03-02T21:00:00Z"
+
+top_issues: []
+
+waiver:
+  active: false
+
+quality_score: 100
+expires: "2026-03-16T20:00:00Z"
+
+evidence:
+  tests_reviewed: 13
+  risks_identified: 1
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: "No-op stub exposes no attack surface. No secrets, no I/O, no external calls."
+  performance:
+    status: PASS
+    notes: "Stub functions are trivial no-ops. Zero performance concern."
+  reliability:
+    status: PASS
+    notes: "require() contract is void/never-throws, verified by tests. reset() is idempotent."
+  maintainability:
+    status: PASS
+    notes: >
+      Well-documented JSDoc, clear Epic 1 vs Epic 2 intent markers,
+      dual-export pattern explained in comments. Low complexity (46 LOC).
+
+recommendations:
+  immediate: []
+  future:
+    - action: "Consider adding index.js barrel export in .aios-core/core/synapse/ once more modules land (Story 10.5+)"
+      refs: [".aios-core/core/synapse/"]
+    - action: "Align story YAML frontmatter status: Draft with actual Ready for Review state"
+      refs: ["docs/stories/active/10.1.story.md"]
