@@ -23,6 +23,8 @@ DELEGATIONS:  [YYYY-MM-DD] TASK: ___ | DELEGATED_TO: ___ | STATUS: pending|compl
 
 ## Decisions
 
+- [2026-03-02] DECISION: Position SYNAPSE as 19th kernel module | REASON: Context injection gap is real and grows with org size. No existing module manages selective rule injection. P1✅ P2✅ P3✅ P4✅. Owner: @devops. Design validator: @architect. Scope B (data + engine + hook). Path: .aios-core/core/synapse/ | ORG IMPACT: kernel_module_dirs 18→19. ORGANOGRAMA updated. Pending story creation → @pm.
+
 - [2026-03-02] DECISION: Upgrade Neo to v3 Tiger Archetype + DNA Layer | REASON: v2 lacked authentic identity — enforced Gold Layer on mind clones but had none himself. DNA layer separates concerns correctly: operational structure in NEO.md (lean, 681 lines), deep personality in .neo/dna/ (5 files, 888 lines total). Same pattern used by MMOS minds. | ORG IMPACT: .neo/dna/ created as new sub-layer. Context Loading expanded from 5 → 10 files. Bridge file updated. Story 9.1 completed. Commit 8a6cf1b.
 
 - [2026-02-28] DECISION: Position book-to-intelligence as Cross-Departmental workflow | REASON: Pipeline serves two departments simultaneously — Neo (L1 principles + L2 frameworks → .neo/kb/) and MMOS (L3 authorial DNA → minds/sources/). Single-department classification would misrepresent its role. | ORG IMPACT: Workflows 14→15. Resolves source gargalo for GAP-MIND-006, GAP-MIND-008, GAP-MIND-009. Accelerates mind cloning pipeline.

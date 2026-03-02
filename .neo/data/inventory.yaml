@@ -126,11 +126,12 @@ processes:
 # ------------------------------------------------------------
 infrastructure:
 
-  kernel_module_dirs: 18
+  kernel_module_dirs: 19
   # Path: .aios-core/core/ (directories only)
   # config, docs, elicitation, events, execution, health-check,
   # ideation, manifest, mcp, memory, migration, orchestration,
-  # permissions, quality-gates, registry, session, ui, utils
+  # permissions, quality-gates, registry, session, ui, utils,
+  # synapse (positioned 2026-03-02 — pending story/implementation)
 
   orchestration_modules: 32
   # Path: .aios-core/core/orchestration/

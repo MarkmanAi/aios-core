@@ -226,6 +226,34 @@
 
 ---
 
+## KERNEL MODULES (Infrastructure)
+
+| Module | Path | Owner | Status |
+|--------|------|-------|--------|
+| config | `.aios-core/core/config` | — | operational |
+| elicitation | `.aios-core/core/elicitation` | — | operational |
+| events | `.aios-core/core/events` | — | operational |
+| execution | `.aios-core/core/execution` | — | operational |
+| health-check | `.aios-core/core/health-check` | — | operational |
+| ideation | `.aios-core/core/ideation` | — | operational |
+| manifest | `.aios-core/core/manifest` | — | operational |
+| mcp | `.aios-core/core/mcp` | — | operational |
+| memory | `.aios-core/core/memory` | — | operational |
+| migration | `.aios-core/core/migration` | — | operational |
+| orchestration | `.aios-core/core/orchestration` | — | operational |
+| permissions | `.aios-core/core/permissions` | — | operational |
+| quality-gates | `.aios-core/core/quality-gates` | — | operational |
+| registry | `.aios-core/core/registry` | — | operational |
+| session | `.aios-core/core/session` | — | operational |
+| ui | `.aios-core/core/ui` | — | operational |
+| utils | `.aios-core/core/utils` | — | operational |
+| docs | `.aios-core/core/docs` | — | operational |
+| **synapse** | `.aios-core/core/synapse` | **@devops** | **positioned — pending story** |
+
+*19th kernel module. Context injection engine. Design validator: @architect. Positioned by Neo 2026-03-02.*
+
+---
+
 ## HEADCOUNT SUMMARY
 
 | Category | Count |
@@ -238,5 +266,6 @@
 | Cloned Minds | 27 |
 | Departments | 2 |
 | Workflows | 15 (1 OPERATIONAL: book-to-intelligence) |
+| Kernel Modules | 19 (18 operational + 1 positioned: synapse) |
 
 *Source: `.neo/data/inventory.yaml` — cross-validated with REPO_PATH_MAP_v2*
