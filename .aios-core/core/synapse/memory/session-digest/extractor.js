@@ -280,9 +280,12 @@ async function writeDigest(projectDir, sessionId, digest) {
   // Ensure directory exists
   await fs.mkdir(storageDir, { recursive: true });
 
+  // Sanitize sessionId to prevent path traversal in filename
+  const safeSessionId = sessionId.replace(/[^a-zA-Z0-9-_]/g, '-').slice(0, 64);
+
   // Generate filename
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const filename = `${sessionId}-${timestamp}.yaml`;
+  const filename = `${safeSessionId}-${timestamp}.yaml`;
   const filePath = path.join(storageDir, filename);
 
   // Separate frontmatter and body
