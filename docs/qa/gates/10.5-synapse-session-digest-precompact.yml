@@ -1,0 +1,148 @@
+schema: 1
+story: '10.5'
+story_title: 'SYNAPSE — Session Digest: PreCompact Hook Migration'
+gate: CONCERNS
+status_reason: >
+  Implementation is solid and all 29 tests pass. Two MEDIUM security concerns found:
+  sessionId used unsanitized in filename (path traversal risk) and projectDir from
+  env var not validated against a safe base path. No CRITICAL or HIGH issues.
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-03-02T22:55:00Z'
+
+top_issues:
+  - id: MEDIUM-1
+    severity: medium
+    title: 'sessionId used directly in filename without sanitization'
+    description: >
+      In writeDigest(), the sessionId is interpolated directly into the filename:
+      `${sessionId}-${timestamp}.yaml`. If sessionId contains path separators
+      (e.g. "../../etc/passwd"), path.join could resolve outside storageDir.
+      path.join does normalize traversal, but the filename itself could become
+      malformed or leak internal paths.
+    file: '.aios-core/core/synapse/memory/session-digest/extractor.js'
+    line: 285
+    fix: 'Sanitize sessionId: sessionId.replace(/[^a-zA-Z0-9-_]/g, "-").slice(0, 64)'
+    suggested_owner: dev
+
+  - id: MEDIUM-2
+    severity: medium
+    title: 'projectDir from CLAUDE_HOOK_INPUT not validated against safe base'
+    description: >
+      extractSessionDigest() uses context.projectDir (sourced from env var
+      CLAUDE_HOOK_INPUT) directly in path.join without validating it stays
+      within the expected project root. A crafted CLAUDE_HOOK_INPUT could
+      direct digest writes to arbitrary filesystem locations.
+    file: '.claude/hooks/synapse-precompact.js'
+    line: 46
+    fix: >
+      Validate projectDir against process.cwd() or a known safe root:
+      if (!path.resolve(projectDir).startsWith(process.cwd())) {
+        projectDir = process.cwd();
+      }
+    suggested_owner: dev
+
+  - id: LOW-1
+    severity: low
+    title: 'AC7 "SYNAPSE digest skipped" message not implemented in hook'
+    description: >
+      AC7 specifies: "if feature gate disabled, hook logs SYNAPSE digest skipped
+      and returns immediately". Neither the extractor nor the hook implements this
+      log. Dev Notes acknowledge gate lives in provider layer (acceptable), but
+      the specific log message for the disabled-gate case is absent.
+    file: '.claude/hooks/synapse-precompact.js'
+    fix: 'Add feature gate check in hook; log "SYNAPSE digest skipped" when disabled'
+    suggested_owner: dev
+
+  - id: LOW-2
+    severity: low
+    title: 'Hook script (synapse-precompact.js) has no dedicated tests'
+    description: >
+      The integration test calls extractSessionDigest() directly. The hook script
+      itself — setImmediate pattern, CLAUDE_HOOK_INPUT parsing, error suppression
+      — is not covered by any test. AC3 / AC4 are asserted only implicitly.
+    file: 'tests/core/synapse/memory/session-digest/extractor.test.js'
+    fix: 'Add hook smoke test: spawn hook as child_process, verify it returns < 50ms and creates digest file'
+    suggested_owner: dev
+
+  - id: LOW-3
+    severity: low
+    title: 'No explicit assertion for AC4 (< 50ms hook return time)'
+    description: >
+      The performance test validates extraction time (< 5s / AC5). The fire-and-
+      forget return time (< 50ms / AC4) is not explicitly asserted. setImmediate
+      inherently guarantees this, but the AC has no corresponding test.
+    file: 'tests/core/synapse/memory/session-digest/extractor.test.js'
+    fix: 'Add: spawn hook, assert process exits or yields within 50ms'
+    suggested_owner: dev
+
+  - id: LOW-4
+    severity: low
+    title: 'analyzeConversation marked async unnecessarily'
+    description: >
+      analyzeConversation() is declared async but awaits nothing internally —
+      all called functions (extractCorrections, identifyPatterns, extractAxioms,
+      captureContextSnapshot) are synchronous. Adds unnecessary Promise wrapper
+      overhead on every extraction call.
+    file: '.aios-core/core/synapse/memory/session-digest/extractor.js'
+    line: 75
+    fix: 'Remove async keyword; update callers to not await if extracted to sync chain'
+    suggested_owner: dev
+
+waiver:
+  active: false
+
+quality_score: 80
+expires: '2026-03-16T00:00:00Z'
+
+evidence:
+  tests_reviewed: 29
+  risks_identified: 6
+  trace:
+    ac_covered: [1, 2, 3, 5, 6, 9, 10]
+    ac_gaps:
+      - ac: 4
+        note: 'No explicit < 50ms assertion (fire-and-forget pattern assumed safe)'
+      - ac: 7
+        note: 'Feature gate log message deferred to provider layer per Dev Notes'
+      - ac: 8
+        note: 'Integration test calls extractor directly, not via hook script'
+
+nfr_validation:
+  security:
+    status: CONCERNS
+    notes: >
+      sessionId not sanitized before filename use (MEDIUM-1).
+      projectDir from env var not path-validated (MEDIUM-2).
+      No secrets or credentials exposed.
+  performance:
+    status: PASS
+    notes: >
+      Extraction < 5s: tested and passing (avg ~2-9ms in test runs).
+      Hook fire-and-forget via setImmediate: correct pattern, guarantees < 50ms return.
+  reliability:
+    status: PASS
+    notes: >
+      Hook catches all errors, never throws, never blocks compact.
+      Graceful degradation on empty conversation confirmed by tests.
+      Directory auto-creation with recursive: true prevents missing-dir failures.
+  maintainability:
+    status: PASS
+    notes: >
+      Good JSDoc on all functions. Clear module structure. Exports well-defined.
+      Minor: analyzeConversation needlessly async (LOW-4).
+
+recommendations:
+  immediate:
+    - action: 'Sanitize sessionId before filename use'
+      refs: ['.aios-core/core/synapse/memory/session-digest/extractor.js:285']
+    - action: 'Validate projectDir from CLAUDE_HOOK_INPUT against known safe root'
+      refs: ['.claude/hooks/synapse-precompact.js:46']
+  future:
+    - action: 'Add hook script unit/smoke test (child_process spawn)'
+      refs: ['.claude/hooks/synapse-precompact.js']
+    - action: 'Add explicit < 50ms assertion for AC4'
+      refs: ['tests/core/synapse/memory/session-digest/extractor.test.js']
+    - action: 'Remove async from analyzeConversation'
+      refs: ['.aios-core/core/synapse/memory/session-digest/extractor.js:75']
+    - action: 'Implement feature gate skip log in hook when gate disabled (AC7)'
+      refs: ['.claude/hooks/synapse-precompact.js']
