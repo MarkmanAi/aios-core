@@ -1,7 +1,6 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 # AIOS CodeRabbit Configuration
-# Story: COLLAB-1
-# Created: 2025-12-30
+# Story: COLLAB-1 | Updated: 2026-03-02
 #
 # CodeRabbit provides AI-powered code review for pull requests
 # Documentation: https://docs.coderabbit.ai/getting-started/yaml-configuration
@@ -11,6 +10,8 @@ tone_instructions: "Be professional, constructive, and focused on code quality."
 early_access: false
 
 reviews:
+  profile: "chill"
+
   # Automatic review settings
   auto_review:
     enabled: true
@@ -21,59 +22,151 @@ reviews:
   # Review behavior
   request_changes_workflow: true
   high_level_summary: true
+  high_level_summary_placeholder: "@coderabbitai summary"
   poem: false
   review_status: true
   collapse_walkthrough: false
+  abort_on_close: true
 
-  # Path-specific review instructions (array format per schema)
+  # ---------------------------------------------------------------------------
+  # PATH FILTERS - Exclude generated/build files from review
+  # ---------------------------------------------------------------------------
+  path_filters:
+    - "!**/node_modules/**"
+    - "!**/dist/**"
+    - "!**/build/**"
+    - "!**/.next/**"
+    - "!**/coverage/**"
+    - "!**/*.min.js"
+    - "!**/*.min.css"
+    - "!**/package-lock.json"
+    - "!**/yarn.lock"
+    - "!**/pnpm-lock.yaml"
+    - "!**/*.d.ts"
+
+  # ---------------------------------------------------------------------------
+  # PATH INSTRUCTIONS - Context-specific review rules
+  # ---------------------------------------------------------------------------
   path_instructions:
+
+    # ── AIOS CORE — Agents ──────────────────────────────────────────────────
     - path: ".aios-core/development/agents/**"
       instructions: |
         Verify agent follows AIOS agent YAML structure (persona_profile, commands, dependencies).
         Check that persona_profile includes archetype, communication style, and greeting_levels.
         Validate all commands listed have corresponding task dependencies.
         Ensure agent has proper visibility metadata for commands.
+        Ensure elicit=true tasks have proper interaction_points defined.
         Check for security: no hardcoded credentials or sensitive data.
 
+    # ── AIOS CORE — Tasks (SOPs) ─────────────────────────────────────────────
     - path: ".aios-core/development/tasks/**"
       instructions: |
         Verify task follows AIOS task format with clear elicitation points.
         Check that deliverables are well-defined.
         Validate any referenced dependencies exist in the codebase.
         Ensure task has proper error handling guidance.
+        Verify veto_conditions exist for blocking steps.
 
+    # ── AIOS CORE — Workflows ────────────────────────────────────────────────
     - path: ".aios-core/development/workflows/**"
       instructions: |
         Verify workflow YAML structure is valid.
         Check step ordering and dependencies make logical sense.
         Validate referenced agents and tasks exist.
+        Ensure quality gates exist between phases.
 
-    - path: ".aios-core/product/templates/**"
+    # ── NEO META LAYER ───────────────────────────────────────────────────────
+    - path: ".neo/**"
       instructions: |
-        Ensure template follows AIOS template conventions.
-        Check placeholder syntax is consistent.
-        Validate template produces valid output.
+        This is the Meta-Organizational layer — governed by Neo (Matrix Architect).
+        Verify .neo/ files follow established schema (MEMORY.md, inventory.yaml, gaps.yaml).
+        Check inventory.yaml counts are consistent with actual file counts.
+        Ensure ORGANOGRAMA.md reflects actual agents in the repository.
+        Flag any new agents/minds/squads not registered in inventory.yaml.
 
+    # ── SQUADS — MMOS ────────────────────────────────────────────────────────
+    - path: "squads/mmos-squad/**"
+      instructions: |
+        MMOS Squad: Mind cloning pipeline.
+        Verify mind directories follow standard structure (sources/, artifacts/, system_prompts/, kb/, docs/, metadata.yaml).
+        Check metadata.yaml for required fields: slug, domain, fidelity_score, pipeline_status.
+        Flag any mind without L6-L8 artifacts (Gold Layer — P7 principle).
+
+    # ── SQUADS — Squad Creator ───────────────────────────────────────────────
+    - path: "squads/squad-creator/**"
+      instructions: |
+        Squad Creator: Technical squad building pipeline.
+        Verify agent files follow AIOS agent format.
+        Check task files have proper elicitation points.
+
+    # ── PACKAGES ─────────────────────────────────────────────────────────────
+    - path: "packages/**"
+      instructions: |
+        Shared packages — changes here affect all consumers.
+        CRITICAL: Check for breaking API changes.
+        HIGH: Verify exports are properly typed.
+        Check for missing peer dependency declarations.
+
+    # ── GITHUB ACTIONS ───────────────────────────────────────────────────────
     - path: ".github/**"
       instructions: |
         Review for security implications.
-        Check for proper secret handling.
-        Validate workflow syntax.
+        CRITICAL: Check for secret exposure in logs (echo $SECRET patterns).
+        HIGH: Validate workflow syntax and action versions.
         Ensure consistent with existing CI patterns.
+        Check for proper permissions scoping.
 
+    # ── HOOKS (Governance Policies) ──────────────────────────────────────────
+    - path: ".claude/hooks/**"
+      instructions: |
+        Governance policies — these run on every agent action.
+        CRITICAL: Verify hooks don't accidentally block legitimate operations.
+        Check that error messages are helpful and actionable.
+        Ensure hooks follow read-only pattern where applicable (P5 principle).
+
+    # ── SOURCE CODE — JavaScript ─────────────────────────────────────────────
     - path: "**/*.js"
       instructions: |
         Check for async/await best practices.
         Verify error handling is comprehensive.
         Look for potential security vulnerabilities.
         Ensure code follows AIOS coding standards (ES2022, single quotes, 2-space indent).
+        Flag any hardcoded credentials or API keys.
 
+    # ── SOURCE CODE — TypeScript ─────────────────────────────────────────────
     - path: "**/*.ts"
       instructions: |
         Verify TypeScript types are properly defined.
         Check for any 'any' type usage that should be more specific.
         Ensure exports are properly typed.
+        No implicit any.
+
+    # ── TESTS ────────────────────────────────────────────────────────────────
+    - path: "**/*.test.*"
+      instructions: |
+        Validate test coverage includes edge cases.
+        Verify mock implementations are correct.
+        Test names should be descriptive and follow AAA pattern.
+        Do not flag test-specific patterns (any in mocks, etc.).
+
+    # ── DOCUMENTATION ────────────────────────────────────────────────────────
+    - path: "docs/**"
+      instructions: |
+        Validate clarity and completeness.
+        Code examples should be functional and up-to-date.
+        Check internal links are valid.
+        Do not flag markdown style preferences.
 
 # Chat settings
 chat:
   auto_reply: true
+
+# Knowledge Base
+knowledge_base:
+  learnings:
+    scope: "auto"
+  issues:
+    scope: "auto"
+  pull_requests:
+    scope: "auto"

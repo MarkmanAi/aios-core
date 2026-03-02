@@ -1,0 +1,74 @@
+# AIOS DevOps Setup Report
+# Generated: 2026-03-02
+# Agent: @devops (Gage)
+# Task: setup-github (Story 5.10)
+
+setup:
+  completed: true
+  date: "2026-03-02"
+  project_type: node
+  story_id: "5.10"
+
+repository:
+  url: "https://github.com/MarkmanAi/aios-core"
+  owner: MarkmanAi
+  name: aios-core
+  visibility: public
+
+workflows_installed:
+  status: already_present
+  count: 9
+  files:
+    - ci.yml
+    - pr-automation.yml
+    - release.yml
+    - semantic-release.yml
+    - npm-publish.yml
+    - test.yml
+    - welcome.yml
+    - pr-labeling.yml
+    - macos-testing.yml
+    - quarterly-gap-audit.yml
+
+coderabbit:
+  configured: true
+  updated: "2026-03-02"
+  profile: "chill"
+  config_file: ".coderabbit.yaml"
+  improvements_applied:
+    - path_filters (11 exclusions)
+    - high_level_summary_placeholder
+    - abort_on_close
+    - aios_specific_paths (.neo/, squads/, packages/, .claude/hooks/)
+    - knowledge_base section
+  github_app_url: "https://github.com/apps/coderabbitai"
+  github_app_status: "pending_install — visit URL above to activate"
+
+branch_protection:
+  enabled: true
+  branch: "main"
+  required_checks:
+    - lint
+    - typecheck
+    - test
+  required_reviewers: 1
+  dismiss_stale_reviews: true
+  allow_force_pushes: false
+  allow_deletions: false
+
+secrets_configured:
+  status: skipped
+  note: "Configure later via: gh secret set SECRET_NAME"
+
+next_steps:
+  - "🔴 REQUIRED: Install CodeRabbit GitHub App → https://github.com/apps/coderabbitai"
+  - "Create first PR to test CI/CD pipeline and CodeRabbit review"
+  - "Configure secrets when ready: gh secret set ANTHROPIC_API_KEY"
+  - "Review branch protection: github.com/MarkmanAi/aios-core/settings/branches"
+
+validation_checklist:
+  - "[x] GitHub Actions workflows present (9 installed)"
+  - "[x] .coderabbit.yaml configured and updated"
+  - "[x] Branch protection enabled (main)"
+  - "[ ] CodeRabbit GitHub App installed (manual step)"
+  - "[ ] Repository secrets configured (skipped)"
