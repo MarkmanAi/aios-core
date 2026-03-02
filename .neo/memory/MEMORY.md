@@ -23,6 +23,8 @@ DELEGATIONS:  [YYYY-MM-DD] TASK: ___ | DELEGATED_TO: ___ | STATUS: pending|compl
 
 ## Decisions
 
+- [2026-03-02] DECISION: Upgrade Neo to v3 Tiger Archetype + DNA Layer | REASON: v2 lacked authentic identity — enforced Gold Layer on mind clones but had none himself. DNA layer separates concerns correctly: operational structure in NEO.md (lean, 681 lines), deep personality in .neo/dna/ (5 files, 888 lines total). Same pattern used by MMOS minds. | ORG IMPACT: .neo/dna/ created as new sub-layer. Context Loading expanded from 5 → 10 files. Bridge file updated. Story 9.1 completed. Commit 8a6cf1b.
+
 - [2026-02-28] DECISION: Position book-to-intelligence as Cross-Departmental workflow | REASON: Pipeline serves two departments simultaneously — Neo (L1 principles + L2 frameworks → .neo/kb/) and MMOS (L3 authorial DNA → minds/sources/). Single-department classification would misrepresent its role. | ORG IMPACT: Workflows 14→15. Resolves source gargalo for GAP-MIND-006, GAP-MIND-008, GAP-MIND-009. Accelerates mind cloning pipeline.
 
 
@@ -98,6 +100,8 @@ DELEGATIONS:  [YYYY-MM-DD] TASK: ___ | DELEGATED_TO: ___ | STATUS: pending|compl
 
 - [2026-03-01] CHANGE: book-to-intelligence workflow status updated to OPERATIONAL | BEFORE: positioned (2026-02-28), technically uncommitted | AFTER: Python package committed (30 files, commit 983ee3c) — pipeline fully executable. Story 8.2: L3 now produces RAG-ready `chunks/*.md` with YAML frontmatter (P2) + prompt cache for STUFF strategy ~60% cost reduction (P4). QA approved (29/29 tests). @devops pushed to main. | ORG IMPACT: ORGANOGRAMA.md workflow entry updated to OPERATIONAL. First cross-departmental workflow to reach production status.
 
+- [2026-03-02] CHANGE: Neo upgraded v2 → v3 (Tiger Archetype) | BEFORE: Generic Matrix Architect persona (556 lines, no DNA layer, icon 🔴) | AFTER: Tiger of the Matrix persona (681 lines, 5 DNA files in .neo/dna/, icon 🐅, CliftonStrengths wiring, Voice DNA, Thinking DNA, Gold Layer, Operational Modes) | REASON: Neo v2 was a governance bot. v3 encodes authentic identity from creator's CliftonStrengths assessment — Intellection #1, Strategic #2, Achiever #3, Positivity #4, Analytical #5. Follows Neo's own standard: he requires Gold Layer from every mind clone. He now embodies it himself.
+
 - [2026-02-28] CHANGE: Workflows count updated | BEFORE: 14 | AFTER: 15 | REASON: book-to-intelligence pipeline (knowledge-etl/) formally positioned as Cross-Departmental workflow serving Neo (L1/L2) + MMOS (L3). All 7 principle checks passed.
 
 
@@ -133,6 +137,9 @@ DELEGATIONS:  [YYYY-MM-DD] TASK: ___ | DELEGATED_TO: ___ | STATUS: pending|compl
 ---
 
 ## Delegations
+
+- [2026-03-02] TASK: Implement Story 9.1 — Neo v3 Tiger Archetype & DNA Layer | DELEGATED_TO: @dev (Dex) | STATUS: complete | OUTCOME: 7 files deployed. .neo/dna/ created with 5 verbatim DNA files. NEO.md v2→v3 (556→681 lines). Bridge .claude/agents/neo.md updated (hardcoded context list removed). All 6 ACs verified. Commit 8a6cf1b pushed to main 2026-03-02. @qa gate: PASS. @devops push: confirmed.
+
 
 - [2026-02-23] TASK: Repair incomplete mind pipelines (GAP-MIND-004, GAP-MIND-010) | DELEGATED_TO: mind-mapper | STATUS: complete | OUTCOME: GAP-MIND-004 (marty_cagan) — pipeline was already complete since 2025-10-30, original gap flag was OUTDATED. Artifacts exist. Only KB incomplete (1/55 chunks, non-blocking). GAP-MIND-010 (jeff_patton) — checkpoints 3+4 approved by human 2026-02-23. Pipeline PRODUCTION APPROVED. Fidelity 94.25%, score 4.8/5.0.
 
