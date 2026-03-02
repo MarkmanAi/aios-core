@@ -325,6 +325,28 @@ describe('_writeDigest', () => {
     const filePath = await _writeDigest(tmpDir, 'my-session-id', digest);
     expect(path.basename(filePath)).toContain('my-session-id');
   });
+
+  it('sanitizes sessionId with path traversal characters in filename (MEDIUM-1)', async () => {
+    const maliciousId = '../../etc/passwd';
+    const filePath = await _writeDigest(tmpDir, maliciousId, digest);
+    const basename = path.basename(filePath);
+    // Must not contain traversal sequences
+    expect(basename).not.toContain('..');
+    expect(basename).not.toContain('/');
+    expect(basename).not.toContain('\\');
+    // File must be inside the expected storageDir
+    const storageDir = path.join(tmpDir, '.aios', 'session-digests');
+    expect(filePath.startsWith(storageDir)).toBe(true);
+  });
+
+  it('truncates excessively long sessionId to 64 chars in filename', async () => {
+    const longId = 'a'.repeat(200);
+    const filePath = await _writeDigest(tmpDir, longId, digest);
+    const basename = path.basename(filePath);
+    // The safe session id prefix should be max 64 chars
+    const prefix = basename.split('-2026')[0]; // split at timestamp start
+    expect(prefix.length).toBeLessThanOrEqual(64);
+  });
 });
 
 // ---------------------------------------------------------------------------

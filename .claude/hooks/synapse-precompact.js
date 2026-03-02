@@ -41,9 +41,14 @@ setImmediate(async () => {
       hookContext = {};
     }
 
+    // Validate projectDir stays within the known project root (prevent path traversal)
+    const requestedDir = hookContext.projectDir || process.cwd();
+    const resolvedDir = path.resolve(requestedDir);
+    const safeProjectDir = resolvedDir.startsWith(process.cwd()) ? resolvedDir : process.cwd();
+
     const context = {
       sessionId: hookContext.sessionId || `session-${Date.now()}`,
-      projectDir: hookContext.projectDir || process.cwd(),
+      projectDir: safeProjectDir,
       conversation: hookContext.conversation || { messages: [] },
       metadata: hookContext.metadata || {},
     };
