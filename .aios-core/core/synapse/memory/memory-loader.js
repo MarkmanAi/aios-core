@@ -167,15 +167,16 @@ class MemoryLoader {
    * Returns full memory content (Layer 3)
    *
    * @param {string} memoryId - Memory ID
-   * @returns {Promise<Object|null>} Full memory or null if not found
+   * @param {string} [agentId] - Requesting agent (enforces scoping when provided)
+   * @returns {Promise<Object|null>} Full memory or null if not found / not authorized
    */
-  async getMemoryById(memoryId) {
+  async getMemoryById(memoryId, agentId) {
     if (!memoryId) {
       return null;
     }
 
     try {
-      return await this.retriever.getMemoryById(memoryId);
+      return await this.retriever.getMemoryById(memoryId, agentId);
     } catch (error) {
       console.error(`[MemoryLoader] Failed to get memory ${memoryId}:`, error.message);
       return null;

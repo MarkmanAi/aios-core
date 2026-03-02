@@ -390,9 +390,10 @@ class MemoryRetriever {
    * Get memory by ID (Layer 3 always)
    *
    * @param {string} memoryId - Memory ID
-   * @returns {Promise<Object|null>} Full memory or null if not found
+   * @param {string} [callerAgentId] - Agent requesting the memory (enforces scoping when provided)
+   * @returns {Promise<Object|null>} Full memory or null if not found / not authorized
    */
-  async getMemoryById(memoryId) {
+  async getMemoryById(memoryId, callerAgentId) {
     try {
       // Search index for memory
       const searchResult = await this.indexManager.search({});
@@ -400,6 +401,11 @@ class MemoryRetriever {
 
       if (!memory) {
         return null;
+      }
+
+      // Enforce agent-scoped privacy when callerAgentId is provided
+      if (callerAgentId && memory.agent !== callerAgentId && memory.agent !== 'shared') {
+        return null; // Unauthorized: cannot access another agent's private memory
       }
 
       // Read full content

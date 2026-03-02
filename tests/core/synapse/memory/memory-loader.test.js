@@ -57,6 +57,9 @@ describe('MemoryLoader', () => {
 
       expect(result.memories).toBeDefined();
       expect(Array.isArray(result.memories)).toBe(true);
+      // Verify warm tier was NOT loaded when layers=[1]
+      expect(result.metadata.tiers).not.toContain('warm');
+      expect(result.metadata.tiers).toContain('hot');
     });
 
     it('should return empty memories on error (graceful degradation)', async () => {
@@ -130,6 +133,13 @@ describe('MemoryLoader', () => {
       if (largeBudget.length > 0) {
         expect(largeBudget[0]).toHaveProperty('content');
       }
+    });
+
+    it('should return empty array with zero token budget', async () => {
+      // tokenBudget: 0 → Layer 1 selected (< 500), 0 memories fit in budget
+      const zeroBudget = await loader.queryMemories('dev', { tokenBudget: 0 });
+      expect(Array.isArray(zeroBudget)).toBe(true);
+      expect(zeroBudget.length).toBe(0);
     });
 
     it('should forward all options to retriever', async () => {
