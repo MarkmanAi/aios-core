@@ -67,6 +67,9 @@ class MemoryLoader {
       let memories = hotResult.memories;
       let tokensUsed = hotResult.metadata.tokenUsage;
 
+      // Track which tiers were actually loaded (CR-3 fix)
+      const tiersLoaded = ['hot'];
+
       // If budget allows, add WARM tier (context - Layer 2)
       if (tokensUsed < budget * 0.7 && layers.includes(2)) {
         const remainingBudget = budget - tokensUsed;
@@ -81,6 +84,7 @@ class MemoryLoader {
 
         memories = [...memories, ...warmResult.memories];
         tokensUsed += warmResult.metadata.tokenUsage;
+        tiersLoaded.push('warm');
       }
 
       return {
@@ -90,7 +94,7 @@ class MemoryLoader {
           count: memories.length,
           tokensUsed,
           budget,
-          tiers: ['hot', 'warm'],
+          tiers: tiersLoaded,
         },
       };
     } catch (error) {
@@ -133,7 +137,7 @@ class MemoryLoader {
         ? await this.retriever.retrieve({
           agent: agentId,
           layer: options.layer,
-          tokenBudget: options.tokenBudget || 2000,
+          tokenBudget: options.tokenBudget ?? 2000,
           attentionMin,
           sectors,
           tags: options.tags,
@@ -141,7 +145,7 @@ class MemoryLoader {
           limit: options.limit,
         })
         : await this.retriever.queryMemories(agentId, {
-          tokenBudget: options.tokenBudget || 2000,
+          tokenBudget: options.tokenBudget ?? 2000,
           attentionMin,
           sectors,
           tags: options.tags,

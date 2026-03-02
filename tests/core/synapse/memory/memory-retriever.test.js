@@ -44,6 +44,16 @@ describe('MemoryRetriever', () => {
       await expect(retriever.retrieve({ agent: 'dev', layer: 4 })).rejects.toThrow('Layer must be');
     });
 
+    it('should validate tokenBudget parameter', async () => {
+      await expect(retriever.retrieve({ agent: 'dev', tokenBudget: -1 })).rejects.toThrow('tokenBudget must be a non-negative number');
+      await expect(retriever.retrieve({ agent: 'dev', tokenBudget: 'big' })).rejects.toThrow('tokenBudget must be a non-negative number');
+    });
+
+    it('should validate limit parameter', async () => {
+      await expect(retriever.retrieve({ agent: 'dev', limit: 0 })).rejects.toThrow('limit must be a positive number');
+      await expect(retriever.retrieve({ agent: 'dev', limit: -5 })).rejects.toThrow('limit must be a positive number');
+    });
+
     it('should retrieve memories with default options', async () => {
       const result = await retriever.retrieve({ agent: 'dev' });
 

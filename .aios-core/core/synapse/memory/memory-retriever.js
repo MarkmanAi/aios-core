@@ -72,6 +72,16 @@ class MemoryRetriever {
       throw new Error('Layer must be 1 (index), 2 (context), or 3 (detail)');
     }
 
+    // Validate tokenBudget
+    if (typeof tokenBudget !== 'number' || tokenBudget < 0) {
+      throw new Error('tokenBudget must be a non-negative number');
+    }
+
+    // Validate limit
+    if (limit !== undefined && (typeof limit !== 'number' || limit <= 0)) {
+      throw new Error('limit must be a positive number');
+    }
+
     try {
       // Agent-Scoped Retrieval (AC: 5)
       // Each agent accesses: own private memories + shared memories
@@ -99,19 +109,19 @@ class MemoryRetriever {
       // Sort by attention_score descending
       results.sort((a, b) => b.attention_score - a.attention_score);
 
-      // Apply limit after combining
-      if (limit) {
-        results = results.slice(0, limit);
-      }
-
       // Apply attention score filter
       if (attentionMin !== undefined) {
         results = results.filter(m => m.attention_score >= attentionMin);
       }
 
-      // Apply sector boosting if specified
+      // Apply sector boosting before limit so top-N are sector-preferred (CR-1 fix)
       if (sectors && sectors.length > 0) {
         results = this._applySectorBoosting(results, sectors);
+      }
+
+      // Apply limit after boosting to ensure sector-preferred memories are prioritized
+      if (limit) {
+        results = results.slice(0, limit);
       }
 
       // Progressive disclosure by layer
