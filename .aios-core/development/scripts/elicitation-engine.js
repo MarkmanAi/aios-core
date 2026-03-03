@@ -30,14 +30,14 @@ class ElicitationEngine {
       startTime: new Date().toISOString(),
       answers: {},
       currentStep: 0,
-      options
+      options,
     };
     
     if (options.saveSession) {
       this.sessionFile = path.join(
         process.cwd(), 
         '.aios-sessions', 
-        `${componentType}-${Date.now()}.json`
+        `${componentType}-${Date.now()}.json`,
       );
       await fs.ensureDir(path.dirname(this.sessionFile));
     }
@@ -104,7 +104,7 @@ class ElicitationEngine {
         type: 'confirm',
         name: '_showHelp',
         message: 'Would you like to see help for this step?',
-        default: false
+        default: false,
       });
     }
     
@@ -187,16 +187,18 @@ class ElicitationEngine {
     const { type, source, transform } = smartDefaultConfig;
     
     switch (type) {
-      case 'fromAnswer':
+      case 'fromAnswer': {
         const value = this.sessionData.answers[source];
         return transform ? transform(value) : value;
-        
+      }
+
       case 'generated':
         return this.generateDefault(smartDefaultConfig);
-        
-      case 'conditional':
+
+      case 'conditional': {
         const condition = this.evaluateCondition(smartDefaultConfig.condition);
         return condition ? smartDefaultConfig.ifTrue : smartDefaultConfig.ifFalse;
+      }
         
       default:
         return undefined;
@@ -209,10 +211,11 @@ class ElicitationEngine {
    */
   generateDefault(config) {
     switch (config.generator) {
-      case 'kebabCase':
+      case 'kebabCase': {
         const source = this.sessionData.answers[config.source] || '';
         return source.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-        
+      }
+
       case 'timestamp':
         return new Date().toISOString();
         
@@ -274,7 +277,7 @@ class ElicitationEngine {
     
     return {
       valid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -289,10 +292,11 @@ class ElicitationEngine {
     
     if (typeof validator === 'object') {
       switch (validator.type) {
-        case 'regex':
+        case 'regex': {
           const regex = new RegExp(validator.pattern);
           return regex.test(value) || validator.message;
-          
+        }
+
         case 'length':
           if (validator.min && value.length < validator.min) {
             return `Must be at least ${validator.min} characters`;
@@ -301,10 +305,11 @@ class ElicitationEngine {
             return `Must be at most ${validator.max} characters`;
           }
           return true;
-          
-        case 'unique':
+
+        case 'unique': {
           const exists = await this.checkExists(validator.path, value);
           return !exists || `${value} already exists`;
+        }
           
         default:
           return true;
@@ -353,7 +358,7 @@ class ElicitationEngine {
       completedSteps: this.sessionData.currentStep + 1,
       answers: Object.keys(this.sessionData.answers).length,
       duration: this.sessionData.startTime ? 
-        Date.now() - new Date(this.sessionData.startTime).getTime() : 0
+        Date.now() - new Date(this.sessionData.startTime).getTime() : 0,
     };
   }
 

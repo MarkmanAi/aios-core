@@ -33,9 +33,9 @@ class ManifestPreview {
       const updatedManifest = this.addComponentToManifest(manifest, componentType, componentInfo);
       const updatedContent = yaml.dump(updatedManifest, {
         styles: {
-          '!!null': 'canonical'
+          '!!null': 'canonical',
         },
-        sortKeys: false
+        sortKeys: false,
       });
       
       // Generate diff preview
@@ -46,12 +46,12 @@ class ManifestPreview {
         diff,
         currentContent,
         updatedContent,
-        changes: this.summarizeChanges(manifest, updatedManifest)
+        changes: this.summarizeChanges(manifest, updatedManifest),
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -64,22 +64,22 @@ class ManifestPreview {
     const updated = JSON.parse(JSON.stringify(manifest)); // Deep clone
     
     switch (componentType) {
-      case 'agent':
+      case 'agent': {
         if (!updated.team) updated.team = {};
         if (!updated.team.agents) updated.team.agents = [];
-        
+
         // Check if agent already exists
         const existingAgentIndex = updated.team.agents.findIndex(
-          a => a.id === componentInfo.id
+          a => a.id === componentInfo.id,
         );
-        
+
         if (existingAgentIndex >= 0) {
           // Update existing
           updated.team.agents[existingAgentIndex] = {
             id: componentInfo.id,
             path: `agents/${componentInfo.id}.md`,
             name: componentInfo.name || componentInfo.id,
-            ...(componentInfo.description && { description: componentInfo.description })
+            ...(componentInfo.description && { description: componentInfo.description }),
           };
         } else {
           // Add new
@@ -87,16 +87,17 @@ class ManifestPreview {
             id: componentInfo.id,
             path: `agents/${componentInfo.id}.md`,
             name: componentInfo.name || componentInfo.id,
-            ...(componentInfo.description && { description: componentInfo.description })
+            ...(componentInfo.description && { description: componentInfo.description }),
           });
         }
         break;
+      }
         
-      case 'workflow':
+      case 'workflow': {
         if (!updated.workflows) updated.workflows = [];
-        
+
         const existingWorkflowIndex = updated.workflows.findIndex(
-          w => w.id === componentInfo.id
+          w => w.id === componentInfo.id,
         );
         
         if (existingWorkflowIndex >= 0) {
@@ -105,7 +106,7 @@ class ManifestPreview {
             path: `workflows/${componentInfo.id}.yaml`,
             name: componentInfo.name || componentInfo.id,
             type: componentInfo.type || 'standard',
-            ...(componentInfo.description && { description: componentInfo.description })
+            ...(componentInfo.description && { description: componentInfo.description }),
           };
         } else {
           updated.workflows.push({
@@ -113,10 +114,11 @@ class ManifestPreview {
             path: `workflows/${componentInfo.id}.yaml`,
             name: componentInfo.name || componentInfo.id,
             type: componentInfo.type || 'standard',
-            ...(componentInfo.description && { description: componentInfo.description })
+            ...(componentInfo.description && { description: componentInfo.description }),
           });
         }
         break;
+      }
     }
     
     // Update metadata
@@ -154,7 +156,7 @@ class ManifestPreview {
         changes.push({
           type: 'added',
           category: 'agent',
-          item: agent.id
+          item: agent.id,
         });
       });
     }
@@ -169,7 +171,7 @@ class ManifestPreview {
         changes.push({
           type: 'added',
           category: 'workflow',
-          item: workflow.id
+          item: workflow.id,
         });
       });
     }
@@ -180,7 +182,7 @@ class ManifestPreview {
         type: 'updated',
         category: 'version',
         from: oldManifest.metadata?.version || '1.0.0',
-        to: newManifest.metadata?.version
+        to: newManifest.metadata?.version,
       });
     }
     
@@ -228,7 +230,7 @@ class ManifestPreview {
       type: 'confirm',
       name: 'confirm',
       message: 'Apply these changes to team-manifest.yaml?',
-      default: true
+      default: true,
     }]);
     
     if (confirm) {

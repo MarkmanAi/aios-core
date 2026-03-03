@@ -16,7 +16,7 @@ class ModificationValidator {
       agent: this.validateAgentModification.bind(this),
       task: this.validateTaskModification.bind(this),
       workflow: this.validateWorkflowModification.bind(this),
-      template: this.validateTemplateModification.bind(this)
+      template: this.validateTemplateModification.bind(this),
     };
   }
 
@@ -28,13 +28,13 @@ class ModificationValidator {
    * @param {Object} options - Validation options
    * @returns {Object} Validation result with errors and warnings
    */
-  async validateModification(_componentType, originalContent, modifiedContent, options = {}) {
+  async validateModification(componentType, originalContent, modifiedContent, options = {}) {
     const result = {
       valid: true,
       errors: [],
       warnings: [],
       suggestions: [],
-      breakingChanges: []
+      breakingChanges: [],
     };
 
     // Basic validation
@@ -49,7 +49,7 @@ class ModificationValidator {
       const typeResult = await this.validationRules[componentType](
         originalContent,
         modifiedContent,
-        options
+        options,
       );
       this.mergeResults(result, typeResult);
     } else {
@@ -62,9 +62,9 @@ class ModificationValidator {
 
     // Check for breaking changes
     const breakingChanges = await this.detectBreakingChanges(
-      _componentType,
+      componentType,
       originalContent,
-      modifiedContent
+      modifiedContent,
     );
     result.breakingChanges = breakingChanges;
 
@@ -76,12 +76,12 @@ class ModificationValidator {
    * Validate agent modifications
    * @private
    */
-  async validateAgentModification(originalContent, modifiedContent, options) {
+  async validateAgentModification(originalContent, modifiedContent, _options) {
     const result = {
       valid: true,
       errors: [],
       warnings: [],
-      suggestions: []
+      suggestions: [],
     };
 
     try {
@@ -137,7 +137,7 @@ class ModificationValidator {
       const markdownValidation = this.validateMarkdown(modifiedParts.markdown);
       this.mergeResults(result, markdownValidation);
 
-    } catch (_error) {
+    } catch (error) {
       result.valid = false;
       result.errors.push(`Failed to parse agent content: ${error.message}`);
     }
@@ -149,12 +149,12 @@ class ModificationValidator {
    * Validate task modifications
    * @private
    */
-  async validateTaskModification(originalContent, modifiedContent, options) {
+  async validateTaskModification(originalContent, modifiedContent, _options) {
     const result = {
       valid: true,
       errors: [],
       warnings: [],
-      suggestions: []
+      suggestions: [],
     };
 
     // Check for required sections
@@ -204,12 +204,12 @@ class ModificationValidator {
    * Validate workflow modifications
    * @private
    */
-  async validateWorkflowModification(originalContent, modifiedContent, options) {
+  async validateWorkflowModification(originalContent, modifiedContent, _options) {
     const result = {
       valid: true,
       errors: [],
       warnings: [],
-      suggestions: []
+      suggestions: [],
     };
 
     try {
@@ -270,18 +270,18 @@ class ModificationValidator {
             // Check if criteria references valid artifacts or phases
             const referencesValid = this.validateCriteriaReferences(
               criteria,
-              modifiedWorkflow
+              modifiedWorkflow,
             );
             if (!referencesValid) {
               result.warnings.push(
-                `Entry criteria '${criteria}' in phase '${phaseName}' may reference non-existent artifact`
+                `Entry criteria '${criteria}' in phase '${phaseName}' may reference non-existent artifact`,
               );
             }
           }
         }
       }
 
-    } catch (_error) {
+    } catch (error) {
       result.valid = false;
       result.errors.push(`Failed to parse workflow: ${error.message}`);
     }
@@ -293,12 +293,12 @@ class ModificationValidator {
    * Validate template modifications
    * @private
    */
-  async validateTemplateModification(originalContent, modifiedContent, options) {
+  async validateTemplateModification(originalContent, modifiedContent, _options) {
     const result = {
       valid: true,
       errors: [],
       warnings: [],
-      suggestions: []
+      suggestions: [],
     };
 
     // Check for placeholder consistency
@@ -308,7 +308,7 @@ class ModificationValidator {
     // Warn about unreplaced placeholders
     if (uniquePlaceholders.length > 0) {
       result.suggestions.push(
-        `Template contains ${uniquePlaceholders.length} placeholders: ${uniquePlaceholders.join(', ')}`
+        `Template contains ${uniquePlaceholders.length} placeholders: ${uniquePlaceholders.join(', ')}`,
       );
     }
 
@@ -331,7 +331,7 @@ class ModificationValidator {
     const result = {
       valid: true,
       errors: [],
-      warnings: []
+      warnings: [],
     };
 
     const baseDir = path.join(process.cwd(), 'aios-core');
@@ -362,7 +362,7 @@ class ModificationValidator {
     const result = {
       valid: true,
       errors: [],
-      warnings: []
+      warnings: [],
     };
 
     // Check for broken internal links
@@ -388,11 +388,11 @@ class ModificationValidator {
    * Validate security concerns
    * @private
    */
-  async validateSecurity(content, componentType) {
+  async validateSecurity(content, _componentType) {
     const result = {
       valid: true,
       errors: [],
-      warnings: []
+      warnings: [],
     };
 
     const securityIssues = await this.securityChecker.checkContent(content);
@@ -434,7 +434,7 @@ class ModificationValidator {
               breakingChanges.push({
                 type: 'removed_commands',
                 items: removedCommands,
-                impact: 'Users relying on these commands will need to update their workflows'
+                impact: 'Users relying on these commands will need to update their workflows',
               });
             }
           }
@@ -443,23 +443,24 @@ class ModificationValidator {
         }
         break;
 
-      case 'task':
+      case 'task': {
         // Check for changed output format
         const originalOutput = originalContent.match(/## Output Format[\s\S]*?```[\s\S]*?```/);
         const modifiedOutput = modifiedContent.match(/## Output Format[\s\S]*?```[\s\S]*?```/);
-        
+
         if (originalOutput && modifiedOutput && originalOutput[0] !== modifiedOutput[0]) {
           breakingChanges.push({
             type: 'output_format_changed',
-            impact: 'Components consuming this task output may need updates'
+            impact: 'Components consuming this task output may need updates',
           });
         }
         break;
+      }
 
       case 'workflow':
         // Check for removed phases
         try {
-          const _originalWorkflow = yaml.load(originalContent);
+          const originalWorkflow = yaml.load(originalContent);
           const modifiedWorkflow = yaml.load(modifiedContent);
 
           const originalPhases = Object.keys(originalWorkflow.phases || {});
@@ -471,7 +472,7 @@ class ModificationValidator {
             breakingChanges.push({
               type: 'removed_phases',
               items: removedPhases,
-              impact: 'Projects using this workflow may fail at removed phases'
+              impact: 'Projects using this workflow may fail at removed phases',
             });
           }
         } catch (_error) {
@@ -495,7 +496,7 @@ class ModificationValidator {
 
     return {
       yaml: match[1],
-      markdown: match[2]
+      markdown: match[2],
     };
   }
 

@@ -751,7 +751,7 @@ class GreenfieldHandler extends EventEmitter {
    * @param {Object} context - Execution context
    * @private
    */
-  async _recordPhase(phase, context) {
+  async _recordPhase(phase, _context) {
     const sessionState = this._getSessionState();
     if (!sessionState) {
       return;
