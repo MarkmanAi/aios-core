@@ -1,17 +1,20 @@
 schema: 1
 story: '10.5'
 story_title: 'SYNAPSE — Session Digest: PreCompact Hook Migration'
-gate: CONCERNS
+gate: PASS
 status_reason: >
-  Implementation is solid and all 31 tests pass. Two MEDIUM security concerns found:
-  sessionId used unsanitized in filename (path traversal risk) and projectDir from
-  env var not validated against a safe base path. No CRITICAL or HIGH issues.
+  Implementation is solid and all 31 tests pass. Two MEDIUM security issues were
+  identified and resolved in commit a5d9457: sessionId is now sanitized before
+  filename use and projectDir is validated against process.cwd(). No CRITICAL or
+  HIGH issues. Four LOW items deferred as tech debt.
 reviewer: 'Quinn (Test Architect)'
-updated: '2026-03-02T22:55:00Z'
+updated: '2026-03-03T00:10:00Z'
 
 top_issues:
   - id: MEDIUM-1
     severity: medium
+    status: resolved
+    resolved_in: 'a5d9457'
     title: 'sessionId used directly in filename without sanitization'
     description: >
       In writeDigest(), the sessionId is interpolated directly into the filename:
@@ -21,11 +24,13 @@ top_issues:
       malformed or leak internal paths.
     file: '.aios-core/core/synapse/memory/session-digest/extractor.js'
     line: 285
-    fix: 'Sanitize sessionId: sessionId.replace(/[^a-zA-Z0-9-_]/g, "-").slice(0, 64)'
+    fix: 'sessionId.replace(/[^a-zA-Z0-9-_]/g, "-").slice(0, 64) — applied in a5d9457'
     suggested_owner: dev
 
   - id: MEDIUM-2
     severity: medium
+    status: resolved
+    resolved_in: 'a5d9457'
     title: 'projectDir from CLAUDE_HOOK_INPUT not validated against safe base'
     description: >
       extractSessionDigest() uses context.projectDir (sourced from env var
@@ -35,10 +40,7 @@ top_issues:
     file: '.claude/hooks/synapse-precompact.js'
     line: 46
     fix: >
-      Validate projectDir against process.cwd() or a known safe root:
-      if (!path.resolve(projectDir).startsWith(process.cwd())) {
-        projectDir = process.cwd();
-      }
+      resolvedDir.startsWith(process.cwd()) fallback applied in a5d9457.
     suggested_owner: dev
 
   - id: LOW-1
@@ -109,10 +111,10 @@ evidence:
 
 nfr_validation:
   security:
-    status: CONCERNS
+    status: PASS
     notes: >
-      sessionId not sanitized before filename use (MEDIUM-1).
-      projectDir from env var not path-validated (MEDIUM-2).
+      MEDIUM-1 resolved in a5d9457: sessionId sanitized with replace(/[^a-zA-Z0-9-_]/g, '-').slice(0,64).
+      MEDIUM-2 resolved in a5d9457: projectDir validated against process.cwd() before use.
       No secrets or credentials exposed.
   performance:
     status: PASS
@@ -132,11 +134,14 @@ nfr_validation:
       Minor: analyzeConversation needlessly async (LOW-4).
 
 recommendations:
-  immediate:
+  immediate: []
+  resolved:
     - action: 'Sanitize sessionId before filename use'
       refs: ['.aios-core/core/synapse/memory/session-digest/extractor.js:285']
+      resolved_in: 'a5d9457'
     - action: 'Validate projectDir from CLAUDE_HOOK_INPUT against known safe root'
       refs: ['.claude/hooks/synapse-precompact.js:46']
+      resolved_in: 'a5d9457'
   future:
     - action: 'Add hook script unit/smoke test (child_process spawn)'
       refs: ['.claude/hooks/synapse-precompact.js']

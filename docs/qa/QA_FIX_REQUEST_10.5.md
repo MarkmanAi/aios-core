@@ -114,11 +114,11 @@ evidence:
 
 **Verification:**
 
-- [ ] Run `npm test -- tests/core/synapse/memory/session-digest/` and confirm output shows `31 passed, 31 total`
-- [ ] Confirm `docs/stories/active/10.5.story.md` line 124 shows `31/31`
-- [ ] Confirm `docs/stories/active/10.5.story.md` line 277 shows `All 31 tests pass`
-- [ ] Confirm `docs/qa/gates/10.5-synapse-session-digest-precompact.yml` `status_reason` shows `all 31 tests pass`
-- [ ] Confirm `docs/qa/gates/10.5-synapse-session-digest-precompact.yml` `tests_reviewed: 31`
+- [x] Run `npm test -- tests/core/synapse/memory/session-digest/` and confirm output shows `31 passed, 31 total`
+- [x] Confirm `docs/stories/active/10.5.story.md` line 124 shows `31/31`
+- [x] Confirm `docs/stories/active/10.5.story.md` line 277 shows `All 31 tests pass`
+- [x] Confirm `docs/qa/gates/10.5-synapse-session-digest-precompact.yml` `status_reason` shows `all 31 tests pass`
+- [x] Confirm `docs/qa/gates/10.5-synapse-session-digest-precompact.yml` `tests_reviewed: 31`
 
 **Status:** [x] Fixed — 2026-03-02 by @dev (Dex)
 
@@ -128,11 +128,11 @@ evidence:
 
 **CRITICAL: @dev must follow these constraints:**
 
-- [ ] Fix ONLY the 4 occurrences of "29" listed above — no other changes
-- [ ] Do NOT modify any code files
-- [ ] Do NOT modify any other sections of the story file
-- [ ] Run `npm test` to confirm tests still pass before committing
-- [ ] Commit message: `docs(stories): fix test count 29→31 in story and gate file [Story 10.5]`
+- [x] Fix ONLY the 4 occurrences of "29" listed above — no other changes
+- [x] Do NOT modify any code files
+- [x] Do NOT modify any other sections of the story file
+- [x] Run `npm test` to confirm tests still pass before committing
+- [x] Commit message: `docs(stories): fix test count 29→31 in story and gate file [Story 10.5]`
 
 ---
 
