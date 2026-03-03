@@ -24,7 +24,7 @@ describe('brownfield-upgrader', () => {
   let targetDir;
 
   beforeEach(() => {
-    tempDir = path.join(os.tmpdir(), 'brownfield-test-' + Date.now());
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'aios-brownfield-upgrader-'));
     sourceDir = path.join(tempDir, 'source');
     targetDir = path.join(tempDir, 'target');
 

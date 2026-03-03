@@ -39,13 +39,10 @@ async function cleanupWithRetry(dir, maxRetries = 5, retryDelay = 100) {
 
 describe('Environment Configuration Integration', () => {
   let testDir;
-  let testId;
 
   beforeEach(async () => {
-    // Create unique temporary test directory with random suffix to avoid collisions
-    testId = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
-    testDir = path.join(os.tmpdir(), `aios-env-test-${testId}`);
-    await fs.ensureDir(testDir);
+    // Create unique temporary test directory via mkdtempSync to avoid parallel worker collisions
+    testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'aios-env-test-'));
   });
 
   afterEach(async () => {

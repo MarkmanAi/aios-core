@@ -16,17 +16,20 @@ const {
   shouldSurface,
 } = require('../../.aios-core/core/orchestration/surface-checker');
 
+// Use fixture copy so tests are independent of the live criteria file
+const FIXTURE_PATH = path.join(__dirname, 'fixtures', 'bob-surface-criteria.yaml');
+
 describe('SurfaceChecker', () => {
   let checker;
 
   beforeEach(() => {
-    checker = new SurfaceChecker();
+    checker = new SurfaceChecker(FIXTURE_PATH);
     checker.load();
   });
 
   describe('load()', () => {
     it('should load criteria file successfully', () => {
-      const newChecker = new SurfaceChecker();
+      const newChecker = new SurfaceChecker(FIXTURE_PATH);
       const result = newChecker.load();
       expect(result).toBe(true);
       expect(newChecker.criteria).not.toBeNull();
@@ -461,7 +464,7 @@ describe('SurfaceChecker', () => {
 
 describe('createSurfaceChecker()', () => {
   it('should create and load a SurfaceChecker', () => {
-    const checker = createSurfaceChecker();
+    const checker = createSurfaceChecker(FIXTURE_PATH);
     expect(checker).toBeInstanceOf(SurfaceChecker);
     expect(checker.criteria).not.toBeNull();
   });
@@ -469,13 +472,13 @@ describe('createSurfaceChecker()', () => {
 
 describe('shouldSurface() convenience function', () => {
   it('should work as a standalone function', () => {
-    const result = shouldSurface({ estimated_cost: 10 });
+    const result = shouldSurface({ estimated_cost: 10 }, FIXTURE_PATH);
     expect(result.should_surface).toBe(true);
     expect(result.criterion_id).toBe('C001');
   });
 
   it('should return no surface for empty context', () => {
-    const result = shouldSurface({});
+    const result = shouldSurface({}, FIXTURE_PATH);
     expect(result.should_surface).toBe(false);
   });
 });

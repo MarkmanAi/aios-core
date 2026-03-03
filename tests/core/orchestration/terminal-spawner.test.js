@@ -37,8 +37,8 @@ const {
 let tmpDir;
 
 describe('Terminal Spawner (Story 12.10)', () => {
-  // Store original env vars
-  const originalEnv = { ...process.env };
+  // Snapshot captured per-test in beforeEach to handle env mutations correctly
+  let envSnapshot;
 
   beforeAll(() => {
     tmpDir = fsSync.mkdtempSync(path.join(os.tmpdir(), 'aios-terminal-spawner-'));
@@ -49,8 +49,8 @@ describe('Terminal Spawner (Story 12.10)', () => {
   });
 
   beforeEach(async () => {
-    // Reset environment variables before each test
-    process.env = { ...originalEnv };
+    // Snapshot process.env before each test (mutation-safe approach)
+    envSnapshot = { ...process.env };
 
     // Clean up test directory
     try {
@@ -62,8 +62,12 @@ describe('Terminal Spawner (Story 12.10)', () => {
   });
 
   afterEach(async () => {
-    // Restore original environment
-    process.env = { ...originalEnv };
+    // Restore process.env by mutating the original object (not replacing it)
+    // This ensures modules holding a reference to process.env see the restored values
+    Object.keys(process.env).forEach(key => {
+      if (!(key in envSnapshot)) delete process.env[key];
+    });
+    Object.assign(process.env, envSnapshot);
 
     // Clean up
     try {
