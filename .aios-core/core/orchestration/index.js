@@ -44,6 +44,9 @@ const { DashboardIntegration, NotificationType } = require('./dashboard-integrat
 // Story 0.9: CLI Commands
 const cliCommands = require('./cli-commands');
 
+// Story 11.2: TerminalSpawner export
+const terminalSpawner = require('./terminal-spawner');
+
 module.exports = {
   // Main orchestrators
   WorkflowOrchestrator,
@@ -97,6 +100,15 @@ module.exports = {
   orchestrateStatus: cliCommands.orchestrateStatus,
   orchestrateStop: cliCommands.orchestrateStop,
   orchestrateResume: cliCommands.orchestrateResume,
+
+  // Story 11.2: TerminalSpawner exports
+  TerminalSpawner: terminalSpawner,
+  spawnAgent: terminalSpawner.spawnAgent,
+  createContextFile: terminalSpawner.createContextFile,
+  pollForOutput: terminalSpawner.pollForOutput,
+  isSpawnerAvailable: terminalSpawner.isSpawnerAvailable,
+  getPlatform: terminalSpawner.getPlatform,
+  cleanupOldFiles: terminalSpawner.cleanupOldFiles,
 
   // Factory function for easy instantiation
   createOrchestrator(workflowPath, options = {}) {

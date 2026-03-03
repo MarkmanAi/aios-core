@@ -192,9 +192,10 @@ class GreetingBuilder {
    * @param {Object} agent - Agent definition
    * @param {string} sessionType - Session type
    * @param {string} permissionBadge - Permission mode badge (optional)
+   * @param {Object|null} sectionContext - Enriched context (Story ACT-7)
    * @returns {string} Presentation text
    */
-  buildPresentation(agent, sessionType, permissionBadge = '') {
+  buildPresentation(agent, sessionType, permissionBadge = '', sectionContext = null) {
     const profile = agent.persona_profile;
 
     // Try greeting_levels from communication first, then fall back to top level
@@ -205,40 +206,139 @@ class GreetingBuilder {
       return permissionBadge ? `${base} ${permissionBadge}` : base;
     }
 
-    // Always use archetypal greeting for richer presentation
+    // Without sectionContext: always use archetypal (backward compatible)
+    if (!sectionContext) {
+      const archetypeGreeting =
+        greetingLevels.archetypal || greetingLevels.named || `${agent.icon} ${agent.name} ready`;
+      return permissionBadge ? `${archetypeGreeting} ${permissionBadge}` : archetypeGreeting;
+    }
+
+    const effectiveType = sectionContext.sessionType || sessionType;
+
+    if (effectiveType === 'existing') {
+      const namedGreeting =
+        greetingLevels.named || greetingLevels.archetypal || `${agent.icon} ${agent.name} ready`;
+      let greeting = permissionBadge ? `${namedGreeting} ${permissionBadge}` : namedGreeting;
+      const story =
+        sectionContext.sessionStory || sectionContext.projectStatus?.currentStory || null;
+      greeting += story ? ` — continuing ${story}` : ' — welcome back';
+      return greeting;
+    }
+
+    if (effectiveType === 'workflow') {
+      const namedGreeting =
+        greetingLevels.named || greetingLevels.archetypal || `${agent.icon} ${agent.name} ready`;
+      let greeting = permissionBadge ? `${namedGreeting} ${permissionBadge}` : namedGreeting;
+      if (sectionContext.workflowState || sectionContext.workflowActive) {
+        greeting += ' — workflow active';
+      }
+      return greeting;
+    }
+
+    // new or unknown: archetypal
     const archetypeGreeting =
       greetingLevels.archetypal || greetingLevels.named || `${agent.icon} ${agent.name} ready`;
-
-    // Append permission badge if available
     return permissionBadge ? `${archetypeGreeting} ${permissionBadge}` : archetypeGreeting;
   }
 
   /**
    * Build role description section
    * @param {Object} agent - Agent definition
+   * @param {Object|null} sectionContext - Enriched context (Story ACT-7)
    * @returns {string} Role description
    */
-  buildRoleDescription(agent) {
+  buildRoleDescription(agent, sectionContext = null) {
     if (!agent.persona || !agent.persona.role) {
       return '';
     }
 
-    return `**Role:** ${agent.persona.role}`;
+    // Without sectionContext: plain role (backward compatible)
+    if (!sectionContext) {
+      return `**Role:** ${agent.persona.role}`;
+    }
+
+    const { sessionStory, projectStatus, gitConfig } = sectionContext;
+    const contextParts = [];
+
+    const story = sessionStory || projectStatus?.currentStory;
+    if (story) {
+      contextParts.push(`Story: ${story}`);
+    }
+
+    const branch = gitConfig?.branch || projectStatus?.branch;
+    if (branch && branch !== 'main' && branch !== 'master') {
+      contextParts.push(`Branch: \`${branch}\``);
+    }
+
+    if (contextParts.length === 0) {
+      return `**Role:** ${agent.persona.role}`;
+    }
+
+    return `**Role:** ${agent.persona.role} — ${contextParts.join(' | ')}`;
   }
 
   /**
    * Build project status section
    * @param {Object} projectStatus - Project status data
    * @param {string} sessionType - Session type
+   * @param {Object|null} sectionContext - Enriched context (Story ACT-7)
    * @returns {string} Formatted project status
    */
-  buildProjectStatus(projectStatus, sessionType = 'full') {
+  buildProjectStatus(projectStatus, sessionType = 'full', sectionContext = null) {
     if (!projectStatus) {
       return '';
     }
 
-    const format = sessionType === 'workflow' ? 'condensed' : 'full';
-    return this._formatProjectStatus(projectStatus, format);
+    // Without sectionContext: legacy format (backward compatible)
+    if (!sectionContext) {
+      const format = sessionType === 'workflow' ? 'condensed' : 'full';
+      return this._formatProjectStatus(projectStatus, format);
+    }
+
+    const effectiveType = sectionContext.sessionType || sessionType;
+
+    // Workflow always uses condensed
+    if (effectiveType === 'workflow') {
+      return this._formatProjectStatus(projectStatus, 'condensed');
+    }
+
+    // New/existing with sectionContext: narrative format
+    return this._formatProjectStatusNarrative(projectStatus);
+  }
+
+  /**
+   * Format project status as natural language narrative
+   * @private
+   * @param {Object} status - Project status
+   * @returns {string} Narrative text
+   */
+  _formatProjectStatusNarrative(status) {
+    if (!status) return '';
+
+    const parts = [];
+
+    if (status.branch) {
+      let line = `You're on branch \`${status.branch}\``;
+      if (status.modifiedFilesTotalCount > 0) {
+        const fileWord = status.modifiedFilesTotalCount === 1 ? 'file' : 'files';
+        line += ` with ${status.modifiedFilesTotalCount} modified ${fileWord}.`;
+      } else {
+        line += '.';
+      }
+      parts.push(line);
+    }
+
+    if (status.currentStory) {
+      parts.push(`Story **${status.currentStory}** is in progress.`);
+    }
+
+    if (status.recentCommits && status.recentCommits.length > 0) {
+      parts.push(`Last commit: ${status.recentCommits[0]}.`);
+    }
+
+    if (parts.length === 0) return '';
+
+    return `📊 **Project Status:** ${parts.join(' ')}`;
   }
 
   /**
@@ -779,23 +879,64 @@ class GreetingBuilder {
   /**
    * Build footer section
    * @param {Object} agent - Agent definition
+   * @param {Object|null} sectionContext - Enriched context (Story ACT-7)
    * @returns {string} Footer text with signature
    */
-  buildFooter(agent) {
-    const parts = ['Type `*guide` for comprehensive usage instructions.'];
+  buildFooter(agent, sectionContext = null) {
+    const sig = agent?.persona_profile?.communication?.signature_closing;
 
-    // Add agent signature if available
-    if (
-      agent &&
-      agent.persona_profile &&
-      agent.persona_profile.communication &&
-      agent.persona_profile.communication.signature_closing
-    ) {
+    // Without sectionContext: legacy new-session footer (backward compatible)
+    if (!sectionContext) {
+      const parts = ['Type `*guide` for comprehensive usage instructions.'];
+      if (sig) {
+        parts.push('');
+        parts.push(sig);
+      }
+      return parts.join('\n');
+    }
+
+    const sessionType = sectionContext.sessionType || 'new';
+    const story = sectionContext.sessionStory || sectionContext.projectStatus?.currentStory;
+
+    const parts = [];
+
+    if (sessionType === 'existing') {
+      parts.push('Type `*help` for commands, or `*session-info` to review this session.');
+    } else if (sessionType === 'workflow') {
+      if (story) {
+        parts.push(`Focused on **${story}** — Type \`*help\` for commands.`);
+      } else {
+        parts.push('Workflow active — Type `*help` for commands.');
+      }
+    } else {
+      parts.push('Type `*guide` for comprehensive usage instructions.');
+    }
+
+    if (sig) {
       parts.push('');
-      parts.push(agent.persona_profile.communication.signature_closing);
+      parts.push(sig);
     }
 
     return parts.join('\n');
+  }
+
+  /**
+   * Safely execute a section builder with error handling and timeout
+   * @param {Function} builderFn - Builder function (sync or async)
+   * @param {number} timeout - Timeout in ms (default 200)
+   * @returns {Promise<string|null>} Section content or null on error/timeout
+   */
+  async _safeBuildSection(builderFn, timeout = 200) {
+    try {
+      const resultPromise = Promise.resolve(builderFn());
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Section timeout')), timeout),
+      );
+      const result = await Promise.race([resultPromise, timeoutPromise]);
+      return result ?? null;
+    } catch (_error) {
+      return null;
+    }
   }
 
   /**
@@ -810,10 +951,16 @@ class GreetingBuilder {
    * Filter commands by visibility metadata
    * @param {Object} agent - Agent definition
    * @param {string} sessionType - Session type
+   * @param {string|null} userProfile - User profile ('bob'|'advanced'|null)
    * @returns {Array} Filtered commands
    */
-  filterCommandsByVisibility(agent, sessionType) {
+  filterCommandsByVisibility(agent, sessionType, userProfile = null) {
     if (!agent.commands || agent.commands.length === 0) {
+      return [];
+    }
+
+    // Bob mode: only PM agent shows commands (non-PM agents show nothing)
+    if (userProfile === 'bob' && agent.id !== 'pm') {
       return [];
     }
 
@@ -927,6 +1074,35 @@ class GreetingBuilder {
     }
 
     return this.config.git.showConfigWarning !== false;
+  }
+
+  /**
+   * Load and validate the user profile from project config (Story ACT-2)
+   * @returns {string} Validated user profile ('bob'|'advanced'), defaults to 'advanced'
+   */
+  loadUserProfile() {
+    const DEFAULT_PROFILE = 'advanced';
+    try {
+      const { resolveConfig } = require('../../core/config/config-resolver');
+      const { validateUserProfile } = require('../../infrastructure/scripts/validate-user-profile');
+      const resolved = resolveConfig();
+      const rawProfile = resolved?.config?.user_profile;
+
+      if (!rawProfile) {
+        return DEFAULT_PROFILE;
+      }
+
+      const result = validateUserProfile(rawProfile);
+      if (!result.valid) {
+        console.warn(`[GreetingBuilder] user_profile validation failed: ${result.error}`);
+        return DEFAULT_PROFILE;
+      }
+
+      return result.value;
+    } catch (error) {
+      console.warn('[GreetingBuilder] Failed to load user profile:', error.message);
+      return DEFAULT_PROFILE;
+    }
   }
 
   /**

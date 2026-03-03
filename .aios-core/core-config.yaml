@@ -242,12 +242,10 @@ projectStatus:
 
 agentIdentity:
   greeting:
+    preference: archetypal
     contextDetection: true
     sessionDetection: hybrid
-    workflowDetection: hardcoded
-    performance:
-      gitCheckCache: true
-      gitCheckTTL: 300
+    showArchetype: false
 
 # ============================================
 # SECTION 8: GitHub Integration

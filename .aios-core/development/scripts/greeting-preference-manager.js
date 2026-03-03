@@ -17,13 +17,35 @@ const VALID_PREFERENCES = ['auto', 'minimal', 'named', 'archetypal'];
 
 class GreetingPreferenceManager {
   /**
-   * Get current greeting preference
+   * @param {Object} [options]
+   * @param {string} [options.configPath] - Override config file path (useful for tests)
+   * @param {string} [options.backupPath] - Override backup file path (useful for tests)
+   */
+  constructor(options = {}) {
+    this._configPath = options.configPath || CONFIG_PATH;
+    this._backupPath = options.backupPath || BACKUP_PATH;
+  }
+
+  /**
+   * Get current greeting preference, accounting for user_profile overrides
+   * @param {string|null} userProfile - User profile ('bob'|'advanced'|null to read from config)
    * @returns {string} Current preference (auto|minimal|named|archetypal)
    */
-  getPreference() {
+  getPreference(userProfile = null) {
     try {
       const config = this._loadConfig();
-      return config?.agentIdentity?.greeting?.preference || 'auto';
+      const preference = config?.agentIdentity?.greeting?.preference || 'auto';
+
+      // Determine effective user_profile (param takes precedence over config)
+      const effectiveProfile = userProfile || config?.user_profile || null;
+
+      // Bob mode: cap rich preferences to 'named' (bob users see less verbose greetings)
+      if (effectiveProfile === 'bob') {
+        const bobAllowed = ['minimal', 'named'];
+        return bobAllowed.includes(preference) ? preference : 'named';
+      }
+
+      return preference;
     } catch (error) {
       console.warn('[GreetingPreference] Failed to load, using default:', error.message);
       return 'auto';
@@ -99,8 +121,8 @@ class GreetingPreferenceManager {
    */
   _backupConfig() {
     try {
-      if (fs.existsSync(CONFIG_PATH)) {
-        fs.copyFileSync(CONFIG_PATH, BACKUP_PATH);
+      if (fs.existsSync(this._configPath)) {
+        fs.copyFileSync(this._configPath, this._backupPath);
       }
     } catch (error) {
       console.warn('[GreetingPreference] Failed to backup config:', error.message);
@@ -113,8 +135,8 @@ class GreetingPreferenceManager {
    */
   _restoreBackup() {
     try {
-      if (fs.existsSync(BACKUP_PATH)) {
-        fs.copyFileSync(BACKUP_PATH, CONFIG_PATH);
+      if (fs.existsSync(this._backupPath)) {
+        fs.copyFileSync(this._backupPath, this._configPath);
         console.log('[GreetingPreference] Config restored from backup');
       }
     } catch (error) {
@@ -127,7 +149,7 @@ class GreetingPreferenceManager {
    * @private
    */
   _loadConfig() {
-    const content = fs.readFileSync(CONFIG_PATH, 'utf8');
+    const content = fs.readFileSync(this._configPath, 'utf8');
     return yaml.load(content);
   }
 
@@ -137,7 +159,7 @@ class GreetingPreferenceManager {
    */
   _saveConfig(config) {
     const content = yaml.dump(config, { lineWidth: -1 });
-    fs.writeFileSync(CONFIG_PATH, content, 'utf8');
+    fs.writeFileSync(this._configPath, content, 'utf8');
   }
 }
 
