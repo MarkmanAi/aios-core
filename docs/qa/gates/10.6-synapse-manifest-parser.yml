@@ -1,0 +1,45 @@
+schema: 1
+story: "10.6"
+story_title: "SYNAPSE — Manifest Parser + Domain Data Migration"
+gate: PASS
+status_reason: "All 9 ACs met. 21/21 tests pass. 20 domain files verbatim-verified. Lint clean. Layer activation logic correct and well-tested. No CRITICAL or HIGH issues."
+reviewer: "Quinn (Test Architect)"
+updated: "2026-03-02T00:00:00Z"
+
+top_issues: []
+waiver:
+  active: false
+
+quality_score: 95
+expires: "2026-03-16T00:00:00Z"
+
+evidence:
+  tests_reviewed: 21
+  risks_identified: 2
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: "No shell execution, no eval, no dynamic requires. readFileSync path is constructor-fixed (not user-supplied). Domain files are static data only."
+  performance:
+    status: PASS
+    notes: "readFileSync is appropriate for activation-time use (not a hot path). O(n) registry scan with n≈40 keys is negligible."
+  reliability:
+    status: PASS
+    notes: "Graceful handling for unknown agentId and unknown workflowPhase (returns empty arrays, no crash). Default options parameter prevents TypeError on bare call."
+  maintainability:
+    status: PASS
+    notes: "75-line single file, self-documenting layer comments, no external dependencies. Easy to reason about and extend."
+
+recommendations:
+  immediate: []
+  future:
+    - action: "Add descriptive error wrapping in parse() for missing manifest file (improves debuggability when .synapse/ is not initialized)"
+      refs: [".aios-core/core/synapse/manifest-parser.js:13"]
+    - action: "Consider a test fixture copy of manifest to decouple tests from live file (reduces coupling risk if manifest evolves)"
+      refs: ["tests/core/synapse/manifest-parser.test.js:6"]
+    - action: "Correct story doc: file count is 20 (not 18 as stated in AC1 and Task 2 header)"
+      refs: ["docs/stories/active/10.6.story.md"]
