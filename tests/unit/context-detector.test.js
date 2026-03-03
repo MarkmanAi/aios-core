@@ -12,11 +12,22 @@
 
 const ContextDetector = require('../../.aios-core/core/session/context-detector');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 
 describe('ContextDetector', () => {
   let detector;
-  const testSessionFile = path.join(__dirname, '.test-session-state.json');
+  let tmpDir;
+  let testSessionFile;
+
+  beforeAll(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'aios-context-detector-'));
+    testSessionFile = path.join(tmpDir, 'session-state.json');
+  });
+
+  afterAll(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
 
   beforeEach(() => {
     detector = new ContextDetector();

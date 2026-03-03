@@ -8,6 +8,8 @@
  */
 
 const fs = require('fs').promises;
+const fsSync = require('fs');
+const os = require('os');
 const path = require('path');
 const { MemoryRetriever, TOKEN_ESTIMATES } = require('../../../../.aios-core/core/synapse/memory/memory-retriever');
 
@@ -15,10 +17,18 @@ describe('MemoryRetriever', () => {
   let retriever;
   let testDir;
   let digestsDir;
+  let tmpDir;
+
+  beforeAll(() => {
+    tmpDir = fsSync.mkdtempSync(path.join(os.tmpdir(), 'aios-retriever-'));
+  });
+
+  afterAll(() => {
+    fsSync.rmSync(tmpDir, { recursive: true, force: true });
+  });
 
   beforeEach(async () => {
-    // Create temporary test directory
-    testDir = path.join(__dirname, 'fixtures', 'test-retriever');
+    testDir = tmpDir;
     digestsDir = path.join(testDir, '.aios', 'session-digests');
 
     await fs.mkdir(digestsDir, { recursive: true });
@@ -30,8 +40,8 @@ describe('MemoryRetriever', () => {
   });
 
   afterEach(async () => {
-    // Cleanup test directory
-    await fs.rm(testDir, { recursive: true, force: true });
+    // Cleanup .aios subdir only — tmpDir is reused across tests, removed in afterAll
+    await fs.rm(path.join(testDir, '.aios'), { recursive: true, force: true });
   });
 
   describe('retrieve', () => {

@@ -8,6 +8,8 @@
  */
 
 const fs = require('fs').promises;
+const fsSync = require('fs');
+const os = require('os');
 const path = require('path');
 const yaml = require('yaml');
 const {
@@ -22,12 +24,8 @@ const {
 
 // ─── TEST HELPERS ───────────────────────────────────────────────────
 
-const TEST_DIR = path.join(__dirname, 'fixtures', 'test-self-learner');
-const DIGESTS_DIR = path.join(TEST_DIR, '.aios', 'session-digests');
-const MEMORIES_DIR = path.join(TEST_DIR, '.aios', 'memories');
-const INDEX_DIR = path.join(DIGESTS_DIR, 'index');
-const EVIDENCE_DIR = path.join(MEMORIES_DIR, 'learning');
-const GOTCHA_DIR = path.join(MEMORIES_DIR, 'shared', 'durable');
+let tmpDir;
+let TEST_DIR, DIGESTS_DIR, MEMORIES_DIR, INDEX_DIR, EVIDENCE_DIR, GOTCHA_DIR;
 
 /**
  * Create a test digest file
@@ -146,6 +144,20 @@ async function createTestEvidence(evidenceDir, evidence) {
 describe('SelfLearner', () => {
   let learner;
 
+  beforeAll(() => {
+    tmpDir = fsSync.mkdtempSync(path.join(os.tmpdir(), 'aios-self-learner-'));
+    TEST_DIR = tmpDir;
+    DIGESTS_DIR = path.join(TEST_DIR, '.aios', 'session-digests');
+    MEMORIES_DIR = path.join(TEST_DIR, '.aios', 'memories');
+    INDEX_DIR = path.join(DIGESTS_DIR, 'index');
+    EVIDENCE_DIR = path.join(MEMORIES_DIR, 'learning');
+    GOTCHA_DIR = path.join(MEMORIES_DIR, 'shared', 'durable');
+  });
+
+  afterAll(() => {
+    fsSync.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
   beforeEach(async () => {
     await fs.mkdir(DIGESTS_DIR, { recursive: true });
     await fs.mkdir(INDEX_DIR, { recursive: true });
@@ -156,7 +168,7 @@ describe('SelfLearner', () => {
   });
 
   afterEach(async () => {
-    await fs.rm(TEST_DIR, { recursive: true, force: true });
+    await fs.rm(path.join(TEST_DIR, '.aios'), { recursive: true, force: true });
   });
 
   // ─── CONSTRUCTOR & FACTORY ──────────────────────────────────────
