@@ -50,6 +50,12 @@ module.exports = {
     'tests/unit/manifest/manifest-validator.test.js',
     // Performance tests are flaky on different hardware (OSR-10 tech debt)
     'tests/integration/install-transaction.test.js',
+    // Story 11.1: orphaned tests (no backing module)
+    // pro/license/ module does not exist in this repo (private/future feature)
+    'tests/license/',
+    // Story 11.1: orphaned tests (no backing module)
+    // squads/mmos-squad/ backing services (clickup, google-drive, file-service) not implemented
+    'squads/mmos-squad/',
   ],
 
   // Coverage collection (Story TD-3: Updated paths)

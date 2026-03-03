@@ -13,6 +13,13 @@
  */
 
 const WorkflowOrchestrator = require('./workflow-orchestrator');
+const {
+  WorkflowExecutor,
+  createWorkflowExecutor,
+  executeDevelopmentCycle,
+  PhaseStatus,
+  CheckpointDecision,
+} = require('./workflow-executor');
 const SubagentPromptBuilder = require('./subagent-prompt-builder');
 const ContextManager = require('./context-manager');
 const ChecklistRunner = require('./checklist-runner');
@@ -41,6 +48,13 @@ module.exports = {
   // Main orchestrators
   WorkflowOrchestrator,
   MasterOrchestrator, // Epic 0: ADE Master Orchestrator
+
+  // Story 11.1: WorkflowExecutor export (was missing from module.exports)
+  WorkflowExecutor,
+  createWorkflowExecutor,
+  executeDevelopmentCycle,
+  PhaseStatus,
+  CheckpointDecision,
 
   // Supporting modules
   SubagentPromptBuilder,
