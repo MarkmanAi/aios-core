@@ -120,13 +120,11 @@ class GreetingBuilder {
       sections.push(contextSection);
     }
 
-    // 5. Workflow suggestions (if workflow session and no context section)
-    if (sessionType === 'workflow' && context.lastCommands && !contextSection) {
-      const suggestions = this.workflowNavigator.getNextSteps(context.lastCommands, {
-        agentId: agent.id,
-      });
-      if (suggestions && suggestions.length > 0) {
-        sections.push(this.buildWorkflowSuggestions(suggestions));
+    // 5. Workflow suggestions (existing and workflow sessions)
+    if (sessionType !== 'new') {
+      const workflowSuggestions = this.buildWorkflowSuggestions(context);
+      if (workflowSuggestions) {
+        sections.push(workflowSuggestions);
       }
     }
 
@@ -679,14 +677,22 @@ class GreetingBuilder {
 
   /**
    * Build workflow suggestions section
+   * Checks session state file first, then falls back to command history detection.
+   * Enhances suggestions with SurfaceChecker warnings when applicable.
    * @param {Object} context - Session context
    * @returns {string|null} Workflow suggestions or null
    */
   buildWorkflowSuggestions(context) {
     try {
+      // 1. Try session state detection first (cross-terminal continuity — AC6)
+      const sessionStateSuggestion = this._detectWorkflowFromSessionState();
+      if (sessionStateSuggestion) {
+        return sessionStateSuggestion;
+      }
+
+      // 2. Fall back to command history detection
       const commandHistory = context.commandHistory || context.lastCommands || [];
       const workflowState = this.workflowNavigator.detectWorkflowState(commandHistory, context);
-
       if (!workflowState) {
         return null;
       }
@@ -696,13 +702,93 @@ class GreetingBuilder {
         return null;
       }
 
+      // 3. Enhance with SurfaceChecker proactive warnings (AC4)
+      const enhanced = this._enhanceWithSurfaceChecker(suggestions, context);
+
       const greetingMessage = this.workflowNavigator.getGreetingMessage(workflowState);
       const header = greetingMessage || 'Next steps:';
 
-      return this.workflowNavigator.formatSuggestions(suggestions, header);
+      return this.workflowNavigator.formatSuggestions(enhanced, header);
     } catch (error) {
       console.warn('[GreetingBuilder] Workflow suggestions failed:', error.message);
       return null;
+    }
+  }
+
+  /**
+   * Detect active workflow from session state file (AC3/AC6 — cross-terminal continuity)
+   * @private
+   * @returns {string|null} Session state summary string or null
+   */
+  _detectWorkflowFromSessionState() {
+    try {
+      const { SessionState } = require('../../core/orchestration/session-state');
+      const sessionState = new SessionState();
+      const stateFilePath = sessionState.getStateFilePath();
+
+      if (!fs.existsSync(stateFilePath)) {
+        return null;
+      }
+
+      const content = fs.readFileSync(stateFilePath, 'utf8');
+      const data = yaml.load(content);
+      const ss = data && data.session_state;
+
+      if (!ss || !ss.workflow || !ss.workflow.current_phase) {
+        return null;
+      }
+
+      const epicTitle = (ss.epic && ss.epic.title) || '';
+      const currentStory = (ss.progress && ss.progress.current_story) || '';
+      const totalStories = (ss.epic && ss.epic.total_stories) || 0;
+      const doneCount =
+        ss.progress && Array.isArray(ss.progress.stories_done)
+          ? ss.progress.stories_done.length
+          : 0;
+      const progress = totalStories > 0 ? `${doneCount}/${totalStories}` : '';
+
+      const parts = [];
+      if (epicTitle) parts.push(epicTitle);
+      if (currentStory) parts.push(currentStory);
+      if (progress) parts.push(progress);
+
+      return parts.join(' — ') || 'Workflow active';
+    } catch (_error) {
+      return null;
+    }
+  }
+
+  /**
+   * Enhance suggestions with SurfaceChecker proactive warnings (AC4)
+   * @private
+   * @param {Array} suggestions - Original suggestions from suggestNextCommands
+   * @param {Object} context - Session context passed to shouldSurface
+   * @returns {Array} Enhanced suggestions (warning prepended if applicable)
+   */
+  _enhanceWithSurfaceChecker(suggestions, context) {
+    try {
+      const { SurfaceChecker } = require('../../core/orchestration/surface-checker');
+      const checker = new SurfaceChecker();
+
+      if (!checker.load()) {
+        return suggestions;
+      }
+
+      const surfaceResult = checker.shouldSurface(context);
+      if (!surfaceResult || !surfaceResult.should_surface) {
+        return suggestions;
+      }
+
+      const warningItem = {
+        command: `⚠️ ${surfaceResult.criterion_id}`,
+        description: `warning: ${surfaceResult.criterion_name || surfaceResult.message}`,
+        raw_command: surfaceResult.criterion_id,
+        args: '',
+      };
+
+      return [warningItem, ...suggestions];
+    } catch (_error) {
+      return suggestions;
     }
   }
 
