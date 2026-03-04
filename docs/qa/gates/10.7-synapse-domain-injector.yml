@@ -1,0 +1,83 @@
+schema: 1
+story: "10.7"
+story_title: "SYNAPSE — Domain Injector + Hook Registration"
+gate: PASS
+status_reason: "HIGH issue (EXTRACTOR_REL wrong path) verified fixed in PR #8 merge — correct '../../' path confirmed on disk, extractor.js loads successfully. All 7 ACs met. 15/15 integration tests + 316/316 synapse suite pass. Lint clean. Remaining items are MED/LOW non-blocking."
+reviewer: "Quinn (Test Architect)"
+updated: "2026-03-04T00:00:00Z"
+
+top_issues:
+  - id: "MNT-001"
+    severity: medium
+    finding: "inject() has no input validation — null/undefined activeDomains causes spread crash; crafted file values pose theoretical path traversal risk"
+    suggested_action: "Add guard: if (!activeDomains || !Array.isArray(activeDomains)) return '' — register as tech debt for Epic 11"
+  - id: "TEST-001"
+    severity: medium
+    finding: "getStatus() test (integration.test.js:151) is order-coupled to prior test writing the session file"
+    suggested_action: "Add explicit writeSessionFile() call in getStatus test beforeEach or restructure as independent test"
+  - id: "DOC-001"
+    severity: low
+    finding: "Story doc line 100 shows inject(activeDomains, synapseDir) — actual signature is inject(activeDomains)"
+    suggested_action: "Update story doc to match actual function signature"
+  - id: "DOC-002"
+    severity: low
+    finding: "Task 6 checklist still shows [ ] PENDING @devops despite .claude/settings.json confirmed created in PR #8"
+    suggested_action: "Mark Task 6 @devops subtask as [x] in story"
+  - id: "DOC-003"
+    severity: low
+    finding: "*session-info command present in .antigravity/rules/agents/synapse.md but not in source spec (IDE sync artifact)"
+    suggested_action: "Register as tech debt — evaluate in next IDE sync pass"
+
+waiver:
+  active: false
+
+quality_score: 88
+expires: "2026-03-18T00:00:00Z"
+
+evidence:
+  tests_reviewed: 15
+  synapse_suite_total: 316
+  full_suite_total: 5233
+  risks_identified: 5
+  high_issue_resolution:
+    issue: "EXTRACTOR_REL wrong path"
+    original_finding: "PR #8 review — path '../.aios-core/...' resolved to .claude/.aios-core/ (file not found)"
+    verification: "@dev confirmed on 2026-03-04: file contains '../../.aios-core/...' which resolves correctly to project root. extractor.js exists and exports extractSessionDigest (type=function). No code change needed — fix was present in PR #8 merge."
+    status: RESOLVED
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7]
+    ac_gaps: []
+    ac_note: "AC8 (Epic 10 Done) is an epic-closure criterion, not a code deliverable — satisfied when all stories close."
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: "No shell execution, no eval. Path validation in precompact.js prevents directory traversal via resolvedDir.startsWith(process.cwd()) guard. inject() input validation gap noted as MNT-001 (medium, non-blocking)."
+  performance:
+    status: PASS
+    notes: "Fire-and-forget setImmediate pattern in precompact.js returns to Claude Code within 50ms budget. DomainInjector uses synchronous fs operations appropriate for activation-time (not hot path)."
+  reliability:
+    status: PASS
+    notes: "PreCompact hook wraps entire async block in try/catch with stderr logging — compact is never blocked on failure. DomainInjector skips missing domain files with warning (never throws). SynapseMemoryProvider clearCache() called correctly in *synapse-diagnose."
+  maintainability:
+    status: PASS
+    notes: "domain-injector.js uses LAYER_ORDER constant for deterministic sort (handles unknown layers gracefully). index.js is a 15-line barrel with no logic. Public API stable for Epic 11 consumers."
+
+recommendations:
+  immediate: []
+  future:
+    - action: "Add input validation guard to inject() — if (!activeDomains || !Array.isArray(activeDomains)) return ''"
+      refs: [".aios-core/core/synapse/domain-injector.js:30"]
+      priority: medium
+    - action: "Decouple getStatus() test from prior test state — add independent setup"
+      refs: ["tests/core/synapse/integration.test.js:151"]
+      priority: medium
+    - action: "Correct story doc signature: inject(activeDomains) not inject(activeDomains, synapseDir)"
+      refs: ["docs/stories/active/10.7.story.md:100"]
+      priority: low
+    - action: "Mark Task 6 @devops checkbox as complete in story"
+      refs: ["docs/stories/active/10.7.story.md:136"]
+      priority: low
+    - action: "Audit IDE sync for extra commands not in source spec (session-info in antigravity synapse.md)"
+      refs: [".antigravity/rules/agents/synapse.md:21"]
+      priority: low
