@@ -217,11 +217,13 @@ class WaveExecutor extends EventEmitter {
     this.emit('task_started', { taskId: task.id, description: task.description });
 
     try {
-      // Create timeout promise
+      // Create timeout promise.
+      // .unref() prevents this long-running timer from keeping Node.js / Jest alive.
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => {
+        const t = setTimeout(() => {
           reject(new Error(`Task ${task.id} timed out after ${this.taskTimeout}ms`));
         }, this.taskTimeout);
+        if (t.unref) t.unref();
       });
 
       // Execute task with rate limiting if available
@@ -272,10 +274,12 @@ class WaveExecutor extends EventEmitter {
         duration: Date.now() - startTime,
       };
     } finally {
-      // Remove from active after a delay (for monitoring)
-      setTimeout(() => {
+      // Remove from active after a delay (for monitoring).
+      // .unref() prevents this timer from keeping Node.js / Jest alive after tests finish.
+      const cleanupTimer = setTimeout(() => {
         this.activeExecutions.delete(task.id);
       }, 5000);
+      if (cleanupTimer.unref) cleanupTimer.unref();
     }
   }
 

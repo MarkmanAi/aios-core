@@ -31,7 +31,7 @@ const { SessionState, ActionType } = require('./session-state');
 // Constants
 const DEFAULT_TIMEOUT_MS = 7200000; // 2 hours
 const CHECKPOINT_TIMEOUT_MS = 1800000; // 30 minutes
-const STATE_SAVE_INTERVAL_MS = 300000; // 5 minutes
+const _STATE_SAVE_INTERVAL_MS = 300000; // 5 minutes
 
 /**
  * Workflow phase status
@@ -656,7 +656,7 @@ class WorkflowExecutor {
    * @param {string} agent - Agent ID
    * @returns {Promise<Object>} Phase result
    */
-  async executeSelfHealingPhase(phase, agent) {
+  async executeSelfHealingPhase(phase, _agent) {
     try {
       const maxIterations = phase.config?.max_iterations || this.config?.coderabbit_integration?.self_healing?.max_iterations || 3;
       const severityFilter = phase.config?.severity_filter || ['CRITICAL', 'HIGH'];
@@ -791,7 +791,7 @@ class WorkflowExecutor {
         console.log(`[WorkflowExecutor] Running CodeRabbit: ${command}`);
       }
 
-      const { stdout, stderr } = await execAsync(command, {
+      const { stdout, stderr: _stderr } = await execAsync(command, {
         timeout: (coderabbitConfig.self_healing?.timeout_minutes || 30) * 60 * 1000,
         maxBuffer: 10 * 1024 * 1024, // 10MB
       });
@@ -1044,7 +1044,7 @@ class WorkflowExecutor {
    * @param {string} storyPath - Path to story file
    * @returns {Promise<Object>} Phase result
    */
-  async executeCheckpointPhase(phase, agent, storyPath) {
+  async executeCheckpointPhase(_phase, _agent, _storyPath) {
     // This phase requires human interaction
     // In a real implementation, this would wait for user input
 
@@ -1110,7 +1110,7 @@ class WorkflowExecutor {
    * @param {Object} result - Phase result
    * @returns {string} Error handler ID
    */
-  getErrorHandler(phaseId, result) {
+  getErrorHandler(phaseId, _result) {
     const phase = this.workflow.workflow.phases[phaseId];
     return phase?.on_failure || 'default_error_handler';
   }
@@ -1121,7 +1121,7 @@ class WorkflowExecutor {
    * @param {Object} result - Phase result
    * @returns {Promise<Object>} Handler result
    */
-  async handleError(handlerId, result) {
+  async handleError(handlerId, _result) {
     const handler = this.workflow.workflow.error_handlers?.[handlerId];
 
     if (!handler) {

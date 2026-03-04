@@ -140,6 +140,9 @@ agents:
       - path: .aios-core/data/workflow-patterns.yaml
         lazy: false
         size: 8KB
+      - path: docs/framework/coding-standards.md
+        lazy: false
+        size: 25KB
     lazy_loading: {}
     performance_target: <75ms
 
@@ -173,7 +176,13 @@ agents:
     config_sections:
       - devStoryLocation
       - storyBacklog
-    files_loaded: []
+    files_loaded:
+      - path: docs/framework/coding-standards.md
+        lazy: false
+        size: 25KB
+      - path: docs/framework/tech-stack.md
+        lazy: false
+        size: 30KB
     lazy_loading: {}
     performance_target: <100ms
 
@@ -185,6 +194,12 @@ agents:
       - path: .aios-core/product/data/brainstorming-techniques.md
         lazy: false
         size: 2KB
+      - path: docs/framework/tech-stack.md
+        lazy: false
+        size: 30KB
+      - path: docs/framework/source-tree.md
+        lazy: false
+        size: 20KB
     lazy_loading: {}
     performance_target: <100ms
 
@@ -192,9 +207,25 @@ agents:
     config_sections:
       - dataLocation
       - uxLocation
-    files_loaded: []
+    files_loaded:
+      - path: docs/framework/tech-stack.md
+        lazy: false
+        size: 30KB
+      - path: docs/framework/coding-standards.md
+        lazy: false
+        size: 25KB
     lazy_loading: {}
     performance_target: <100ms
+
+  squad-creator:
+    config_sections:
+      - squadsTemplateLocation
+      - dataLocation
+    files_loaded: []
+    lazy_loading:
+      agent_registry: true
+      expansion_pack_manifest: true
+    performance_target: <150ms
 
   aios-developer:
     config_sections:
@@ -279,18 +310,25 @@ lazy_loading_strategy:
       size: 25KB
       used_by:
         - dev
+        - pm
+        - ux-design-expert
+        - sm
       cache_priority: high
 
     - path: docs/framework/tech-stack.md
       size: 30KB
       used_by:
         - dev
+        - pm
+        - ux-design-expert
+        - analyst
       cache_priority: high
 
     - path: docs/framework/source-tree.md
       size: 20KB
       used_by:
         - dev
+        - analyst
       cache_priority: medium
 
 # ======================================================================

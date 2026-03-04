@@ -57,6 +57,10 @@ jest.mock('../../.aios-core/core/orchestration/surface-checker', () => ({
 }));
 
 const { loadProjectStatus } = require('../../.aios-core/infrastructure/scripts/project-status-loader');
+const GreetingPreferenceManager = require('../../.aios-core/development/scripts/greeting-preference-manager');
+const { SessionState, sessionStateExists } = require('../../.aios-core/core/orchestration/session-state');
+const { SurfaceChecker } = require('../../.aios-core/core/orchestration/surface-checker');
+const { resolveConfig } = require('../../.aios-core/core/config/config-resolver');
 
 describe('Story ACT-7: Context-Aware Greeting Sections', () => {
   let builder;
@@ -87,7 +91,30 @@ describe('Story ACT-7: Context-Aware Greeting Sections', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
+
+    // Re-initialize all factory mock implementations cleared by resetAllMocks().
+    GreetingPreferenceManager.mockImplementation(() => ({
+      getPreference: jest.fn().mockReturnValue('auto'),
+      setPreference: jest.fn(),
+      getConfig: jest.fn().mockReturnValue({}),
+    }));
+
+    SessionState.mockImplementation(() => ({
+      getStateFilePath: jest.fn().mockReturnValue('/tmp/nonexistent-state.yaml'),
+    }));
+    sessionStateExists.mockReturnValue(false);
+
+    SurfaceChecker.mockImplementation(() => ({
+      load: jest.fn().mockReturnValue(false),
+      shouldSurface: jest.fn().mockReturnValue({ should_surface: false }),
+    }));
+
+    resolveConfig.mockReturnValue({
+      config: { user_profile: 'advanced' },
+      warnings: [],
+      legacy: false,
+    });
 
     mockAgent = {
       id: 'dev',

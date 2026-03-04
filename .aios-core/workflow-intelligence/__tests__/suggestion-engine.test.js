@@ -5,6 +5,7 @@
 
 'use strict';
 
+const os = require('os');
 const path = require('path');
 const fs = require('fs');
 
@@ -29,6 +30,15 @@ const {
 
 describe('SuggestionEngine', () => {
   let engine;
+  let tmpDir;
+
+  beforeAll(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'aios-suggestion-'));
+  });
+
+  afterAll(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
 
   beforeEach(() => {
     engine = createSuggestionEngine({ lazyLoad: true });
@@ -71,7 +81,7 @@ describe('SuggestionEngine', () => {
 
     it('should use story override when provided', async () => {
       // Create a temporary file for testing
-      const testStoryPath = path.join(process.cwd(), 'test-story-temp.md');
+      const testStoryPath = path.join(tmpDir, 'test-story-temp.md');
       fs.writeFileSync(testStoryPath, '# Test Story');
 
       try {

@@ -17,7 +17,7 @@ class ConflictResolver {
       'theirs': this.resolveTheirs.bind(this),
       'manual': this.resolveManual.bind(this),
       'auto': this.resolveAuto.bind(this),
-      'interactive': this.resolveInteractive.bind(this)
+      'interactive': this.resolveInteractive.bind(this),
     };
   }
 
@@ -32,7 +32,7 @@ class ConflictResolver {
       if (conflicts.length === 0) {
         return {
           hasConflicts: false,
-          files: []
+          files: [],
         };
       }
 
@@ -40,28 +40,28 @@ class ConflictResolver {
       for (const file of conflicts) {
         const content = await fs.readFile(
           path.join(this.rootPath, file),
-          'utf-8'
+          'utf-8',
         );
         
-        const conflictInfo = this.parseConflictMarkers(_content);
+        const conflictInfo = this.parseConflictMarkers(content);
         conflictDetails.push({
           file,
           conflicts: conflictInfo.conflicts,
           conflictCount: conflictInfo.conflicts.length,
-          type: this.detectConflictType(file, conflictInfo)
+          type: this.detectConflictType(file, conflictInfo),
         });
       }
 
       return {
         hasConflicts: true,
         files: conflictDetails,
-        totalConflicts: conflictDetails.reduce((sum, f) => sum + f.conflictCount, 0)
+        totalConflicts: conflictDetails.reduce((sum, f) => sum + f.conflictCount, 0),
       };
     } catch (error) {
       console.error(chalk.red(`Error detecting conflicts: ${error.message}`));
       return {
         hasConflicts: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -70,7 +70,7 @@ class ConflictResolver {
    * Parse conflict markers in file content
    * @private
    */
-  parseConflictMarkers(_content) {
+  parseConflictMarkers(content) {
     const conflicts = [];
     const lines = content.split('\n');
     let inConflict = false;
@@ -88,7 +88,7 @@ class ConflictResolver {
           theirs: [],
           separator: null,
           endLine: null,
-          branch: line.substring(8).trim()
+          branch: line.substring(8).trim(),
         };
       } else if (inConflict && line.startsWith('=======')) {
         currentConflict.separator = lineNumber;
@@ -119,7 +119,7 @@ class ConflictResolver {
     const conflicts = conflictInfo.conflicts;
 
     // Check for specific conflict patterns
-    for (const _conflict of conflicts) {
+    for (const conflict of conflicts) {
       const oursContent = conflict.ours.join('\n');
       const theirsContent = conflict.theirs.join('\n');
 
@@ -164,7 +164,7 @@ class ConflictResolver {
     }
 
     console.log(chalk.yellow(
-      `Found ${conflictInfo.totalConflicts} conflicts in ${conflictInfo.files.length} files`
+      `Found ${conflictInfo.totalConflicts} conflicts in ${conflictInfo.files.length} files`,
     ));
 
     const resolver = this.strategies[strategy];
@@ -175,27 +175,27 @@ class ConflictResolver {
     const results = {
       resolved: 0,
       failed: 0,
-      files: []
+      files: [],
     };
 
     for (const fileInfo of conflictInfo.files) {
       try {
         console.log(chalk.blue(`\nResolving conflicts in: ${fileInfo.file}`));
-        const resolved = await resolver(_fileInfo, options);
+        const resolved = await resolver(fileInfo, options);
         
         if (resolved.success) {
           results.resolved += resolved.conflictsResolved;
           results.files.push({
             file: fileInfo.file,
             status: 'resolved',
-            method: resolved.method
+            method: resolved.method,
           });
         } else {
           results.failed++;
           results.files.push({
             file: fileInfo.file,
             status: 'failed',
-            error: resolved.error
+            error: resolved.error,
           });
         }
       } catch (error) {
@@ -203,7 +203,7 @@ class ConflictResolver {
         results.files.push({
           file: fileInfo.file,
           status: 'error',
-          error: error.message
+          error: error.message,
         });
       }
     }
@@ -215,7 +215,7 @@ class ConflictResolver {
    * Resolve using 'ours' strategy (keep current branch changes)
    * @private
    */
-  async resolveOurs(_fileInfo) {
+  async resolveOurs(fileInfo) {
     try {
       await this.git.execGit(`checkout --ours "${fileInfo.file}"`);
       await this.git.execGit(`add "${fileInfo.file}"`);
@@ -223,12 +223,12 @@ class ConflictResolver {
       return {
         success: true,
         conflictsResolved: fileInfo.conflictCount,
-        method: 'ours'
+        method: 'ours',
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -237,7 +237,7 @@ class ConflictResolver {
    * Resolve using 'theirs' strategy (keep incoming branch changes)
    * @private
    */
-  async resolveTheirs(_fileInfo) {
+  async resolveTheirs(fileInfo) {
     try {
       await this.git.execGit(`checkout --theirs "${fileInfo.file}"`);
       await this.git.execGit(`add "${fileInfo.file}"`);
@@ -245,12 +245,12 @@ class ConflictResolver {
       return {
         success: true,
         conflictsResolved: fileInfo.conflictCount,
-        method: 'theirs'
+        method: 'theirs',
       };
     } catch (error) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -259,15 +259,15 @@ class ConflictResolver {
    * Resolve conflicts manually by editing the file
    * @private
    */
-  async resolveManual(_fileInfo) {
+  async resolveManual(fileInfo) {
     const filePath = path.join(this.rootPath, fileInfo.file);
-    const content = await fs.readFile(filePath, 'utf-8');
+    const _content = await fs.readFile(filePath, 'utf-8');
     
     console.log(chalk.yellow(
-      `Manual resolution required for ${fileInfo.file}`
+      `Manual resolution required for ${fileInfo.file}`,
     ));
     console.log(chalk.gray(
-      'Edit the file to resolve conflicts, then mark as resolved'
+      'Edit the file to resolve conflicts, then mark as resolved',
     ));
     
     // In a real implementation, this would open an editor
@@ -275,7 +275,7 @@ class ConflictResolver {
     return {
       success: false,
       error: 'Manual resolution required',
-      instruction: `Edit ${filePath} and run: git add "${fileInfo.file}"`
+      instruction: `Edit ${filePath} and run: git add "${fileInfo.file}"`,
     };
   }
 
@@ -283,7 +283,7 @@ class ConflictResolver {
    * Automatically resolve conflicts based on type
    * @private
    */
-  async resolveAuto(_fileInfo) {
+  async resolveAuto(fileInfo) {
     const filePath = path.join(this.rootPath, fileInfo.file);
     const content = await fs.readFile(filePath, 'utf-8');
     
@@ -293,25 +293,25 @@ class ConflictResolver {
     switch (fileInfo.type) {
       case 'whitespace':
         // For whitespace conflicts, keep theirs
-        resolved = await this.autoResolveWhitespace(_content, fileInfo);
+        resolved = await this.autoResolveWhitespace(content, fileInfo);
         resolvedCount = fileInfo.conflictCount;
         break;
         
       case 'imports':
         // For import conflicts, merge both
-        resolved = await this.autoResolveImports(_content, fileInfo);
+        resolved = await this.autoResolveImports(content, fileInfo);
         resolvedCount = fileInfo.conflictCount;
         break;
         
       case 'version':
         // For version conflicts, keep higher version
-        resolved = await this.autoResolveVersion(_content, fileInfo);
+        resolved = await this.autoResolveVersion(content, fileInfo);
         resolvedCount = fileInfo.conflictCount;
         break;
         
       case 'json':
         // For JSON conflicts, attempt to merge
-        resolved = await this.autoResolveJSON(_content, fileInfo);
+        resolved = await this.autoResolveJSON(content, fileInfo);
         resolvedCount = fileInfo.conflictCount;
         break;
         
@@ -319,7 +319,7 @@ class ConflictResolver {
         // Can't auto-resolve
         return {
           success: false,
-          error: `Cannot auto-resolve ${fileInfo.type} conflicts`
+          error: `Cannot auto-resolve ${fileInfo.type} conflicts`,
         };
     }
 
@@ -330,7 +330,7 @@ class ConflictResolver {
     return {
       success: true,
       conflictsResolved: resolvedCount,
-      method: `auto-${fileInfo.type}`
+      method: `auto-${fileInfo.type}`,
     };
   }
 
@@ -338,10 +338,10 @@ class ConflictResolver {
    * Interactive conflict resolution
    * @private
    */
-  async resolveInteractive(_fileInfo) {
+  async resolveInteractive(fileInfo) {
     const filePath = path.join(this.rootPath, fileInfo.file);
     const content = await fs.readFile(filePath, 'utf-8');
-    const conflicts = this.parseConflictMarkers(_content).conflicts;
+    const conflicts = this.parseConflictMarkers(content).conflicts;
     
     let resolvedContent = content;
     let resolvedCount = 0;
@@ -349,7 +349,7 @@ class ConflictResolver {
     console.log(chalk.blue(`\nResolving ${fileInfo.file} (${conflicts.length} conflicts)`));
 
     for (let i = 0; i < conflicts.length; i++) {
-      const _conflict = conflicts[i];
+      const conflict = conflicts[i];
       console.log(chalk.yellow(`\nConflict ${i + 1}/${conflicts.length}:`));
       
       // Show conflict preview
@@ -371,15 +371,15 @@ class ConflictResolver {
           { name: 'Keep both (ours first)', value: 'both-ours' },
           { name: 'Keep both (theirs first)', value: 'both-theirs' },
           { name: 'Custom merge', value: 'custom' },
-          { name: 'Skip this conflict', value: 'skip' }
-        ]
+          { name: 'Skip this conflict', value: 'skip' },
+        ],
       }]);
 
       if (resolution !== 'skip') {
         resolvedContent = await this.applyResolution(
           resolvedContent,
-          _conflict,
-          resolution
+          conflict,
+          resolution,
         );
         resolvedCount++;
       }
@@ -393,7 +393,7 @@ class ConflictResolver {
     return {
       success: true,
       conflictsResolved: resolvedCount,
-      method: 'interactive'
+      method: 'interactive',
     };
   }
 
@@ -401,9 +401,9 @@ class ConflictResolver {
    * Apply a specific resolution to content
    * @private
    */
-  async applyResolution(_content, _conflict, resolution) {
+  async applyResolution(content, conflict, resolution) {
     const lines = content.split('\n');
-    let newLines = [];
+    const newLines = [];
     let skipUntil = null;
 
     for (let i = 0; i < lines.length; i++) {
@@ -425,15 +425,16 @@ class ConflictResolver {
             newLines.push(...conflict.theirs);
             newLines.push(...conflict.ours);
             break;
-          case 'custom':
+          case 'custom': {
             const { custom } = await inquirer.prompt([{
               type: 'editor',
               name: 'custom',
               message: 'Enter custom resolution:',
-              default: conflict.ours.join('\n')
+              default: conflict.ours.join('\n'),
             }]);
             newLines.push(...custom.split('\n'));
             break;
+          }
         }
         skipUntil = conflict.endLine;
       } else {
@@ -448,14 +449,14 @@ class ConflictResolver {
    * Auto-resolve whitespace conflicts
    * @private
    */
-  async autoResolveWhitespace(_content, fileInfo) {
+  async autoResolveWhitespace(content, fileInfo) {
     // Remove conflict markers and keep theirs (usually has correct formatting)
     let resolved = content;
     
     for (const _conflict of fileInfo.conflicts) {
       const pattern = new RegExp(
-        `<<<<<<<[^\\n]*\\n[\\s\\S]*?=======\\n([\\s\\S]*?)>>>>>>>[^\\n]*\\n`,
-        'g'
+        '<<<<<<<[^\\n]*\\n[\\s\\S]*?=======\\n([\\s\\S]*?)>>>>>>>[^\\n]*\\n',
+        'g',
       );
       resolved = resolved.replace(pattern, '$1');
     }
@@ -467,11 +468,11 @@ class ConflictResolver {
    * Auto-resolve import conflicts
    * @private
    */
-  async autoResolveImports(_content, fileInfo) {
+  async autoResolveImports(content, fileInfo) {
     // Merge imports from both sides, removing duplicates
     const imports = new Set();
     
-    for (const _conflict of fileInfo.conflicts) {
+    for (const conflict of fileInfo.conflicts) {
       // Extract imports from both sides
       const oursImports = conflict.ours
         .filter(line => line.includes('import') || line.includes('require'))
@@ -489,8 +490,8 @@ class ConflictResolver {
     let resolved = content;
     for (const _conflict of fileInfo.conflicts) {
       const pattern = new RegExp(
-        `<<<<<<<[^\\n]*\\n[\\s\\S]*?>>>>>>>[^\\n]*\\n`,
-        'g'
+        '<<<<<<<[^\\n]*\\n[\\s\\S]*?>>>>>>>[^\\n]*\\n',
+        'g',
       );
       resolved = resolved.replace(pattern, Array.from(imports).join('\n') + '\n');
     }
@@ -502,10 +503,10 @@ class ConflictResolver {
    * Auto-resolve version conflicts
    * @private
    */
-  async autoResolveVersion(_content, fileInfo) {
+  async autoResolveVersion(content, fileInfo) {
     let resolved = content;
     
-    for (const _conflict of fileInfo.conflicts) {
+    for (const conflict of fileInfo.conflicts) {
       const oursVersion = conflict.ours.join('').match(/(\d+)\.(\d+)\.(\d+)/);
       const theirsVersion = conflict.theirs.join('').match(/(\d+)\.(\d+)\.(\d+)/);
       
@@ -525,7 +526,7 @@ class ConflictResolver {
         }
         
         const pattern = new RegExp(
-          `<<<<<<<[^\\n]*\\n[\\s\\S]*?=======\\n([\\s\\S]*?)>>>>>>>[^\\n]*\\n`
+          '<<<<<<<[^\\n]*\\n[\\s\\S]*?=======\\n([\\s\\S]*?)>>>>>>>[^\\n]*\\n',
         );
         
         if (useTheirs) {
@@ -543,7 +544,7 @@ class ConflictResolver {
    * Auto-resolve JSON conflicts
    * @private
    */
-  async autoResolveJSON(_content, fileInfo) {
+  async autoResolveJSON(content, _fileInfo) {
     try {
       // Try to parse and merge JSON objects
       const oursMatch = content.match(/<<<<<<<[^{]*({[\s\S]*?})[\s\S]*?=======/);
@@ -575,7 +576,7 @@ class ConflictResolver {
     const result = { ...obj1 };
     
     for (const key in obj2) {
-      if (obj2.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj2, key)) {
         if (typeof obj2[key] === 'object' && !Array.isArray(obj2[key]) && 
             obj1[key] && typeof obj1[key] === 'object') {
           result[key] = this.deepMerge(obj1[key], obj2[key]);
@@ -598,7 +599,7 @@ class ConflictResolver {
     if (!conflictInfo.hasConflicts) {
       return {
         summary: 'No conflicts detected',
-        details: []
+        details: [],
       };
     }
 
@@ -612,10 +613,10 @@ class ConflictResolver {
         preview: file.conflicts.map(c => ({
           lines: `${c.startLine}-${c.endLine}`,
           oursPreview: c.ours.slice(0, 2).join('\n'),
-          theirsPreview: c.theirs.slice(0, 2).join('\n')
-        }))
+          theirsPreview: c.theirs.slice(0, 2).join('\n'),
+        })),
       })),
-      recommendations: this.generateRecommendations(conflictInfo)
+      recommendations: this.generateRecommendations(conflictInfo),
     };
 
     return report;
@@ -639,7 +640,7 @@ class ConflictResolver {
       recommendations.push({
         type: 'whitespace',
         suggestion: 'Use auto-resolution for whitespace conflicts',
-        command: "resolver.resolveConflicts('auto', { type: 'whitespace' })"
+        command: "resolver.resolveConflicts('auto', { type: 'whitespace' })",
       });
     }
 
@@ -647,7 +648,7 @@ class ConflictResolver {
       recommendations.push({
         type: 'imports',
         suggestion: 'Merge import statements from both branches',
-        command: "resolver.resolveConflicts('auto', { type: 'imports' })"
+        command: "resolver.resolveConflicts('auto', { type: 'imports' })",
       });
     }
 
@@ -655,7 +656,7 @@ class ConflictResolver {
       recommendations.push({
         type: 'version',
         suggestion: 'Keep the higher version number',
-        command: "resolver.resolveConflicts('auto', { type: 'version' })"
+        command: "resolver.resolveConflicts('auto', { type: 'version' })",
       });
     }
 
@@ -664,7 +665,7 @@ class ConflictResolver {
       recommendations.push({
         type: 'general',
         suggestion: 'Consider reviewing branch merge strategy',
-        command: 'Use smaller, more focused branches'
+        command: 'Use smaller, more focused branches',
       });
     }
 

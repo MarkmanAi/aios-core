@@ -824,6 +824,26 @@ Runtime state is persisted in `.aios/`:
 
 ---
 
+## Data File Governance
+
+The following data files are referenced by agents in `.aios-core/data/agent-config-requirements.yaml`.
+All files must exist on disk, have a documented owner, and be kept current.
+
+| File | Owner | Description |
+|------|-------|-------------|
+| `docs/framework/coding-standards.md` | @dev | AIOS coding standards and conventions |
+| `docs/framework/tech-stack.md` | @architect | Technology stack and dependency decisions |
+| `.aios-core/data/technical-preferences.md` | @architect | Technical preferences and best practices |
+| `.aios-core/product/data/test-levels-framework.md` | @qa | Test levels and testing framework guidelines |
+| `.aios-core/product/data/test-priorities-matrix.md` | @qa | Test priorities and risk matrix |
+| `.aios-core/product/data/brainstorming-techniques.md` | @analyst | Brainstorming techniques and ideation methods |
+| `.aios-core/product/data/elicitation-methods.md` | @po | Requirements elicitation methods |
+
+**Governance rule:** Any new file added to `agent-config-requirements.yaml` must be added to this table.
+Run `*update-source-tree` (via @aios-master) to audit and validate governance compliance.
+
+---
+
 ## Related Documents
 
 - [Coding Standards](./coding-standards.md)

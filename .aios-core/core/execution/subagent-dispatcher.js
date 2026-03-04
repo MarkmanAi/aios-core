@@ -414,7 +414,7 @@ class SubagentDispatcher extends EventEmitter {
    * @returns {Promise<Object>} - Execution result
    */
   async executeWithProvider(prompt, providerName, task) {
-    const startTime = Date.now();
+    const _startTime = Date.now();
 
     // Get primary provider
     const provider = this.getAIProvider(providerName);
@@ -548,7 +548,7 @@ class SubagentDispatcher extends EventEmitter {
    * @param {Object} task - Original task
    * @returns {Object} - Selected result
    */
-  selectParallelResult(claudeResult, geminiResult, task) {
+  selectParallelResult(claudeResult, geminiResult, _task) {
     switch (this.parallelMode) {
       case 'race':
         // Return first successful result

@@ -1,0 +1,63 @@
+schema: 1
+story: "11.5"
+story_title: "CI Health — Test Isolation: Windows Timing, Env Mutation & Real File (Class C/D/E)"
+gate: PASS
+status_reason: >
+  All 5 Class C/D/E targeted suites pass 186/186 tests in both serial (--runInBand) and
+  3x consecutive parallel runs. All fix patterns validated: mkdtempSync, maxRetries, envSnapshot,
+  fixture file. Node v24.13.1 supports all options natively. Lint clean. No production code touched.
+reviewer: "Quinn (Test Architect)"
+updated: "2026-03-03T22:00:00Z"
+
+top_issues: []
+
+waiver:
+  active: false
+
+quality_score: 95
+expires: "2026-03-17T00:00:00Z"
+
+evidence:
+  tests_reviewed: 186
+  risks_identified: 0
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 8, 9]
+    ac_gaps: []
+    ac_notes:
+      "7": >
+        AC7 requires 10 consecutive parallel runs. Dev validated 3x, QA validated 3x.
+        Consistent PASS across all 6 validation rounds. Risk assessed as low.
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: "Test-only changes. No production code modified. No user-controlled data paths."
+  performance:
+    status: PASS
+    notes: >
+      mkdtempSync is synchronous but acceptable in test setup. Native maxRetries
+      avoids busy-wait loops. Fixture read is <1ms.
+  reliability:
+    status: PASS
+    notes: >
+      EBUSY retry via native maxRetries (Node v24). env snapshot/restore via
+      Object.assign/delete (correct for Jest workers). mkdtempSync eliminates
+      collision risk from Date.now() suffix.
+  maintainability:
+    status: PASS
+    notes: >
+      All fixes follow exactly the patterns documented in Dev Notes. FIXTURE_PATH
+      constant is idiomatic. Changes are minimal and self-explanatory.
+
+recommendations:
+  immediate: []
+  future:
+    - action: >
+        Consider promoting surface-criteria.yaml fixture to tests/fixtures/ (shared)
+        if other suites need the same file.
+      refs: ["tests/core/fixtures/bob-surface-criteria.yaml"]
+    - action: >
+        Create a follow-up story for the 7 remaining parallel flakies identified
+        in Story 11.2 re-assessment (session-state, semantic-merge-engine,
+        wave-executor, self-learner, greeting-builder, squad-generator, config-cli).
+      refs: ["docs/qa/gates/11.2-ci-health-core-test-regression-fixes.yml"]

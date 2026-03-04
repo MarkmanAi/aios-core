@@ -263,7 +263,7 @@ class StorageAdapter {
       // Clean up temp file
       try {
         require('fs').unlinkSync(tempPath);
-      } catch (e) {
+      } catch (_e) {
         // Ignore cleanup errors
       }
     }

@@ -227,6 +227,57 @@ class DashboardEmitter {
   }
 
   /**
+   * Emit BobPhaseChange event
+   * @param {string} phase - Orchestration phase name
+   * @param {string} story - Story ID being orchestrated
+   * @param {string} executor - Agent executing the phase
+   */
+  async emitBobPhaseChange(phase, story, executor) {
+    await this.emit(DashboardEventType.BOB_PHASE_CHANGE, { phase, story, executor });
+  }
+
+  /**
+   * Emit BobAgentSpawned event
+   * @param {string} agent - Agent ID
+   * @param {number} pid - Process ID
+   * @param {string} task - Task being assigned
+   */
+  async emitBobAgentSpawned(agent, pid, task) {
+    await this.emit(DashboardEventType.BOB_AGENT_SPAWNED, { agent, pid, task });
+  }
+
+  /**
+   * Emit BobAgentCompleted event
+   * @param {string} agent - Agent ID
+   * @param {number} pid - Process ID
+   * @param {boolean} success - Whether the agent succeeded
+   * @param {number} duration - Execution duration in ms
+   */
+  async emitBobAgentCompleted(agent, pid, success, duration) {
+    await this.emit(DashboardEventType.BOB_AGENT_COMPLETED, { agent, pid, success, duration });
+  }
+
+  /**
+   * Emit BobSurfaceDecision event
+   * @param {string} criteria - Decision criteria identifier
+   * @param {string} action - Action taken
+   * @param {Object} [context={}] - Additional context
+   */
+  async emitBobSurfaceDecision(criteria, action, context = {}) {
+    await this.emit(DashboardEventType.BOB_SURFACE_DECISION, { criteria, action, context });
+  }
+
+  /**
+   * Emit BobError event
+   * @param {string} phase - Phase where the error occurred
+   * @param {string} message - Error message
+   * @param {boolean} [recoverable=true] - Whether the error is recoverable
+   */
+  async emitBobError(phase, message, recoverable = true) {
+    await this.emit(DashboardEventType.BOB_ERROR, { phase, message, recoverable });
+  }
+
+  /**
    * POST event to monitor-server with timeout
    * @private
    * @param {Object} event

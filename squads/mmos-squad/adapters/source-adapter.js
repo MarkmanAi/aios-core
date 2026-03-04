@@ -79,7 +79,7 @@ class SourceAdapter {
       try {
         const tiktok = require(`${SERVICES_PATH}/tiktok/dist`);
         this._tiktokService = tiktok.createTikTokService();
-      } catch (error) {
+      } catch (_error) {
         // If dist not available, service not built yet
         this._tiktokService = null;
         if (!this.options.silent) {

@@ -11,6 +11,7 @@
 
 const GreetingPreferenceManager = require('../../.aios-core/development/scripts/greeting-preference-manager');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const yaml = require('js-yaml');
 
@@ -24,23 +25,18 @@ jest.mock('../../.aios-core/infrastructure/scripts/project-status-loader', () =>
 
 const GreetingBuilder = require('../../.aios-core/development/scripts/greeting-builder');
 
-// Mock fs operations for config file
-const CONFIG_PATH = path.join(process.cwd(), '.aios-core', 'core-config.yaml');
-const BACKUP_PATH = path.join(process.cwd(), '.aios-core', 'core-config.yaml.backup');
-const TEST_CONFIG_PATH = path.join(__dirname, '..', 'fixtures', 'test-core-config.yaml');
-
 describe('GreetingPreferenceManager', () => {
   let manager;
-  let originalConfig;
   let testConfig;
+  let tmpDir;
+  let tmpConfigPath;
+  let tmpBackupPath;
 
   beforeEach(() => {
-    manager = new GreetingPreferenceManager();
-    
-    // Backup original config if exists
-    if (fs.existsSync(CONFIG_PATH)) {
-      originalConfig = fs.readFileSync(CONFIG_PATH, 'utf8');
-    }
+    // Use isolated temp directory — never touch the real core-config.yaml
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'greeting-pref-test-'));
+    tmpConfigPath = path.join(tmpDir, 'core-config.yaml');
+    tmpBackupPath = path.join(tmpDir, 'core-config.yaml.backup');
 
     // Create test config
     testConfig = {
@@ -52,20 +48,13 @@ describe('GreetingPreferenceManager', () => {
         },
       },
     };
+
+    manager = new GreetingPreferenceManager({ configPath: tmpConfigPath, backupPath: tmpBackupPath });
   });
 
   afterEach(() => {
-    // Restore original config
-    if (originalConfig) {
-      fs.writeFileSync(CONFIG_PATH, originalConfig, 'utf8');
-    } else if (fs.existsSync(CONFIG_PATH)) {
-      fs.unlinkSync(CONFIG_PATH);
-    }
-    
-    // Clean up backup
-    if (fs.existsSync(BACKUP_PATH)) {
-      fs.unlinkSync(BACKUP_PATH);
-    }
+    // Clean up temp directory
+    try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch (_) {}
   });
 
   describe('getPreference', () => {
@@ -77,15 +66,15 @@ describe('GreetingPreferenceManager', () => {
 
     test('returns configured preference', () => {
       testConfig.agentIdentity.greeting.preference = 'minimal';
-      fs.writeFileSync(CONFIG_PATH, yaml.dump(testConfig), 'utf8');
+      fs.writeFileSync(tmpConfigPath, yaml.dump(testConfig), 'utf8');
       
       const preference = manager.getPreference();
       expect(preference).toBe('minimal');
     });
 
     test('handles missing config file gracefully', () => {
-      if (fs.existsSync(CONFIG_PATH)) {
-        fs.unlinkSync(CONFIG_PATH);
+      if (fs.existsSync(tmpConfigPath)) {
+        fs.unlinkSync(tmpConfigPath);
       }
       
       const preference = manager.getPreference();
@@ -95,19 +84,19 @@ describe('GreetingPreferenceManager', () => {
 
   describe('setPreference', () => {
     test('sets valid preference successfully', () => {
-      fs.writeFileSync(CONFIG_PATH, yaml.dump(testConfig), 'utf8');
+      fs.writeFileSync(tmpConfigPath, yaml.dump(testConfig), 'utf8');
       
       const result = manager.setPreference('minimal');
       expect(result.success).toBe(true);
       expect(result.preference).toBe('minimal');
       
       // Verify config was updated
-      const updatedConfig = yaml.load(fs.readFileSync(CONFIG_PATH, 'utf8'));
+      const updatedConfig = yaml.load(fs.readFileSync(tmpConfigPath, 'utf8'));
       expect(updatedConfig.agentIdentity.greeting.preference).toBe('minimal');
     });
 
     test('throws error for invalid preference', () => {
-      fs.writeFileSync(CONFIG_PATH, yaml.dump(testConfig), 'utf8');
+      fs.writeFileSync(tmpConfigPath, yaml.dump(testConfig), 'utf8');
       
       expect(() => manager.setPreference('invalid')).toThrow('Invalid preference');
       expect(() => manager.setPreference('Auto')).toThrow('Invalid preference');
@@ -115,7 +104,7 @@ describe('GreetingPreferenceManager', () => {
     });
 
     test('accepts all valid preferences', () => {
-      fs.writeFileSync(CONFIG_PATH, yaml.dump(testConfig), 'utf8');
+      fs.writeFileSync(tmpConfigPath, yaml.dump(testConfig), 'utf8');
       
       expect(() => manager.setPreference('auto')).not.toThrow();
       expect(() => manager.setPreference('minimal')).not.toThrow();
@@ -124,17 +113,17 @@ describe('GreetingPreferenceManager', () => {
     });
 
     test('creates backup before modification', () => {
-      fs.writeFileSync(CONFIG_PATH, yaml.dump(testConfig), 'utf8');
+      fs.writeFileSync(tmpConfigPath, yaml.dump(testConfig), 'utf8');
       
       manager.setPreference('minimal');
       
-      expect(fs.existsSync(BACKUP_PATH)).toBe(true);
-      const backupConfig = yaml.load(fs.readFileSync(BACKUP_PATH, 'utf8'));
+      expect(fs.existsSync(tmpBackupPath)).toBe(true);
+      const backupConfig = yaml.load(fs.readFileSync(tmpBackupPath, 'utf8'));
       expect(backupConfig.agentIdentity.greeting.preference).toBe('auto');
     });
 
     test('restores backup on YAML error', () => {
-      fs.writeFileSync(CONFIG_PATH, yaml.dump(testConfig), 'utf8');
+      fs.writeFileSync(tmpConfigPath, yaml.dump(testConfig), 'utf8');
       
       // Mock yaml.dump to throw error
       const originalDump = yaml.dump;
@@ -148,17 +137,17 @@ describe('GreetingPreferenceManager', () => {
       yaml.dump = originalDump;
       
       // Config should be restored
-      const restoredConfig = yaml.load(fs.readFileSync(CONFIG_PATH, 'utf8'));
+      const restoredConfig = yaml.load(fs.readFileSync(tmpConfigPath, 'utf8'));
       expect(restoredConfig.agentIdentity.greeting.preference).toBe('auto');
     });
 
     test('creates config structure if missing', () => {
       const minimalConfig = {};
-      fs.writeFileSync(CONFIG_PATH, yaml.dump(minimalConfig), 'utf8');
+      fs.writeFileSync(tmpConfigPath, yaml.dump(minimalConfig), 'utf8');
       
       manager.setPreference('named');
       
-      const updatedConfig = yaml.load(fs.readFileSync(CONFIG_PATH, 'utf8'));
+      const updatedConfig = yaml.load(fs.readFileSync(tmpConfigPath, 'utf8'));
       expect(updatedConfig.agentIdentity.greeting.preference).toBe('named');
     });
   });
@@ -167,7 +156,7 @@ describe('GreetingPreferenceManager', () => {
     test('returns complete greeting config', () => {
       testConfig.agentIdentity.greeting.preference = 'archetypal';
       testConfig.agentIdentity.greeting.showArchetype = false;
-      fs.writeFileSync(CONFIG_PATH, yaml.dump(testConfig), 'utf8');
+      fs.writeFileSync(tmpConfigPath, yaml.dump(testConfig), 'utf8');
       
       const config = manager.getConfig();
       expect(config.preference).toBe('archetypal');
@@ -176,8 +165,8 @@ describe('GreetingPreferenceManager', () => {
     });
 
     test('returns empty object if config missing', () => {
-      if (fs.existsSync(CONFIG_PATH)) {
-        fs.unlinkSync(CONFIG_PATH);
+      if (fs.existsSync(tmpConfigPath)) {
+        fs.unlinkSync(tmpConfigPath);
       }
       
       const config = manager.getConfig();

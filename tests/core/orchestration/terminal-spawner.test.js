@@ -34,32 +34,44 @@ const {
 } = require('../../../.aios-core/core/orchestration/terminal-spawner');
 
 // Test fixtures
-const TEST_OUTPUT_DIR = path.join(os.tmpdir(), 'aios-terminal-spawner-test');
+let tmpDir;
 
 describe('Terminal Spawner (Story 12.10)', () => {
-  // Store original env vars
-  const originalEnv = { ...process.env };
+  // Snapshot captured per-test in beforeEach to handle env mutations correctly
+  let envSnapshot;
+
+  beforeAll(() => {
+    tmpDir = fsSync.mkdtempSync(path.join(os.tmpdir(), 'aios-terminal-spawner-'));
+  });
+
+  afterAll(() => {
+    fsSync.rmSync(tmpDir, { recursive: true, force: true });
+  });
 
   beforeEach(async () => {
-    // Reset environment variables before each test
-    process.env = { ...originalEnv };
+    // Snapshot process.env before each test (mutation-safe approach)
+    envSnapshot = { ...process.env };
 
     // Clean up test directory
     try {
-      await fs.rm(TEST_OUTPUT_DIR, { recursive: true, force: true });
+      await fs.rm(tmpDir, { recursive: true, force: true });
     } catch {
       // Ignore if doesn't exist
     }
-    await fs.mkdir(TEST_OUTPUT_DIR, { recursive: true });
+    await fs.mkdir(tmpDir, { recursive: true });
   });
 
   afterEach(async () => {
-    // Restore original environment
-    process.env = { ...originalEnv };
+    // Restore process.env by mutating the original object (not replacing it)
+    // This ensures modules holding a reference to process.env see the restored values
+    Object.keys(process.env).forEach(key => {
+      if (!(key in envSnapshot)) delete process.env[key];
+    });
+    Object.assign(process.env, envSnapshot);
 
     // Clean up
     try {
-      await fs.rm(TEST_OUTPUT_DIR, { recursive: true, force: true });
+      await fs.rm(tmpDir, { recursive: true, force: true });
     } catch {
       // Ignore cleanup errors
     }
@@ -374,7 +386,7 @@ describe('Terminal Spawner (Story 12.10)', () => {
       const task = 'test';
       const options = {
         timeout: 5000,
-        outputDir: TEST_OUTPUT_DIR,
+        outputDir: tmpDir,
         debug: false,
       };
 
@@ -394,7 +406,7 @@ describe('Terminal Spawner (Story 12.10)', () => {
       const task = 'test';
       const options = {
         timeout: 5000,
-        outputDir: TEST_OUTPUT_DIR,
+        outputDir: tmpDir,
         debug: false,
       };
 
@@ -411,7 +423,7 @@ describe('Terminal Spawner (Story 12.10)', () => {
       const task = 'test';
       const options = {
         timeout: 5000,
-        outputDir: TEST_OUTPUT_DIR,
+        outputDir: tmpDir,
         context: {
           story: 'test-story.md',
           files: ['file1.js', 'file2.js'],
@@ -438,7 +450,7 @@ describe('Terminal Spawner (Story 12.10)', () => {
       const task = 'test';
       const options = {
         timeout: 5000,
-        outputDir: TEST_OUTPUT_DIR,
+        outputDir: tmpDir,
         debug: false,
         retries: 1,
       };
@@ -458,7 +470,7 @@ describe('Terminal Spawner (Story 12.10)', () => {
   describe('Timeout handling (Task 3.2)', () => {
     it('should timeout if lock file persists', async () => {
       // Given
-      const outputFile = path.join(TEST_OUTPUT_DIR, 'aios-output-timeout-test.md');
+      const outputFile = path.join(tmpDir, 'aios-output-timeout-test.md');
       const lockFile = outputFile.replace('output', 'lock');
       await fs.writeFile(lockFile, 'locked');
       await fs.writeFile(outputFile, 'test output');
@@ -473,7 +485,7 @@ describe('Terminal Spawner (Story 12.10)', () => {
 
     it('should return output when lock is removed', async () => {
       // Given
-      const outputFile = path.join(TEST_OUTPUT_DIR, 'aios-output-success-test.md');
+      const outputFile = path.join(tmpDir, 'aios-output-success-test.md');
       const lockFile = outputFile.replace('output', 'lock');
       await fs.writeFile(outputFile, 'test output content');
       // No lock file - simulates completed process
@@ -492,7 +504,7 @@ describe('Terminal Spawner (Story 12.10)', () => {
   describe('Lock cleanup (Task 3.3, 3.4)', () => {
     it('should register and unregister lock files', () => {
       // Given
-      const lockPath = path.join(TEST_OUTPUT_DIR, 'test-lock.lock');
+      const lockPath = path.join(tmpDir, 'test-lock.lock');
 
       // When
       registerLockFile(lockPath);
@@ -504,7 +516,7 @@ describe('Terminal Spawner (Story 12.10)', () => {
 
     it('should cleanup registered lock files', async () => {
       // Given
-      const lockPath = path.join(TEST_OUTPUT_DIR, 'cleanup-test.lock');
+      const lockPath = path.join(tmpDir, 'cleanup-test.lock');
       await fs.writeFile(lockPath, 'locked');
       registerLockFile(lockPath);
 
@@ -518,7 +530,7 @@ describe('Terminal Spawner (Story 12.10)', () => {
 
     it('should cleanup old files', async () => {
       // Given - create old file
-      const oldFile = path.join(TEST_OUTPUT_DIR, 'aios-output-old.md');
+      const oldFile = path.join(tmpDir, 'aios-output-old.md');
       await fs.writeFile(oldFile, 'old content');
 
       // Manually set mtime to past
@@ -526,7 +538,7 @@ describe('Terminal Spawner (Story 12.10)', () => {
       await fs.utimes(oldFile, pastTime, pastTime);
 
       // When
-      const cleaned = await cleanupOldFiles(TEST_OUTPUT_DIR, 3600000); // 1 hour
+      const cleaned = await cleanupOldFiles(tmpDir, 3600000); // 1 hour
 
       // Then
       expect(cleaned).toBeGreaterThanOrEqual(1);
@@ -549,7 +561,7 @@ describe('Terminal Spawner (Story 12.10)', () => {
       };
 
       // When
-      const contextPath = await createContextFile(context, TEST_OUTPUT_DIR);
+      const contextPath = await createContextFile(context, tmpDir);
 
       // Then
       expect(contextPath).toBeTruthy();
@@ -566,7 +578,7 @@ describe('Terminal Spawner (Story 12.10)', () => {
 
     it('should return empty string for null context', async () => {
       // When
-      const result = await createContextFile(null, TEST_OUTPUT_DIR);
+      const result = await createContextFile(null, tmpDir);
 
       // Then
       expect(result).toBe('');
@@ -577,7 +589,7 @@ describe('Terminal Spawner (Story 12.10)', () => {
       const context = { story: 'test.md' };
 
       // When
-      const contextPath = await createContextFile(context, TEST_OUTPUT_DIR);
+      const contextPath = await createContextFile(context, tmpDir);
 
       // Then
       const content = JSON.parse(await fs.readFile(contextPath, 'utf8'));

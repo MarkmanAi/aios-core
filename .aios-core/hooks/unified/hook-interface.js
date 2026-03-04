@@ -40,7 +40,7 @@ class UnifiedHook {
    * @param {HookContext} context - Execution context
    * @returns {Promise<HookResult>} Hook result
    */
-  async execute(context) {
+  async execute(_context) {
     throw new Error('execute() must be implemented by subclass');
   }
 
@@ -64,7 +64,7 @@ class UnifiedHook {
    * @returns {Object} Gemini hook config
    */
   toGeminiConfig() {
-    const geminiEvent = EVENT_MAPPING[this.event]?.gemini;
+    const _geminiEvent = EVENT_MAPPING[this.event]?.gemini;
 
     return {
       matcher: this.matcher,

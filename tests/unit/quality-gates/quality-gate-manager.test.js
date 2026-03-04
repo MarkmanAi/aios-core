@@ -60,6 +60,13 @@ describe('QualityGateManager', () => {
     });
 
     it('should run Layer 2', async () => {
+      // Mock Layer 2 execute to avoid calling external CodeRabbit command
+      manager.layers.layer2.execute = jest.fn().mockResolvedValue({
+        layer: 'Layer 2: PR Automation',
+        pass: true,
+        checks: [],
+        duration: 50,
+      });
       const result = await manager.runLayer(2, { verbose: false });
       expect(result).toBeDefined();
       expect(result.layer).toBe('Layer 2: PR Automation');

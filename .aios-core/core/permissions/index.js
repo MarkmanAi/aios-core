@@ -72,6 +72,45 @@ async function setMode(modeName, projectRoot = process.cwd()) {
   return mode.setMode(modeName);
 }
 
+/**
+ * Cycle to the next permission mode (explore → ask → auto → explore)
+ * @param {string} projectRoot - Project root path
+ * @returns {Promise<{mode: string, badge: string, message: string}>} New mode info
+ */
+async function cycleMode(projectRoot = process.cwd()) {
+  const mode = new PermissionMode(projectRoot);
+  const result = await mode.cycleMode();
+  const badge = mode.getBadge();
+  return {
+    ...result,
+    badge,
+    message: `Switched to ${result.name} mode ${badge}`,
+  };
+}
+
+/**
+ * Enforce permission check — returns action decision for a tool call
+ * @param {string} tool - Tool name (Read, Write, Edit, Bash, etc.)
+ * @param {Object} params - Tool parameters
+ * @param {string} projectRoot - Project root path
+ * @returns {Promise<{action: 'allow'|'deny'|'prompt', message?: string}>}
+ */
+async function enforcePermission(tool, params, projectRoot = process.cwd()) {
+  const { guard } = await createGuard(projectRoot);
+  const result = await guard.guard(tool, params);
+
+  if (result.proceed) {
+    return { action: 'allow' };
+  }
+  if (result.blocked) {
+    return { action: 'deny', message: result.message };
+  }
+  if (result.needsConfirmation) {
+    return { action: 'prompt', message: result.message };
+  }
+  return { action: 'deny', message: 'Unknown permission state' };
+}
+
 module.exports = {
   PermissionMode,
   OperationGuard,
@@ -79,4 +118,6 @@ module.exports = {
   checkOperation,
   getModeBadge,
   setMode,
+  cycleMode,
+  enforcePermission,
 };

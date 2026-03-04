@@ -1,0 +1,95 @@
+schema: 1
+story: "11.2"
+story_title: "CI Health — Core Test Regression Fixes: Permission Mode & Greeting System"
+gate: PASS
+status_reason: >
+  All 7 ACs now met. ACs 1–4 and 6 were met at initial review. ACs 5 and 7
+  now satisfied post-Story 11.9: npm test shows exactly 3 failing suites
+  (deferred 11.6/11.7/11.8 only) across 3 consecutive parallel runs.
+  Remaining issues (I2, I3) are pre-existing LOW severity, not introduced
+  by this story, and do not block merge.
+reviewer: "Quinn (Test Architect)"
+updated: "2026-03-03T23:00:00Z"
+updated_history:
+  - "2026-03-03T21:00:00Z — Initial review (post-11.2 completion)"
+  - "2026-03-03T22:00:00Z — Re-assessment post-11.4/11.5 (I1 revised, gate unchanged CONCERNS)"
+  - "2026-03-03T23:00:00Z — Final re-assessment post-11.9: I1 RESOLVED, gate upgraded to PASS"
+
+top_issues:
+  - id: "I1"
+    severity: resolved
+    description: >
+      RESOLVED by Story 11.9. The 7 non-deferred parallel flakies (config-cli,
+      greeting-builder, squad-generator, session-state, semantic-merge-engine,
+      self-learner, wave-executor) are now fixed. npm test = 3 failing (deferred
+      11.6/11.7/11.8 only). AC5 and AC7 now satisfied.
+    file: "npm test (full parallel run)"
+    suggested_owner: resolved
+  - id: "I2"
+    severity: low
+    description: >
+      buildWorkflowSuggestions(context) pre-existing parameter type mismatch — callers
+      pass Array but method expects Object. Mitigated by mocks; method gracefully returns null.
+      Not introduced by this story. Track as tech debt.
+    file: ".aios-core/development/scripts/greeting-builder.js"
+    suggested_owner: dev
+  - id: "I3"
+    severity: low
+    description: >
+      bob mode with preference='auto' maps to 'named' — correct behavior but undocumented
+      and lacks an explicit test case.
+    file: ".aios-core/development/scripts/greeting-preference-manager.js"
+    suggested_owner: dev
+
+waiver:
+  active: false
+
+quality_score: 95
+expires: "2026-03-17T00:00:00Z"
+
+evidence:
+  tests_reviewed: 156
+  risks_identified: 2
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: >
+      enforcePermission() defaults to deny on unknown state (secure fallthrough).
+      No user input reaches filesystem paths. No eval or dynamic require.
+  performance:
+    status: PASS
+    notes: >
+      getPreference() <5ms (file read + YAML parse). cycleMode() acceptable for
+      yolo toggle (not hot path). loadUserProfile() activation-time only.
+  reliability:
+    status: PASS
+    notes: >
+      All error paths have try/catch with sensible defaults: getPreference→'auto',
+      loadUserProfile→'advanced', enforcePermission fallthrough→deny.
+      npm test: 3 consecutive runs with exactly 3 failing suites (deferred by design).
+  maintainability:
+    status: PASS
+    notes: >
+      Pre-existing I2 (buildWorkflowSuggestions type mismatch) and I3 (bob/auto undocumented)
+      are LOW severity, not introduced by this story, and tracked as future improvements.
+      Core implementation is clean, well-documented, and lint-clean.
+
+recommendations:
+  immediate: []
+  future:
+    - action: >
+        Fix buildWorkflowSuggestions(context) parameter: rename to match callers
+        (Array from getNextSteps) or refactor callers to pass context object.
+      refs: [".aios-core/development/scripts/greeting-builder.js:685-706"]
+    - action: >
+        Add test case: GreetingPreferenceManager.getPreference('bob') when
+        config preference is 'auto' should return 'named'.
+      refs: ["tests/core/user-profile-audit.test.js"]
+    - action: >
+        Add inline comment in cycleMode() noting that PermissionMode.cycleMode()
+        handles load() internally — makes the contract explicit.
+      refs: [".aios-core/core/permissions/index.js:80-89"]

@@ -120,13 +120,11 @@ class GreetingBuilder {
       sections.push(contextSection);
     }
 
-    // 5. Workflow suggestions (if workflow session and no context section)
-    if (sessionType === 'workflow' && context.lastCommands && !contextSection) {
-      const suggestions = this.workflowNavigator.getNextSteps(context.lastCommands, {
-        agentId: agent.id,
-      });
-      if (suggestions && suggestions.length > 0) {
-        sections.push(this.buildWorkflowSuggestions(suggestions));
+    // 5. Workflow suggestions (existing and workflow sessions)
+    if (sessionType !== 'new') {
+      const workflowSuggestions = this.buildWorkflowSuggestions(context);
+      if (workflowSuggestions) {
+        sections.push(workflowSuggestions);
       }
     }
 
@@ -192,9 +190,10 @@ class GreetingBuilder {
    * @param {Object} agent - Agent definition
    * @param {string} sessionType - Session type
    * @param {string} permissionBadge - Permission mode badge (optional)
+   * @param {Object|null} sectionContext - Enriched context (Story ACT-7)
    * @returns {string} Presentation text
    */
-  buildPresentation(agent, sessionType, permissionBadge = '') {
+  buildPresentation(agent, sessionType, permissionBadge = '', sectionContext = null) {
     const profile = agent.persona_profile;
 
     // Try greeting_levels from communication first, then fall back to top level
@@ -205,40 +204,139 @@ class GreetingBuilder {
       return permissionBadge ? `${base} ${permissionBadge}` : base;
     }
 
-    // Always use archetypal greeting for richer presentation
+    // Without sectionContext: always use archetypal (backward compatible)
+    if (!sectionContext) {
+      const archetypeGreeting =
+        greetingLevels.archetypal || greetingLevels.named || `${agent.icon} ${agent.name} ready`;
+      return permissionBadge ? `${archetypeGreeting} ${permissionBadge}` : archetypeGreeting;
+    }
+
+    const effectiveType = sectionContext.sessionType || sessionType;
+
+    if (effectiveType === 'existing') {
+      const namedGreeting =
+        greetingLevels.named || greetingLevels.archetypal || `${agent.icon} ${agent.name} ready`;
+      let greeting = permissionBadge ? `${namedGreeting} ${permissionBadge}` : namedGreeting;
+      const story =
+        sectionContext.sessionStory || sectionContext.projectStatus?.currentStory || null;
+      greeting += story ? ` — continuing ${story}` : ' — welcome back';
+      return greeting;
+    }
+
+    if (effectiveType === 'workflow') {
+      const namedGreeting =
+        greetingLevels.named || greetingLevels.archetypal || `${agent.icon} ${agent.name} ready`;
+      let greeting = permissionBadge ? `${namedGreeting} ${permissionBadge}` : namedGreeting;
+      if (sectionContext.workflowState || sectionContext.workflowActive) {
+        greeting += ' — workflow active';
+      }
+      return greeting;
+    }
+
+    // new or unknown: archetypal
     const archetypeGreeting =
       greetingLevels.archetypal || greetingLevels.named || `${agent.icon} ${agent.name} ready`;
-
-    // Append permission badge if available
     return permissionBadge ? `${archetypeGreeting} ${permissionBadge}` : archetypeGreeting;
   }
 
   /**
    * Build role description section
    * @param {Object} agent - Agent definition
+   * @param {Object|null} sectionContext - Enriched context (Story ACT-7)
    * @returns {string} Role description
    */
-  buildRoleDescription(agent) {
+  buildRoleDescription(agent, sectionContext = null) {
     if (!agent.persona || !agent.persona.role) {
       return '';
     }
 
-    return `**Role:** ${agent.persona.role}`;
+    // Without sectionContext: plain role (backward compatible)
+    if (!sectionContext) {
+      return `**Role:** ${agent.persona.role}`;
+    }
+
+    const { sessionStory, projectStatus, gitConfig } = sectionContext;
+    const contextParts = [];
+
+    const story = sessionStory || projectStatus?.currentStory;
+    if (story) {
+      contextParts.push(`Story: ${story}`);
+    }
+
+    const branch = gitConfig?.branch || projectStatus?.branch;
+    if (branch && branch !== 'main' && branch !== 'master') {
+      contextParts.push(`Branch: \`${branch}\``);
+    }
+
+    if (contextParts.length === 0) {
+      return `**Role:** ${agent.persona.role}`;
+    }
+
+    return `**Role:** ${agent.persona.role} — ${contextParts.join(' | ')}`;
   }
 
   /**
    * Build project status section
    * @param {Object} projectStatus - Project status data
    * @param {string} sessionType - Session type
+   * @param {Object|null} sectionContext - Enriched context (Story ACT-7)
    * @returns {string} Formatted project status
    */
-  buildProjectStatus(projectStatus, sessionType = 'full') {
+  buildProjectStatus(projectStatus, sessionType = 'full', sectionContext = null) {
     if (!projectStatus) {
       return '';
     }
 
-    const format = sessionType === 'workflow' ? 'condensed' : 'full';
-    return this._formatProjectStatus(projectStatus, format);
+    // Without sectionContext: legacy format (backward compatible)
+    if (!sectionContext) {
+      const format = sessionType === 'workflow' ? 'condensed' : 'full';
+      return this._formatProjectStatus(projectStatus, format);
+    }
+
+    const effectiveType = sectionContext.sessionType || sessionType;
+
+    // Workflow always uses condensed
+    if (effectiveType === 'workflow') {
+      return this._formatProjectStatus(projectStatus, 'condensed');
+    }
+
+    // New/existing with sectionContext: narrative format
+    return this._formatProjectStatusNarrative(projectStatus);
+  }
+
+  /**
+   * Format project status as natural language narrative
+   * @private
+   * @param {Object} status - Project status
+   * @returns {string} Narrative text
+   */
+  _formatProjectStatusNarrative(status) {
+    if (!status) return '';
+
+    const parts = [];
+
+    if (status.branch) {
+      let line = `You're on branch \`${status.branch}\``;
+      if (status.modifiedFilesTotalCount > 0) {
+        const fileWord = status.modifiedFilesTotalCount === 1 ? 'file' : 'files';
+        line += ` with ${status.modifiedFilesTotalCount} modified ${fileWord}.`;
+      } else {
+        line += '.';
+      }
+      parts.push(line);
+    }
+
+    if (status.currentStory) {
+      parts.push(`Story **${status.currentStory}** is in progress.`);
+    }
+
+    if (status.recentCommits && status.recentCommits.length > 0) {
+      parts.push(`Last commit: ${status.recentCommits[0]}.`);
+    }
+
+    if (parts.length === 0) return '';
+
+    return `📊 **Project Status:** ${parts.join(' ')}`;
   }
 
   /**
@@ -579,14 +677,22 @@ class GreetingBuilder {
 
   /**
    * Build workflow suggestions section
+   * Checks session state file first, then falls back to command history detection.
+   * Enhances suggestions with SurfaceChecker warnings when applicable.
    * @param {Object} context - Session context
    * @returns {string|null} Workflow suggestions or null
    */
   buildWorkflowSuggestions(context) {
     try {
+      // 1. Try session state detection first (cross-terminal continuity — AC6)
+      const sessionStateSuggestion = this._detectWorkflowFromSessionState();
+      if (sessionStateSuggestion) {
+        return sessionStateSuggestion;
+      }
+
+      // 2. Fall back to command history detection
       const commandHistory = context.commandHistory || context.lastCommands || [];
       const workflowState = this.workflowNavigator.detectWorkflowState(commandHistory, context);
-
       if (!workflowState) {
         return null;
       }
@@ -596,13 +702,93 @@ class GreetingBuilder {
         return null;
       }
 
+      // 3. Enhance with SurfaceChecker proactive warnings (AC4)
+      const enhanced = this._enhanceWithSurfaceChecker(suggestions, context);
+
       const greetingMessage = this.workflowNavigator.getGreetingMessage(workflowState);
       const header = greetingMessage || 'Next steps:';
 
-      return this.workflowNavigator.formatSuggestions(suggestions, header);
+      return this.workflowNavigator.formatSuggestions(enhanced, header);
     } catch (error) {
       console.warn('[GreetingBuilder] Workflow suggestions failed:', error.message);
       return null;
+    }
+  }
+
+  /**
+   * Detect active workflow from session state file (AC3/AC6 — cross-terminal continuity)
+   * @private
+   * @returns {string|null} Session state summary string or null
+   */
+  _detectWorkflowFromSessionState() {
+    try {
+      const { SessionState } = require('../../core/orchestration/session-state');
+      const sessionState = new SessionState(process.cwd());
+      const stateFilePath = sessionState.getStateFilePath();
+
+      if (!fs.existsSync(stateFilePath)) {
+        return null;
+      }
+
+      const content = fs.readFileSync(stateFilePath, 'utf8');
+      const data = yaml.load(content);
+      const ss = data && data.session_state;
+
+      if (!ss || !ss.workflow || !ss.workflow.current_phase) {
+        return null;
+      }
+
+      const epicTitle = (ss.epic && ss.epic.title) || '';
+      const currentStory = (ss.progress && ss.progress.current_story) || '';
+      const totalStories = (ss.epic && ss.epic.total_stories) || 0;
+      const doneCount =
+        ss.progress && Array.isArray(ss.progress.stories_done)
+          ? ss.progress.stories_done.length
+          : 0;
+      const progress = totalStories > 0 ? `${doneCount}/${totalStories}` : '';
+
+      const parts = [];
+      if (epicTitle) parts.push(epicTitle);
+      if (currentStory) parts.push(currentStory);
+      if (progress) parts.push(progress);
+
+      return parts.join(' — ') || 'Workflow active';
+    } catch (_error) {
+      return null;
+    }
+  }
+
+  /**
+   * Enhance suggestions with SurfaceChecker proactive warnings (AC4)
+   * @private
+   * @param {Array} suggestions - Original suggestions from suggestNextCommands
+   * @param {Object} context - Session context passed to shouldSurface
+   * @returns {Array} Enhanced suggestions (warning prepended if applicable)
+   */
+  _enhanceWithSurfaceChecker(suggestions, context) {
+    try {
+      const { SurfaceChecker } = require('../../core/orchestration/surface-checker');
+      const checker = new SurfaceChecker();
+
+      if (!checker.load()) {
+        return suggestions;
+      }
+
+      const surfaceResult = checker.shouldSurface(context);
+      if (!surfaceResult || !surfaceResult.should_surface) {
+        return suggestions;
+      }
+
+      const warningItem = {
+        command: `⚠️ ${surfaceResult.criterion_id}`,
+        description: `warning: ${surfaceResult.criterion_name || surfaceResult.message}`,
+        raw_command: surfaceResult.criterion_id,
+        args: '',
+      };
+
+      return [warningItem, ...suggestions];
+    } catch (_error) {
+      return suggestions;
     }
   }
 
@@ -779,23 +965,64 @@ class GreetingBuilder {
   /**
    * Build footer section
    * @param {Object} agent - Agent definition
+   * @param {Object|null} sectionContext - Enriched context (Story ACT-7)
    * @returns {string} Footer text with signature
    */
-  buildFooter(agent) {
-    const parts = ['Type `*guide` for comprehensive usage instructions.'];
+  buildFooter(agent, sectionContext = null) {
+    const sig = agent?.persona_profile?.communication?.signature_closing;
 
-    // Add agent signature if available
-    if (
-      agent &&
-      agent.persona_profile &&
-      agent.persona_profile.communication &&
-      agent.persona_profile.communication.signature_closing
-    ) {
+    // Without sectionContext: legacy new-session footer (backward compatible)
+    if (!sectionContext) {
+      const parts = ['Type `*guide` for comprehensive usage instructions.'];
+      if (sig) {
+        parts.push('');
+        parts.push(sig);
+      }
+      return parts.join('\n');
+    }
+
+    const sessionType = sectionContext.sessionType || 'new';
+    const story = sectionContext.sessionStory || sectionContext.projectStatus?.currentStory;
+
+    const parts = [];
+
+    if (sessionType === 'existing') {
+      parts.push('Type `*help` for commands, or `*session-info` to review this session.');
+    } else if (sessionType === 'workflow') {
+      if (story) {
+        parts.push(`Focused on **${story}** — Type \`*help\` for commands.`);
+      } else {
+        parts.push('Workflow active — Type `*help` for commands.');
+      }
+    } else {
+      parts.push('Type `*guide` for comprehensive usage instructions.');
+    }
+
+    if (sig) {
       parts.push('');
-      parts.push(agent.persona_profile.communication.signature_closing);
+      parts.push(sig);
     }
 
     return parts.join('\n');
+  }
+
+  /**
+   * Safely execute a section builder with error handling and timeout
+   * @param {Function} builderFn - Builder function (sync or async)
+   * @param {number} timeout - Timeout in ms (default 200)
+   * @returns {Promise<string|null>} Section content or null on error/timeout
+   */
+  async _safeBuildSection(builderFn, timeout = 200) {
+    try {
+      const resultPromise = Promise.resolve(builderFn());
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Section timeout')), timeout),
+      );
+      const result = await Promise.race([resultPromise, timeoutPromise]);
+      return result ?? null;
+    } catch (_error) {
+      return null;
+    }
   }
 
   /**
@@ -810,10 +1037,16 @@ class GreetingBuilder {
    * Filter commands by visibility metadata
    * @param {Object} agent - Agent definition
    * @param {string} sessionType - Session type
+   * @param {string|null} userProfile - User profile ('bob'|'advanced'|null)
    * @returns {Array} Filtered commands
    */
-  filterCommandsByVisibility(agent, sessionType) {
+  filterCommandsByVisibility(agent, sessionType, userProfile = null) {
     if (!agent.commands || agent.commands.length === 0) {
+      return [];
+    }
+
+    // Bob mode: only PM agent shows commands (non-PM agents show nothing)
+    if (userProfile === 'bob' && agent.id !== 'pm') {
       return [];
     }
 
@@ -927,6 +1160,35 @@ class GreetingBuilder {
     }
 
     return this.config.git.showConfigWarning !== false;
+  }
+
+  /**
+   * Load and validate the user profile from project config (Story ACT-2)
+   * @returns {string} Validated user profile ('bob'|'advanced'), defaults to 'advanced'
+   */
+  loadUserProfile() {
+    const DEFAULT_PROFILE = 'advanced';
+    try {
+      const { resolveConfig } = require('../../core/config/config-resolver');
+      const { validateUserProfile } = require('../../infrastructure/scripts/validate-user-profile');
+      const resolved = resolveConfig();
+      const rawProfile = resolved?.config?.user_profile;
+
+      if (!rawProfile) {
+        return DEFAULT_PROFILE;
+      }
+
+      const result = validateUserProfile(rawProfile);
+      if (!result.valid) {
+        console.warn(`[GreetingBuilder] user_profile validation failed: ${result.error}`);
+        return DEFAULT_PROFILE;
+      }
+
+      return result.value;
+    } catch (error) {
+      console.warn('[GreetingBuilder] Failed to load user profile:', error.message);
+      return DEFAULT_PROFILE;
+    }
   }
 
   /**

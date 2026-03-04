@@ -37,6 +37,7 @@
 - `*agent` - Get info about specialized agent (use @ to transform)
 - `*correct-course` - Analyze and correct process/quality deviations
 - `*index-docs` - Index documentation for search
+- `*update-source-tree` - Validate data file governance: verify all agent-config-requirements.yaml files exist and are documented in source-tree.md
 
 ## Collaboration
 

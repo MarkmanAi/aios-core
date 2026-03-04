@@ -231,6 +231,7 @@ const SessionContextLoader = require('../../.aios-core/core/session/context-load
 const { loadProjectStatus } = require('../../.aios-core/infrastructure/scripts/project-status-loader');
 const GitConfigDetector = require('../../.aios-core/infrastructure/scripts/git-config-detector');
 const { PermissionMode } = require('../../.aios-core/core/permissions');
+const { globalConfigCache } = require('../../.aios-core/core/config/config-cache');
 
 // ============================================================
 // Tests
@@ -242,8 +243,10 @@ describe('UnifiedActivationPipeline', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
+    // Explicitly reset globalConfigCache mock so no cross-test cache state leaks.
+    globalConfigCache.get.mockReturnValue(null);
+
     // Restore default mock implementations that may have been overridden by prior tests.
-    // jest.clearAllMocks() only clears call history, NOT implementations set via mockImplementation().
     AgentConfigLoader.mockImplementation(() => ({
       loadComplete: jest.fn().mockResolvedValue({
         config: { dataLocation: '.aios-core/data' },

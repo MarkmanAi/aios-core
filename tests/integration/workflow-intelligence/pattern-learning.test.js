@@ -435,13 +435,9 @@ describe('Pattern Learning Integration', () => {
 
     it('should handle missing storage directory', () => {
       const { createPatternStore } = learningModule;
-      const deepPath = path.join(
-        os.tmpdir(),
-        'deep',
-        'nested',
-        'dir',
-        `patterns-${Date.now()}.yaml`,
-      );
+      // Use a unique base dir per test run to avoid parallel worker collisions on Windows
+      const uniqueBase = path.join(os.tmpdir(), `aios-deep-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`);
+      const deepPath = path.join(uniqueBase, 'nested', 'dir', 'patterns.yaml');
 
       const store = createPatternStore({ storagePath: deepPath });
 
@@ -450,11 +446,8 @@ describe('Pattern Learning Integration', () => {
 
       expect(fs.existsSync(deepPath)).toBe(true);
 
-      // Cleanup
-      fs.unlinkSync(deepPath);
-      fs.rmdirSync(path.dirname(deepPath));
-      fs.rmdirSync(path.dirname(path.dirname(deepPath)));
-      fs.rmdirSync(path.dirname(path.dirname(path.dirname(deepPath))));
+      // Cleanup — rmSync handles non-empty dirs and Windows ENOTEMPTY safely
+      fs.rmSync(uniqueBase, { recursive: true, force: true });
     });
   });
 });
