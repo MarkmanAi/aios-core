@@ -37,6 +37,12 @@ const DashboardEventType = {
   STORY_STATUS_CHANGE: 'StoryStatusChange',
   SESSION_START: 'SessionStart',
   SESSION_END: 'SessionEnd',
+  // Bob orchestration events
+  BOB_PHASE_CHANGE: 'BobPhaseChange',
+  BOB_AGENT_SPAWNED: 'BobAgentSpawned',
+  BOB_AGENT_COMPLETED: 'BobAgentCompleted',
+  BOB_SURFACE_DECISION: 'BobSurfaceDecision',
+  BOB_ERROR: 'BobError',
 };
 
 module.exports = {
