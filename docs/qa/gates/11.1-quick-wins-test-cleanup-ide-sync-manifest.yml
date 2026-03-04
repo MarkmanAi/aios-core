@@ -1,0 +1,43 @@
+schema: 1
+story: '11.1'
+story_title: 'CI Health — Quick Wins: Test Cleanup, IDE Sync & Manifest'
+gate: PASS
+status_reason: 'All 9 ACs verified at commit time. Mechanical maintenance story — no new logic. Implementation correct and minimal. Current IDE sync drift and manifest outdate caused by post-11.1 stories (11.6, 11.8), not a regression from this story.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-03-04T00:00:00Z'
+
+top_issues: []
+waiver:
+  active: false
+
+quality_score: 95
+expires: '2026-03-18T00:00:00Z'
+
+evidence:
+  tests_reviewed: 46
+  risks_identified: 0
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'No auth, no network, no user data. Pure test exclusion + export addition.'
+  performance:
+    status: PASS
+    notes: 'Test exclusion reduces Jest discovery time. Export addition has zero runtime overhead.'
+  reliability:
+    status: PASS
+    notes: 'WorkflowExecutor 46/46 tests pass. IDE sync: 0 drift at commit. Manifest: 968 files validated.'
+  maintainability:
+    status: PASS
+    notes: 'Story comments in jest.config.js. Module.exports follows existing ordering convention.'
+
+recommendations:
+  immediate: []
+  future:
+    - action: 'Re-run npm run sync:ide and npm run generate:manifest as part of Epic 11 closure (post-11.6 and 11.8 drift)'
+      refs: ['.aios-core/development/agents/', '.aios-core/install-manifest.yaml']
+    - action: 'Fix story body status mismatch: ## Status section says Draft, should be Ready for Review'
+      refs: ['docs/stories/active/11.1.story.md']

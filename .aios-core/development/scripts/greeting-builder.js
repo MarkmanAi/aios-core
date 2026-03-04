@@ -723,7 +723,7 @@ class GreetingBuilder {
   _detectWorkflowFromSessionState() {
     try {
       const { SessionState } = require('../../core/orchestration/session-state');
-      const sessionState = new SessionState();
+      const sessionState = new SessionState(process.cwd());
       const stateFilePath = sessionState.getStateFilePath();
 
       if (!fs.existsSync(stateFilePath)) {
