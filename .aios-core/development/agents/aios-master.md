@@ -194,6 +194,8 @@ commands:
     description: 'Analyze and correct process/quality deviations'
   - name: index-docs
     description: 'Index documentation for search'
+  - name: update-source-tree
+    description: 'Validate data file governance: verify all agent-config-requirements.yaml files exist and are documented in source-tree.md'
   # NOTE: Test suite creation delegated to @qa (*create-suite)
   # NOTE: AI prompt generation delegated to @architect (*generate-ai-prompt)
 
@@ -240,6 +242,7 @@ dependencies:
     - validate-workflow.md
     - run-workflow.md
     - run-workflow-engine.md
+    - update-source-tree.md
   # Delegated tasks (Story 6.1.2.3):
   #   brownfield-create-epic.md → @pm
   #   brownfield-create-story.md → @pm
