@@ -311,45 +311,49 @@ describe('WorkflowNavigator Integration (Story ACT-5)', () => {
       fs.existsSync = jest.fn().mockReturnValue(true);
       fs.readFileSync = jest.fn().mockReturnValue(yaml.dump(sessionStateData));
 
-      const result = builder.buildWorkflowSuggestions({});
+      try {
+        const result = builder.buildWorkflowSuggestions({});
 
-      // Should detect workflow from session state and return suggestions
-      expect(result).not.toBeNull();
-      expect(result).toContain('ACT-5');
-      expect(result).toContain('Activation Pipeline');
-      expect(result).toContain('2/5');
-
-      // Restore
-      fs.existsSync = originalExistsSync;
-      fs.readFileSync = originalReadFileSync;
+        // Should detect workflow from session state and return suggestions
+        expect(result).not.toBeNull();
+        expect(result).toContain('ACT-5');
+        expect(result).toContain('Activation Pipeline');
+        expect(result).toContain('2/5');
+      } finally {
+        // CRITICAL: restore fs methods even if assertions fail (prevents cross-suite contamination)
+        fs.existsSync = originalExistsSync;
+        fs.readFileSync = originalReadFileSync;
+      }
     });
 
     test('falls back to command history when no session state file', () => {
       const originalExistsSync = fs.existsSync;
       fs.existsSync = jest.fn().mockReturnValue(false);
 
-      jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
-        .mockReturnValue({
-          workflow: 'story_development',
-          state: 'validated',
-          context: {},
+      try {
+        jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
+          .mockReturnValue({
+            workflow: 'story_development',
+            state: 'validated',
+            context: {},
+          });
+        jest.spyOn(builder.workflowNavigator, 'suggestNextCommands')
+          .mockReturnValue([
+            { command: '*develop-yolo', description: 'YOLO mode' },
+          ]);
+        jest.spyOn(builder.workflowNavigator, 'getGreetingMessage')
+          .mockReturnValue('Ready to develop!');
+        jest.spyOn(builder.workflowNavigator, 'formatSuggestions')
+          .mockReturnValue('Ready to develop!\n\n1. `*develop-yolo` - YOLO mode');
+
+        const result = builder.buildWorkflowSuggestions({
+          lastCommands: ['validate-story-draft completed'],
         });
-      jest.spyOn(builder.workflowNavigator, 'suggestNextCommands')
-        .mockReturnValue([
-          { command: '*develop-yolo', description: 'YOLO mode' },
-        ]);
-      jest.spyOn(builder.workflowNavigator, 'getGreetingMessage')
-        .mockReturnValue('Ready to develop!');
-      jest.spyOn(builder.workflowNavigator, 'formatSuggestions')
-        .mockReturnValue('Ready to develop!\n\n1. `*develop-yolo` - YOLO mode');
 
-      const result = builder.buildWorkflowSuggestions({
-        lastCommands: ['validate-story-draft completed'],
-      });
-
-      expect(result).toContain('develop-yolo');
-
-      fs.existsSync = originalExistsSync;
+        expect(result).toContain('develop-yolo');
+      } finally {
+        fs.existsSync = originalExistsSync;
+      }
     });
 
     test('graceful degradation when session state file is malformed', () => {
@@ -359,18 +363,20 @@ describe('WorkflowNavigator Integration (Story ACT-5)', () => {
       fs.existsSync = jest.fn().mockReturnValue(true);
       fs.readFileSync = jest.fn().mockReturnValue('invalid yaml %%% not parseable');
 
-      // Should not throw, should return null from _detectWorkflowFromSessionState
-      // and fall back to command history detection
-      jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
-        .mockReturnValue(null);
+      try {
+        // Should not throw, should return null from _detectWorkflowFromSessionState
+        // and fall back to command history detection
+        jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
+          .mockReturnValue(null);
 
-      const result = builder.buildWorkflowSuggestions({ lastCommands: [] });
+        const result = builder.buildWorkflowSuggestions({ lastCommands: [] });
 
-      // Should gracefully return null (no crash)
-      expect(result).toBeNull();
-
-      fs.existsSync = originalExistsSync;
-      fs.readFileSync = originalReadFileSync;
+        // Should gracefully return null (no crash)
+        expect(result).toBeNull();
+      } finally {
+        fs.existsSync = originalExistsSync;
+        fs.readFileSync = originalReadFileSync;
+      }
     });
 
     test('ignores session state without active workflow phase', () => {
@@ -396,17 +402,19 @@ describe('WorkflowNavigator Integration (Story ACT-5)', () => {
       fs.existsSync = jest.fn().mockReturnValue(true);
       fs.readFileSync = jest.fn().mockReturnValue(yaml.dump(sessionStateData));
 
-      jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
-        .mockReturnValue(null);
+      try {
+        jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
+          .mockReturnValue(null);
 
-      const result = builder.buildWorkflowSuggestions({ lastCommands: [] });
+        const result = builder.buildWorkflowSuggestions({ lastCommands: [] });
 
-      // Should skip session state (no active phase) and fall through to command history
-      // Command history also returns null, so result should be null
-      expect(result).toBeNull();
-
-      fs.existsSync = originalExistsSync;
-      fs.readFileSync = originalReadFileSync;
+        // Should skip session state (no active phase) and fall through to command history
+        // Command history also returns null, so result should be null
+        expect(result).toBeNull();
+      } finally {
+        fs.existsSync = originalExistsSync;
+        fs.readFileSync = originalReadFileSync;
+      }
     });
   });
 
@@ -418,88 +426,92 @@ describe('WorkflowNavigator Integration (Story ACT-5)', () => {
       const originalExistsSync = fs.existsSync;
       fs.existsSync = jest.fn().mockReturnValue(false); // No session state
 
-      SurfaceChecker.mockImplementation(() => ({
-        load: jest.fn().mockReturnValue(true),
-        shouldSurface: jest.fn().mockReturnValue({
-          should_surface: true,
-          criterion_id: 'high_risk',
-          criterion_name: 'High Risk Operation',
-          message: 'This operation modifies critical files',
-          severity: 'warning',
-          can_bypass: true,
-        }),
-      }));
+      try {
+        SurfaceChecker.mockImplementation(() => ({
+          load: jest.fn().mockReturnValue(true),
+          shouldSurface: jest.fn().mockReturnValue({
+            should_surface: true,
+            criterion_id: 'high_risk',
+            criterion_name: 'High Risk Operation',
+            message: 'This operation modifies critical files',
+            severity: 'warning',
+            can_bypass: true,
+          }),
+        }));
 
-      jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
-        .mockReturnValue({
-          workflow: 'story_development',
-          state: 'in_development',
-          context: {},
+        jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
+          .mockReturnValue({
+            workflow: 'story_development',
+            state: 'in_development',
+            context: {},
+          });
+        jest.spyOn(builder.workflowNavigator, 'suggestNextCommands')
+          .mockReturnValue([
+            { command: '*review-qa', description: 'Run QA review', raw_command: 'review-qa', args: '' },
+          ]);
+        jest.spyOn(builder.workflowNavigator, 'getGreetingMessage')
+          .mockReturnValue('Development complete!');
+
+        // The formatSuggestions call should receive enhanced suggestions (with warning prepended)
+        const formatSpy = jest.spyOn(builder.workflowNavigator, 'formatSuggestions')
+          .mockImplementation((suggestions, header) => {
+            return `${header}\n\n${suggestions.map((s, i) => `${i + 1}. \`${s.command}\` - ${s.description}`).join('\n')}`;
+          });
+
+        const result = builder.buildWorkflowSuggestions({
+          lastCommands: ['develop completed'],
+          riskLevel: 'HIGH',
         });
-      jest.spyOn(builder.workflowNavigator, 'suggestNextCommands')
-        .mockReturnValue([
-          { command: '*review-qa', description: 'Run QA review', raw_command: 'review-qa', args: '' },
-        ]);
-      jest.spyOn(builder.workflowNavigator, 'getGreetingMessage')
-        .mockReturnValue('Development complete!');
 
-      // The formatSuggestions call should receive enhanced suggestions (with warning prepended)
-      const formatSpy = jest.spyOn(builder.workflowNavigator, 'formatSuggestions')
-        .mockImplementation((suggestions, header) => {
-          return `${header}\n\n${suggestions.map((s, i) => `${i + 1}. \`${s.command}\` - ${s.description}`).join('\n')}`;
-        });
-
-      const result = builder.buildWorkflowSuggestions({
-        lastCommands: ['develop completed'],
-        riskLevel: 'HIGH',
-      });
-
-      // Should have called formatSuggestions with enhanced array (warning + original)
-      expect(formatSpy).toHaveBeenCalled();
-      const suggestionsArg = formatSpy.mock.calls[0][0];
-      expect(suggestionsArg.length).toBe(2); // warning + original
-      expect(suggestionsArg[0].description).toContain('warning');
-      expect(suggestionsArg[1].command).toBe('*review-qa');
-
-      fs.existsSync = originalExistsSync;
+        // Should have called formatSuggestions with enhanced array (warning + original)
+        expect(formatSpy).toHaveBeenCalled();
+        const suggestionsArg = formatSpy.mock.calls[0][0];
+        expect(suggestionsArg.length).toBe(2); // warning + original
+        expect(suggestionsArg[0].description).toContain('warning');
+        expect(suggestionsArg[1].command).toBe('*review-qa');
+      } finally {
+        fs.existsSync = originalExistsSync;
+      }
     });
 
     test('returns original suggestions when SurfaceChecker is unavailable', () => {
       const originalExistsSync = fs.existsSync;
       fs.existsSync = jest.fn().mockReturnValue(false); // No session state
 
-      // SurfaceChecker.load() returns false (criteria file not found)
-      SurfaceChecker.mockImplementation(() => ({
-        load: jest.fn().mockReturnValue(false),
-        shouldSurface: jest.fn(),
-      }));
+      try {
+        // SurfaceChecker.load() returns false (criteria file not found)
+        SurfaceChecker.mockImplementation(() => ({
+          load: jest.fn().mockReturnValue(false),
+          shouldSurface: jest.fn(),
+        }));
 
-      jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
-        .mockReturnValue({
-          workflow: 'story_development',
-          state: 'validated',
-          context: {},
+        jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
+          .mockReturnValue({
+            workflow: 'story_development',
+            state: 'validated',
+            context: {},
+          });
+        jest.spyOn(builder.workflowNavigator, 'suggestNextCommands')
+          .mockReturnValue([
+            { command: '*develop-yolo', description: 'YOLO mode', raw_command: 'develop-yolo', args: '' },
+          ]);
+        jest.spyOn(builder.workflowNavigator, 'getGreetingMessage')
+          .mockReturnValue('Ready!');
+        const formatSpy = jest.spyOn(builder.workflowNavigator, 'formatSuggestions')
+          .mockReturnValue('Ready!\n\n1. `*develop-yolo` - YOLO mode');
+
+        const result = builder.buildWorkflowSuggestions({
+          lastCommands: ['validate-story-draft completed'],
         });
-      jest.spyOn(builder.workflowNavigator, 'suggestNextCommands')
-        .mockReturnValue([
-          { command: '*develop-yolo', description: 'YOLO mode', raw_command: 'develop-yolo', args: '' },
-        ]);
-      jest.spyOn(builder.workflowNavigator, 'getGreetingMessage')
-        .mockReturnValue('Ready!');
-      const formatSpy = jest.spyOn(builder.workflowNavigator, 'formatSuggestions')
-        .mockReturnValue('Ready!\n\n1. `*develop-yolo` - YOLO mode');
 
-      const result = builder.buildWorkflowSuggestions({
-        lastCommands: ['validate-story-draft completed'],
-      });
-
-      // Should still work without SurfaceChecker
-      expect(result).toContain('develop-yolo');
-      // formatSuggestions should be called with original (unenhanced) suggestions
-      const suggestionsArg = formatSpy.mock.calls[0][0];
-      expect(suggestionsArg.length).toBe(1);
-
-      fs.existsSync = originalExistsSync;
+        // Should still work without SurfaceChecker
+        expect(result).toContain('develop-yolo');
+        // formatSuggestions should be called with original (unenhanced) suggestions
+        const suggestionsArg = formatSpy.mock.calls[0][0];
+        expect(suggestionsArg.length).toBe(1);
+      } finally {
+        fs.existsSync = originalExistsSync;
+      }
     });
   });
 
@@ -582,70 +594,78 @@ describe('WorkflowNavigator Integration (Story ACT-5)', () => {
       const originalExistsSync = fs.existsSync;
       fs.existsSync = jest.fn().mockReturnValue(false);
 
-      jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
-        .mockReturnValue(null);
+      try {
+        jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
+          .mockReturnValue(null);
 
-      const result = builder.buildWorkflowSuggestions({
-        lastCommands: ['some-random-command'],
-      });
+        const result = builder.buildWorkflowSuggestions({
+          lastCommands: ['some-random-command'],
+        });
 
-      expect(result).toBeNull();
-
-      fs.existsSync = originalExistsSync;
+        expect(result).toBeNull();
+      } finally {
+        fs.existsSync = originalExistsSync;
+      }
     });
 
     test('returns null when suggestNextCommands returns empty array', () => {
       const originalExistsSync = fs.existsSync;
       fs.existsSync = jest.fn().mockReturnValue(false);
 
-      jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
-        .mockReturnValue({ workflow: 'test', state: 'unknown', context: {} });
-      jest.spyOn(builder.workflowNavigator, 'suggestNextCommands')
-        .mockReturnValue([]);
+      try {
+        jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
+          .mockReturnValue({ workflow: 'test', state: 'unknown', context: {} });
+        jest.spyOn(builder.workflowNavigator, 'suggestNextCommands')
+          .mockReturnValue([]);
 
-      const result = builder.buildWorkflowSuggestions({
-        lastCommands: ['test-command completed'],
-      });
+        const result = builder.buildWorkflowSuggestions({
+          lastCommands: ['test-command completed'],
+        });
 
-      expect(result).toBeNull();
-
-      fs.existsSync = originalExistsSync;
+        expect(result).toBeNull();
+      } finally {
+        fs.existsSync = originalExistsSync;
+      }
     });
 
     test('handles context with empty lastCommands gracefully', () => {
       const originalExistsSync = fs.existsSync;
       fs.existsSync = jest.fn().mockReturnValue(false);
 
-      jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
-        .mockReturnValue(null);
+      try {
+        jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
+          .mockReturnValue(null);
 
-      const result = builder.buildWorkflowSuggestions({
-        lastCommands: [],
-        commandHistory: [],
-      });
+        const result = builder.buildWorkflowSuggestions({
+          lastCommands: [],
+          commandHistory: [],
+        });
 
-      expect(result).toBeNull();
-
-      fs.existsSync = originalExistsSync;
+        expect(result).toBeNull();
+      } finally {
+        fs.existsSync = originalExistsSync;
+      }
     });
 
     test('handles exception in workflowNavigator gracefully', () => {
       const originalExistsSync = fs.existsSync;
       fs.existsSync = jest.fn().mockReturnValue(false);
 
-      jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
-        .mockImplementation(() => {
-          throw new Error('Unexpected error in navigator');
+      try {
+        jest.spyOn(builder.workflowNavigator, 'detectWorkflowState')
+          .mockImplementation(() => {
+            throw new Error('Unexpected error in navigator');
+          });
+
+        // Should not throw
+        const result = builder.buildWorkflowSuggestions({
+          lastCommands: ['some-command'],
         });
 
-      // Should not throw
-      const result = builder.buildWorkflowSuggestions({
-        lastCommands: ['some-command'],
-      });
-
-      expect(result).toBeNull();
-
-      fs.existsSync = originalExistsSync;
+        expect(result).toBeNull();
+      } finally {
+        fs.existsSync = originalExistsSync;
+      }
     });
   });
 
