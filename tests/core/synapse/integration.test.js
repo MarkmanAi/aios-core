@@ -149,7 +149,13 @@ describe('SYNAPSE full pipeline smoke test', () => {
   });
 
   it('getStatus() returns initialized=true after writeSessionFile()', () => {
+    const parser = new ManifestParser(SYNAPSE_DIR);
+    const registry = parser.parse();
+    const active = parser.getActiveDomains(registry, { agentId: 'dev' });
     const injector = new DomainInjector(SYNAPSE_DIR);
+    const content = injector.inject(active);
+    injector.writeSessionFile(content, tmpDir);
+
     const status = injector.getStatus(tmpDir);
 
     expect(status.initialized).toBe(true);
