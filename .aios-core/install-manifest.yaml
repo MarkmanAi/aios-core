@@ -8,7 +8,7 @@
 # - File types for categorization
 #
 version: 3.11.3
-generated_at: "2026-03-03T17:24:49.634Z"
+generated_at: "2026-03-04T12:24:57.586Z"
 generator: scripts/generate-install-manifest.js
 file_count: 968
 files:
@@ -177,13 +177,13 @@ files:
     type: cli
     size: 5907
   - path: core-config.yaml
-    hash: sha256:0f8f462b78d7fb2a3be431594b92c897375427e544097fa768cefa585772f17e
+    hash: sha256:3b7a49b38066da80eb0c71f92a743236404a4235879fb767cc2e849aeca5c079
     type: config
-    size: 135
+    size: 15581
   - path: core/config/config-cache.js
-    hash: sha256:527a788cbe650aa6b13d1101ebc16419489bfef20b2ee93042f6eb6a51e898e9
+    hash: sha256:7f521adfb2575efb5a5efd5bba0c9f023e64cb5822d97e810d5cec97cb99f4aa
     type: core
-    size: 4704
+    size: 4889
   - path: core/config/config-loader.js
     hash: sha256:998d90c2d40ebbc432e67a4e3a2300644f8805e8c868319ac2feebc64d76289f
     type: core
@@ -245,17 +245,17 @@ files:
     type: elicitation
     size: 10935
   - path: core/events/dashboard-emitter.js
-    hash: sha256:2c14734d2870c75dddeefe0c2b5f60ab649ae63ba5e8b2d71c9ae468ccd11ec2
+    hash: sha256:e6c0379244bc1dde3205e4896cc82f545b2d78247edbbad2b27e82562cc61269
     type: core
-    size: 6677
+    size: 8473
   - path: core/events/index.js
     hash: sha256:328984f1f9839ac13ad1c2ef3c9d9cd34fa39db0c82444800ccba0708fb507bf
     type: core
     size: 331
   - path: core/events/types.js
-    hash: sha256:e478b8cef0d2dbb1bcbdee3e54bf01fe950caa8388fb11197beba5617fe3de82
+    hash: sha256:4306609b7cf9f7e3038ee6e37cbb810ec2742f8174e68aec740f3be7bfa2db4d
     type: core
-    size: 1365
+    size: 1588
   - path: core/execution/autonomous-build-loop.js
     hash: sha256:d93f58bbbdf2d7d92e12195d106b793638895e5b87ccd4f2cabd0ac9a822db45
     type: core
@@ -297,9 +297,9 @@ files:
     type: core
     size: 25740
   - path: core/execution/wave-executor.js
-    hash: sha256:4e2324edb37ae0729062b5ac029f2891e050e7efd3a48d0f4a1dc4f227a6716b
+    hash: sha256:90aae140ad4e6a6294f0513682a9db1a64954d906fb7dccd928ad9905782e596
     type: core
-    size: 11060
+    size: 11355
   - path: core/health-check/base-check.js
     hash: sha256:f1b588ddd75f67f8126a0f7c2d90b023b7e9b1b888a71e8cb83928764a8e9658
     type: core
@@ -661,9 +661,9 @@ files:
     type: core
     size: 35271
   - path: core/orchestration/index.js
-    hash: sha256:458d4076da395b8a8912b38f09c0f2392f7925ed563ff97730e62b7359402745
+    hash: sha256:3effa7ef88df0692e95bb36d869ff3f8546398604078fb5f1a0e8a416c14c6f1
     type: core
-    size: 3836
+    size: 4308
   - path: core/orchestration/lock-manager.js
     hash: sha256:7764b9e79444e75577931a561444f1bf950d893004abc39fa8c2476f632bb481
     type: core
@@ -725,9 +725,9 @@ files:
     type: core
     size: 8808
   - path: core/permissions/index.js
-    hash: sha256:f68b99cc5b97678035d1b37317a9b2f834d04dbaf6810edddc19784b5aaaea9c
+    hash: sha256:adef83e57fba02af7c21e4822bc3f9a4848d12ddea264abfd850001cbb7884ac
     type: core
-    size: 2262
+    size: 3603
   - path: core/permissions/operation-guard.js
     hash: sha256:f9b1b1bd547145c0d8a0f47534af0678ee852df6236acd05c53e479cb0e3f0bd
     type: core
@@ -949,9 +949,9 @@ files:
     type: core
     size: 10916
   - path: data/agent-config-requirements.yaml
-    hash: sha256:d388dc48e23384eae4c0156209846c509f76afb1579f3100f0404ff17580fc3f
+    hash: sha256:b0c1c57a077c2494f7ffd71b797951cc0b08fcd70a296d735f46e8c32e8f645d
     type: data
-    size: 9846
+    size: 10786
   - path: data/aios-kb.md
     hash: sha256:21138a86582b713c2106973907bbf4a5ce4e3192dadd832122ac9c6294d0efb1
     type: data
@@ -973,9 +973,9 @@ files:
     type: data
     size: 2643
   - path: data/workflow-patterns.yaml
-    hash: sha256:e8f87cba39aa0d754c0d0fac1a74e6080e07eedc7042838bc6d2109f29103e69
+    hash: sha256:cd17359da8a29aa4c514110b84369d2bfe9d5a16b60767d77073e7900bb2954c
     type: data
-    size: 23376
+    size: 27690
   - path: data/workflow-state-schema.yaml
     hash: sha256:e94af39f75eb8638639beb7cc86113874007b7e4fb42af31e9300f7c684e90e0
     type: data
@@ -1001,9 +1001,9 @@ files:
     type: development
     size: 5012
   - path: development/agents/aios-master.md
-    hash: sha256:d5430259d6c3288eb0d375cacdf149a50ebd334fc5aa65969af535f8011a8a0e
+    hash: sha256:d6d657fb725bae48e5b6ec7800a75134637edf72efd27eecfaaecbcc8982cfdf
     type: agent
-    size: 15014
+    size: 15212
   - path: development/agents/analyst.md
     hash: sha256:17c49a1f44a776a5df2614db4fb48703b4662b5ca4b44c755a009131b014ef22
     type: agent
@@ -1169,17 +1169,17 @@ files:
     type: script
     size: 11882
   - path: development/scripts/greeting-builder.js
-    hash: sha256:89b17abcb8d2aa20c195fe590e0bd65452ea28bbd905163cbeaa3fd5554f2ad3
+    hash: sha256:d2bce9f7c98913432bee06448a54046ebeab24fa2d0d642f0ffdc037aeb6753e
     type: script
-    size: 30369
+    size: 39692
   - path: development/scripts/greeting-config-cli.js
     hash: sha256:1535acc8d5c802eb3dec7b7348f876a34974fbe4cfa760a9108d5554a72c4cf6
     type: script
     size: 3294
   - path: development/scripts/greeting-preference-manager.js
-    hash: sha256:312b46c2ae71b3282c5ee5e11ec2f0c5deff77d05a22feda5d8e294fdfa12a6a
+    hash: sha256:8ed63ab87473e97c6c33e005138c43d4cd257c3d2e693dd8231494ab1bed2f1c
     type: script
-    size: 4039
+    size: 5058
   - path: development/scripts/manifest-preview.js
     hash: sha256:1183ad904d28ad302c12b87bae30f5092f6afce5d84facd27f57190451d6a9b6
     type: script
@@ -3809,19 +3809,19 @@ files:
     type: workflow-intelligence
     size: 10679
   - path: workflow-intelligence/__tests__/integration.test.js
-    hash: sha256:8f7eb4cff6d36493b49322b3221231db6d6b4259aaa2da4a2c5cdd6d61effded
+    hash: sha256:54d8410cd6184d15644a6200517f173ccb170c955ed6af0152090a64727b629a
     type: workflow-intelligence
     size: 11101
   - path: workflow-intelligence/__tests__/suggestion-engine.test.js
-    hash: sha256:993741ed68c63db9bb50e58133b47159dd9fb1c4844e2fc99a5e618adb8fa12f
+    hash: sha256:9f94bbe65aedfc97357518580c12c1683abdf00e87467b8d73bc06361fd645f4
     type: workflow-intelligence
-    size: 12788
+    size: 13004
   - path: workflow-intelligence/__tests__/wave-analyzer.test.js
     hash: sha256:617a099d4be72f8711a4be734ed0a600d97f7e84bec24edf8b97d68b6c5a2b51
     type: workflow-intelligence
     size: 15055
   - path: workflow-intelligence/__tests__/workflow-registry.test.js
-    hash: sha256:fee70788995d95180f647eea86a012d1f90d8157405c9abf3d8004e1e347a424
+    hash: sha256:495579ef23bf48968a6012338b1471e4bd9926ca7a4ba851f95e767f7ffe31d3
     type: workflow-intelligence
     size: 9967
   - path: workflow-intelligence/engine/confidence-scorer.js
