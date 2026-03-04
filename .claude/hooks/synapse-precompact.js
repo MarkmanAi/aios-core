@@ -21,8 +21,8 @@
 const path = require('path');
 
 // Resolve extractor relative to this hook file location
-// hooks/ → ../ → project root → .aios-core/core/synapse/...
-const EXTRACTOR_REL = '../.aios-core/core/synapse/memory/session-digest/extractor';
+// hooks/ → .claude/ → project root → .aios-core/core/synapse/...
+const EXTRACTOR_REL = '../../.aios-core/core/synapse/memory/session-digest/extractor';
 const EXTRACTOR_PATH = path.resolve(__dirname, EXTRACTOR_REL);
 
 // Fire-and-forget: setImmediate defers execution until AFTER this script returns.
