@@ -9,11 +9,11 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 | Priority | TODO | In Progress | Blocked | Done | Total |
 |----------|------|-------------|---------|------|-------|
 | 🔴 HIGH   | 0    | 0           | 0       | 0    | 0     |
-| 🟡 MEDIUM | 1    | 0           | 0       | 0    | 1     |
+| 🟡 MEDIUM | 3    | 0           | 0       | 0    | 3     |
 | 🟢 LOW    | 1    | 0           | 0       | 0    | 1     |
-| **Total** | **2** | **0**      | **0**   | **0** | **2** |
+| **Total** | **4** | **0**      | **0**   | **0** | **4** |
 
-*Last updated: 2026-03-03*
+*Last updated: 2026-03-04*
 
 ---
 
@@ -24,6 +24,44 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 ---
 
 ## 🟡 MEDIUM Priority
+
+#### [10.7-T1] inject() no input validation — null crash + path traversal risk
+
+- **Source**: QA Review — Story 10.7 (gate: `docs/qa/gates/10.7-synapse-domain-injector.yml`, MNT-001)
+- **Priority**: 🟡 MEDIUM
+- **Effort**: ~1 hour
+- **Status**: 📋 TODO
+- **Assignee**: Dev
+- **Sprint**: Epic 11 or standalone story
+- **Risk**: MEDIUM — null/undefined activeDomains causes spread crash in production; crafted `file` values in array pose theoretical path traversal risk via `path.join()`
+- **Description**: `inject()` in `.aios-core/core/synapse/domain-injector.js:30` does not validate the `activeDomains` parameter. Passing `null` or `undefined` crashes on spread. Additionally, domain `file` values from the manifest are passed directly to `path.join()` without sanitization, creating a theoretical path traversal vector if manifest data is compromised.
+- **Success Criteria**:
+  - [ ] Add input guard: `if (!activeDomains || !Array.isArray(activeDomains)) return ''`
+  - [ ] Add path sanitization: validate each `file` value does not contain `..` before `path.join()`
+  - [ ] All 316 synapse suite tests still pass (`npm test -- tests/core/synapse/`)
+  - [ ] `npm run lint` 0 errors on modified file
+- **Acceptance**: `inject(null)`, `inject(undefined)`, and `inject([])` return `''` gracefully. No path traversal possible via crafted manifest `file` values.
+
+---
+
+#### [10.7-T2] getStatus() integration test order-coupled to prior test
+
+- **Source**: QA Review — Story 10.7 (gate: `docs/qa/gates/10.7-synapse-domain-injector.yml`, TEST-001)
+- **Priority**: 🟡 MEDIUM
+- **Effort**: ~30 min
+- **Status**: 📋 TODO
+- **Assignee**: Dev
+- **Sprint**: Epic 11 or standalone story
+- **Risk**: LOW — currently passes in sequence, but will fail if test order changes or Jest parallelism is increased
+- **Description**: `getStatus()` test at `tests/core/synapse/integration.test.js:151` relies on side effects written by the preceding `writeSessionFile()` test — both share the same temp directory and the session file written by the first test is consumed by the second. If execution order changes (e.g., `--randomize`, shard), the `getStatus` test fails with `initialized: false`.
+- **Success Criteria**:
+  - [ ] `getStatus` test block adds its own `writeSessionFile()` call in a `beforeEach` or at test start
+  - [ ] Test passes when run in isolation: `npm test -- --testNamePattern "getStatus"`
+  - [ ] 316/316 synapse suite tests still pass
+  - [ ] No production code modified — test-only change
+- **Acceptance**: `getStatus` test is fully self-contained and passes in any execution order, including `--randomize` and `--runInBand`.
+
+---
 
 #### [11.2-T1] Fix 7 remaining parallel flaky test suites (Class F)
 
