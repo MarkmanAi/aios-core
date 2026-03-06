@@ -1,7 +1,7 @@
 /**
- * Greenfield Handler - Story 12.13
+ * Greenfield Handler - Story 13.6
  *
- * Epic 12: Bob Full Integration — Completando o PRD v2.0
+ * Epic 13: Bob Full Integration — Completando o PRD v2.0
  *
  * Orchestrates the complete Greenfield Workflow (greenfield-fullstack.yaml)
  * for users starting a brand new project from scratch.

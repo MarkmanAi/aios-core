@@ -254,6 +254,7 @@ Seguir Conventional Commits:
 | Buscar conteúdo | `Grep` tool | `grep`/`rg` no bash |
 | Ler arquivos | `Read` tool | `cat`/`head`/`tail` |
 | Editar arquivos | `Edit` tool | `sed`/`awk` |
+| Criar arquivos | `Write` tool | `echo >/cat <<EOF` |
 | Buscar arquivos | `Glob` tool | `find` |
 | Operações complexas | `Task` tool | Múltiplos comandos manuais |
 
@@ -307,6 +308,10 @@ npm run build               # Build produção
 ## MCP Usage
 
 Ver `.claude/rules/mcp-usage.md` para regras detalhadas.
+
+## Known Issues — Ferramentas
+
+Ver `.claude/rules/write-tool-windows.md` para regras detalhadas.
 
 **Resumo:**
 - Preferir ferramentas nativas do Claude Code sobre MCP

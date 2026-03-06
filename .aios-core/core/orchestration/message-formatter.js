@@ -1,7 +1,7 @@
 /**
  * Message Formatter — Educational Mode Message Formatting
  *
- * Story 12.7: Modo Educativo (Opt-in)
+ * Story 13.4: Educational Mode
  * PRD Reference: §0.5 (Modo Educativo do Bob)
  *
  * Formats Bob's messages based on educational mode:

@@ -1,7 +1,7 @@
 /**
  * Data Lifecycle Manager - Cleanup and archival of stale data
  *
- * Story 12.5: Session State Integration with Bob (AC8-11)
+ * Story 13.2: Data Lifecycle Manager
  *
  * Provides automated cleanup of:
  * - Session states older than 30 days (archived to .aios/archive/sessions/)
@@ -69,7 +69,7 @@ class DataLifecycleManager {
   }
 
   /**
-   * Runs all startup cleanup operations (AC8-11)
+   * Runs all startup cleanup operations (AC-1, AC-2, AC-3, AC-4)
    *
    * @returns {Promise<CleanupResult>} Cleanup result summary
    */
@@ -82,7 +82,7 @@ class DataLifecycleManager {
     };
 
     try {
-      // AC9: Cleanup orphan locks (delegate to LockManager)
+      // AC-3: Cleanup orphan locks (delegate to LockManager)
       result.locksRemoved = await this.cleanupOrphanLocks();
     } catch (error) {
       result.errors.push(`Lock cleanup failed: ${error.message}`);
@@ -90,7 +90,7 @@ class DataLifecycleManager {
     }
 
     try {
-      // AC8: Cleanup stale sessions
+      // AC-1: Cleanup stale sessions
       result.sessionsArchived = await this.cleanupStaleSessions();
     } catch (error) {
       result.errors.push(`Session cleanup failed: ${error.message}`);
@@ -98,21 +98,21 @@ class DataLifecycleManager {
     }
 
     try {
-      // AC10: Cleanup stale snapshots
+      // AC-2: Cleanup stale snapshots
       result.snapshotsRemoved = await this.cleanupStaleSnapshots();
     } catch (error) {
       result.errors.push(`Snapshot cleanup failed: ${error.message}`);
       this._log(`Snapshot cleanup error: ${error.message}`);
     }
 
-    // AC11: Log cleanup summary
+    // AC-4: Log cleanup summary
     this._logCleanupSummary(result);
 
     return result;
   }
 
   /**
-   * Cleans up stale session states (AC8)
+   * Cleans up stale session states (AC-1)
    *
    * Sessions with last_updated > 30 days are moved to .aios/archive/sessions/
    *
@@ -171,7 +171,7 @@ class DataLifecycleManager {
   }
 
   /**
-   * Cleans up stale snapshots (AC10)
+   * Cleans up stale snapshots (AC-2)
    *
    * Snapshots older than 90 days are removed.
    * Reference is kept in index.json for audit trail.
@@ -240,7 +240,7 @@ class DataLifecycleManager {
   }
 
   /**
-   * Cleans up orphan lock files (AC9)
+   * Cleans up orphan lock files (AC-3)
    *
    * Delegates to LockManager.cleanupStaleLocks() which removes:
    * - Locks with expired TTL
@@ -297,7 +297,7 @@ class DataLifecycleManager {
   }
 
   /**
-   * Logs cleanup summary (AC11)
+   * Logs cleanup summary (AC-4)
    * @param {CleanupResult} result - Cleanup result
    * @private
    */

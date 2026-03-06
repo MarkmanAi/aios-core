@@ -1132,4 +1132,110 @@ describe('BobOrchestrator', () => {
       expect(result.error).toContain('UNKNOWN_STATE');
     });
   });
+
+  // ==========================================
+  // AC-3 completeness: stale-lock startup cleanup
+  // ==========================================
+
+  describe('startup cleanup on orchestrate (AC-3 completeness)', () => {
+    it('should call runStartupCleanup during orchestrate startup', async () => {
+      // When
+      await orchestrator.orchestrate();
+
+      // Then
+      expect(orchestrator.dataLifecycleManager.runStartupCleanup).toHaveBeenCalledTimes(1);
+    });
+
+    it('should include cleanupResult in orchestration result', async () => {
+      // When
+      const result = await orchestrator.orchestrate();
+
+      // Then
+      expect(result.cleanupResult).toBeDefined();
+      expect(result.cleanupResult).toEqual(
+        expect.objectContaining({ locksRemoved: 0, sessionsArchived: 0 }),
+      );
+    });
+  });
+
+  // ==========================================
+  // AC-4 completeness: observability callback lambdas
+  // ==========================================
+
+  describe('_setupObservabilityCallbacks (AC-4 completeness)', () => {
+    it('onPhaseChange lambda: updates panel, statusWriter, and dashboardEmitter', async () => {
+      // Given — callback registered in constructor
+      const phaseChangeCb = orchestrator.workflowExecutor.onPhaseChange.mock.calls[0][0];
+      expect(phaseChangeCb).toBeDefined();
+
+      // When
+      phaseChangeCb('2_development', 'story-13.1', '@dev');
+
+      // Then — synchronous panel update
+      expect(orchestrator.observabilityPanel.setPipelineStage).toHaveBeenCalledWith('development');
+
+      // Flush fire-and-forget promises
+      await Promise.resolve();
+      expect(orchestrator.bobStatusWriter.updatePhase).toHaveBeenCalledWith('development');
+      expect(orchestrator.dashboardEmitter.emitBobPhaseChange).toHaveBeenCalledWith(
+        'development',
+        'story-13.1',
+        '@dev',
+      );
+    });
+
+    it('onPhaseChange lambda: uses raw phase key when not in stageMap', async () => {
+      // Given
+      const phaseChangeCb = orchestrator.workflowExecutor.onPhaseChange.mock.calls[0][0];
+
+      // When — unmapped key passes through as-is
+      phaseChangeCb('custom_phase', 'story-13.2', '@qa');
+
+      // Then
+      expect(orchestrator.observabilityPanel.setPipelineStage).toHaveBeenCalledWith('custom_phase');
+    });
+
+    it('onAgentSpawn lambda: normalises agent id and resolves name from map', async () => {
+      // Given
+      const agentSpawnCb = orchestrator.workflowExecutor.onAgentSpawn.mock.calls[0][0];
+
+      // When — agent without @ prefix
+      agentSpawnCb('dev', 'implement feature');
+
+      // Then — @ prefix added, name resolved from agentNameMap
+      expect(orchestrator.observabilityPanel.setCurrentAgent).toHaveBeenCalledWith(
+        '@dev',
+        'Dex',
+        'implement feature',
+        'Assigned for implement feature',
+      );
+      await Promise.resolve();
+      expect(orchestrator.bobStatusWriter.updateAgent).toHaveBeenCalledWith(
+        '@dev',
+        'Dex',
+        'implement feature',
+        'Assigned for implement feature',
+      );
+    });
+
+    it('onTerminalSpawn lambda: updates panel, statusWriter, and dashboardEmitter', async () => {
+      // Given
+      const terminalSpawnCb = orchestrator.workflowExecutor.onTerminalSpawn.mock.calls[0][0];
+
+      // When
+      terminalSpawnCb('@dev', 1234, 'run tests');
+
+      // Then — synchronous panel update
+      expect(orchestrator.observabilityPanel.addTerminal).toHaveBeenCalledWith('@dev', 1234, 'run tests');
+
+      // Flush fire-and-forget promises
+      await Promise.resolve();
+      expect(orchestrator.bobStatusWriter.addTerminal).toHaveBeenCalledWith('@dev', 1234, 'run tests');
+      expect(orchestrator.dashboardEmitter.emitBobAgentSpawned).toHaveBeenCalledWith(
+        '@dev',
+        1234,
+        'run tests',
+      );
+    });
+  });
 });

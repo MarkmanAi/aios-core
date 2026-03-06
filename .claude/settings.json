@@ -2,8 +2,12 @@
   "hooks": {
     "PreCompact": [
       {
-        "command": "node .claude/hooks/synapse-precompact.js",
-        "description": "SYNAPSE Session Digest — captures knowledge before compact"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/synapse-precompact.js"
+          }
+        ]
       }
     ]
   }

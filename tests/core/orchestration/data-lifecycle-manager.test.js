@@ -1,6 +1,6 @@
 /**
  * Data Lifecycle Manager Tests
- * Story 12.5: Session State Integration with Bob (AC8-11)
+ * Story 13.2: Data Lifecycle Manager
  */
 
 const path = require('path');
@@ -90,7 +90,7 @@ describe('DataLifecycleManager', () => {
   });
 
   // ==========================================
-  // cleanupStaleSessions tests (AC8)
+  // cleanupStaleSessions tests (AC-1)
   // ==========================================
 
   describe('cleanupStaleSessions', () => {
@@ -122,7 +122,7 @@ describe('DataLifecycleManager', () => {
       expect(fsSync.existsSync(sessionPath)).toBe(true);
     });
 
-    it('should archive session if last_updated > 30 days (AC8)', async () => {
+    it('should archive session if last_updated > 30 days (AC-1)', async () => {
       // Given - session updated 45 days ago
       const sessionPath = path.join(TEST_PROJECT_ROOT, 'docs/stories/.session-state.yaml');
       const fortyFiveDaysAgo = new Date();
@@ -180,10 +180,37 @@ describe('DataLifecycleManager', () => {
       // Then
       expect(result).toBe(0);
     });
+
+    it('should preserve original file when rename fails (AC-1 partial failure, AC-5)', async () => {
+      // Given - stale session exists
+      const sessionPath = path.join(TEST_PROJECT_ROOT, 'docs/stories/.session-state.yaml');
+      const fortyFiveDaysAgo = new Date();
+      fortyFiveDaysAgo.setDate(fortyFiveDaysAgo.getDate() - 45);
+
+      const sessionState = {
+        session_state: {
+          version: '1.1',
+          last_updated: fortyFiveDaysAgo.toISOString(),
+          epic: { id: 'test', title: 'Test Epic', total_stories: 1 },
+        },
+      };
+      await fs.writeFile(sessionPath, yaml.dump(sessionState));
+
+      // Mock rename to simulate failure
+      const renameSpy = jest.spyOn(fs, 'rename').mockRejectedValue(new Error('ENOENT: rename failed'));
+
+      // When / Then — should throw (rethrows the rename error)
+      await expect(manager.cleanupStaleSessions()).rejects.toThrow('ENOENT: rename failed');
+
+      // Original file must still exist (no data loss)
+      expect(fsSync.existsSync(sessionPath)).toBe(true);
+
+      renameSpy.mockRestore();
+    });
   });
 
   // ==========================================
-  // cleanupStaleSnapshots tests (AC10)
+  // cleanupStaleSnapshots tests (AC-2)
   // ==========================================
 
   describe('cleanupStaleSnapshots', () => {
@@ -221,7 +248,7 @@ describe('DataLifecycleManager', () => {
       expect(fsSync.existsSync(snapshotPath)).toBe(true);
     });
 
-    it('should remove snapshot if age > 90 days and update index.json (AC10)', async () => {
+    it('should remove snapshot if age > 90 days and update index.json (AC-2)', async () => {
       // Given - snapshot created 100 days ago
       const snapshotPath = path.join(TEST_PROJECT_ROOT, '.aios/snapshots/snapshot-old.json');
       await fs.writeFile(snapshotPath, JSON.stringify({ epic_id: 'test', story_id: '1.0' }));
@@ -248,6 +275,37 @@ describe('DataLifecycleManager', () => {
       expect(index.removed_snapshots[0].epic_id).toBe('test');
     });
 
+    it('should preserve existing index entries when adding new ones (AC-2 atomicity)', async () => {
+      // Given - index.json already has one existing entry
+      const indexPath = path.join(TEST_PROJECT_ROOT, '.aios/snapshots/index.json');
+      const existingEntry = {
+        filename: 'snapshot-previous.json',
+        removed_at: '2026-01-01T00:00:00.000Z',
+        original_created: '2025-10-01T00:00:00.000Z',
+        age_days: 92,
+        epic_id: 'prev-epic',
+        story_id: '0.1',
+      };
+      await fs.writeFile(indexPath, JSON.stringify({ removed_snapshots: [existingEntry], last_cleanup: '2026-01-01T00:00:00.000Z' }));
+
+      // And - a new stale snapshot to remove
+      const snapshotPath = path.join(TEST_PROJECT_ROOT, '.aios/snapshots/snapshot-stale.json');
+      await fs.writeFile(snapshotPath, JSON.stringify({ epic_id: 'new-epic', story_id: '1.0' }));
+      const hundredDaysAgo = new Date();
+      hundredDaysAgo.setDate(hundredDaysAgo.getDate() - 100);
+      await fs.utimes(snapshotPath, hundredDaysAgo, hundredDaysAgo);
+
+      // When
+      const result = await manager.cleanupStaleSnapshots();
+
+      // Then - both entries present in index (read→merge→write)
+      expect(result).toBe(1);
+      const index = JSON.parse(await fs.readFile(indexPath, 'utf8'));
+      expect(index.removed_snapshots).toHaveLength(2);
+      expect(index.removed_snapshots[0].filename).toBe('snapshot-previous.json');
+      expect(index.removed_snapshots[1].filename).toBe('snapshot-stale.json');
+    });
+
     it('should not remove index.json itself', async () => {
       // Given - index.json in snapshots
       const indexPath = path.join(TEST_PROJECT_ROOT, '.aios/snapshots/index.json');
@@ -268,11 +326,11 @@ describe('DataLifecycleManager', () => {
   });
 
   // ==========================================
-  // cleanupOrphanLocks tests (AC9)
+  // cleanupOrphanLocks tests (AC-3)
   // ==========================================
 
   describe('cleanupOrphanLocks', () => {
-    it('should delegate to LockManager.cleanupStaleLocks (AC9)', async () => {
+    it('should delegate to LockManager.cleanupStaleLocks (AC-3)', async () => {
       // When
       const result = await manager.cleanupOrphanLocks();
 
@@ -283,7 +341,7 @@ describe('DataLifecycleManager', () => {
   });
 
   // ==========================================
-  // runStartupCleanup tests (AC11)
+  // runStartupCleanup tests (AC-4)
   // ==========================================
 
   describe('runStartupCleanup', () => {
@@ -324,7 +382,7 @@ describe('DataLifecycleManager', () => {
       expect(result.errors[0]).toContain('Lock cleanup failed');
     });
 
-    it('should log cleanup summary (AC11)', async () => {
+    it('should log cleanup summary (AC-4)', async () => {
       // Given
       const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
       jest.spyOn(manager, 'cleanupOrphanLocks').mockResolvedValue(2);

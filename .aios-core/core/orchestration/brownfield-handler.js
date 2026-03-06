@@ -1,7 +1,7 @@
 /**
- * Brownfield Handler - Story 12.8
+ * Brownfield Handler - Story 13.5
  *
- * Epic 12: Bob Full Integration — Completando o PRD v2.0
+ * Epic 13: Bob Full Integration — Completando o PRD v2.0
  *
  * Handles first execution behavior for existing projects without AIOS documentation.
  * Executes the brownfield-discovery.yaml workflow to analyze the codebase and

@@ -1,7 +1,7 @@
 /**
  * Bob Status Writer
  *
- * Story 12.6: Observability Panel Integration + Dashboard Bridge
+ * Story 13.3: BobStatusWriter — Dashboard Bridge
  * PRD Reference: §3.8 (Painel de Observabilidade do Bob)
  *
  * Writes Bob orchestration state to `.aios/dashboard/bob-status.json`
@@ -30,7 +30,7 @@ const os = require('os');
 const BOB_STATUS_VERSION = '1.0';
 
 /**
- * Bob Status Schema (Story 12.6 - AC9: Single source of truth)
+ * Bob Status Schema (Story 13.3 - AC2: Schema Validation)
  * Used by both bob-status.json and WebSocket events
  *
  * @typedef {Object} BobStatusSchema
