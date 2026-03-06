@@ -1,16 +1,24 @@
 """
-Semantic deduplication using sentence-transformers + cosine similarity.
+Semantic deduplication using sentence-transformers + FAISS + SQLite persistence.
 Items above DEDUP_SIMILARITY_BLOCK are blocked as duplicates.
 Items between DEDUP_SIMILARITY_REVIEW and BLOCK are sent to Haiku for classification.
+Cross-run persistence via SQLite registry + FAISS index.
 """
 
 from __future__ import annotations
 
+import hashlib
+import pickle
+import sqlite3
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+import numpy as np
 from rich.console import Console
 
 from knowledge_etl.config import (
+    DEDUP_DB,
     DEFAULT_MODEL_DEDUP,
     DEDUP_SIMILARITY_BLOCK,
     DEDUP_SIMILARITY_REVIEW,
@@ -19,13 +27,16 @@ from knowledge_etl.utils.cost import CostTracker
 from knowledge_etl.utils.llm import LLMClient
 
 if TYPE_CHECKING:
-    import numpy as np
     from sentence_transformers import SentenceTransformer
 
 console = Console()
 
-# Lazy-loaded model singleton
+# Lazy-loaded singletons
 _model: SentenceTransformer | None = None
+_db_conn: sqlite3.Connection | None = None
+
+# Embedding dimension for all-MiniLM-L6-v2
+_EMBEDDING_DIM = 384
 
 
 def _get_model() -> SentenceTransformer:
@@ -38,15 +49,89 @@ def _get_model() -> SentenceTransformer:
     return _model
 
 
+def _init_db(db_path: Path | None = None) -> sqlite3.Connection:
+    """Initialize SQLite dedup registry (singleton)."""
+    global _db_conn
+    if _db_conn is not None:
+        return _db_conn
+
+    path = db_path or DEDUP_DB
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    conn = sqlite3.connect(str(path))
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS embeddings (
+            id INTEGER PRIMARY KEY,
+            text_hash TEXT UNIQUE,
+            text TEXT,
+            embedding_blob BLOB,
+            layer TEXT,
+            domain TEXT,
+            added_at TEXT
+        )
+    """)
+    conn.commit()
+    _db_conn = conn
+    return conn
+
+
+def _load_faiss_index(conn: sqlite3.Connection) -> tuple[Any, list[str]]:
+    """Load all embeddings from SQLite and build a FAISS index."""
+    import faiss
+
+    rows = conn.execute(
+        "SELECT text_hash, embedding_blob FROM embeddings"
+    ).fetchall()
+
+    index = faiss.IndexFlatIP(_EMBEDDING_DIM)
+    hashes: list[str] = []
+
+    if rows:
+        embeddings = []
+        for text_hash, blob in rows:
+            emb = pickle.loads(blob)
+            embeddings.append(emb)
+            hashes.append(text_hash)
+        embeddings_array = np.array(embeddings, dtype=np.float32)
+        index.add(embeddings_array)
+
+    return index, hashes
+
+
+def _persist_embedding(
+    conn: sqlite3.Connection,
+    text: str,
+    embedding: np.ndarray,
+    layer: str = "",
+    domain: str = "",
+) -> None:
+    """Persist an accepted item embedding to SQLite."""
+    text_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    blob = pickle.dumps(embedding.astype(np.float32))
+    now = datetime.now(timezone.utc).isoformat()
+    try:
+        conn.execute(
+            "INSERT OR IGNORE INTO embeddings (text_hash, text, embedding_blob, layer, domain, added_at) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (text_hash, text, blob, layer, domain, now),
+        )
+        conn.commit()
+    except sqlite3.Error:
+        pass
+
+
 def deduplicate(
     new_items: list[dict],
     existing_items: list[dict],
     text_key: str = "principle",
     llm: LLMClient | None = None,
     cost_tracker: CostTracker | None = None,
+    layer: str = "",
+    domain: str = "",
+    db_path: Path | None = None,
 ) -> list[dict]:
     """
-    Filter new_items against existing_items using semantic similarity.
+    Filter new_items against existing_items + SQLite registry using FAISS.
 
     Args:
         new_items: Items to potentially add.
@@ -54,45 +139,58 @@ def deduplicate(
         text_key: Key in item dict containing the text to compare.
         llm: LLMClient for Haiku classification in the gray zone.
         cost_tracker: CostTracker for recording Haiku costs.
+        layer: Pipeline layer label (l1, l2, l3).
+        domain: Knowledge domain.
+        db_path: Override DEDUP_DB path (used by tests with tmp_path).
 
     Returns:
         List of items from new_items that are NOT duplicates.
     """
-    if not existing_items:
-        return new_items
-
     if not new_items:
         return []
 
-    import numpy as np
-
     model = _get_model()
 
-    # Extract text for embedding
-    existing_texts = [_get_text(item, text_key) for item in existing_items]
-    existing_embeddings = model.encode(existing_texts, normalize_embeddings=True)
+    # Initialize SQLite registry + FAISS index
+    conn = _init_db(db_path)
+    faiss_index, registry_hashes = _load_faiss_index(conn)
+    registry_count = len(registry_hashes)
+
+    # Also encode existing in-memory items and add to FAISS
+    existing_texts: list[str] = []
+    if existing_items:
+        existing_texts = [_get_text(item, text_key) for item in existing_items]
+        existing_embeddings = model.encode(existing_texts, normalize_embeddings=True).astype(np.float32)
+        faiss_index.add(existing_embeddings)
 
     unique_items: list[dict] = []
 
     for item in new_items:
         item_text = _get_text(item, text_key)
-        item_embedding = model.encode([item_text], normalize_embeddings=True)
+        item_embedding = model.encode([item_text], normalize_embeddings=True).astype(np.float32)
 
-        # Compute cosine similarity against all existing
-        similarities = np.dot(existing_embeddings, item_embedding.T).flatten()
-        max_similarity = float(np.max(similarities)) if len(similarities) > 0 else 0.0
+        max_similarity = 0.0
+
+        if faiss_index.ntotal > 0:
+            distances, indices = faiss_index.search(item_embedding, k=1)
+            max_similarity = float(distances[0][0])
+            nearest_idx = int(indices[0][0])
+        else:
+            nearest_idx = -1
 
         if max_similarity >= DEDUP_SIMILARITY_BLOCK:
-            # Clearly a duplicate — skip
             console.print(f"  [dim]Dedup SKIP (sim={max_similarity:.3f}):[/dim] {item_text[:60]}...")
             continue
 
         if max_similarity >= DEDUP_SIMILARITY_REVIEW:
-            # Gray zone — ask Haiku to classify
             if llm and cost_tracker:
+                nearest_text = _resolve_nearest_text(
+                    nearest_idx, registry_count, registry_hashes, conn,
+                    existing_texts, item_text,
+                )
                 classification = _haiku_classify(
                     new_text=item_text,
-                    existing_text=existing_texts[int(np.argmax(similarities))],
+                    existing_text=nearest_text,
                     similarity=max_similarity,
                     llm=llm,
                     cost_tracker=cost_tracker,
@@ -102,30 +200,47 @@ def deduplicate(
                     continue
                 console.print(f"  [green]Dedup KEEP (Haiku={classification}):[/green] {item_text[:60]}...")
             else:
-                # No LLM available — conservative: keep it
                 console.print(f"  [yellow]Dedup KEEP (no Haiku, sim={max_similarity:.3f}):[/yellow] {item_text[:60]}...")
 
-        # Distinct or classified as non-duplicate — keep
+        # Accepted
         unique_items.append(item)
-
-        # Add to existing pool for subsequent comparisons within this batch
-        new_embedding = model.encode([item_text], normalize_embeddings=True)
-        existing_embeddings = np.vstack([existing_embeddings, new_embedding])
-        existing_texts.append(item_text)
+        faiss_index.add(item_embedding)
+        _persist_embedding(conn, item_text, item_embedding[0], layer=layer, domain=domain)
 
     console.print(f"[green]Dedup:[/green] {len(unique_items)}/{len(new_items)} items are unique")
     return unique_items
+
+
+def _resolve_nearest_text(
+    nearest_idx: int,
+    registry_count: int,
+    registry_hashes: list[str],
+    conn: sqlite3.Connection,
+    existing_texts: list[str],
+    fallback: str,
+) -> str:
+    """Resolve the text of the nearest neighbor from registry or existing items."""
+    if nearest_idx < 0:
+        return fallback
+    if nearest_idx < registry_count:
+        row = conn.execute(
+            "SELECT text FROM embeddings WHERE text_hash = ?",
+            (registry_hashes[nearest_idx],),
+        ).fetchone()
+        return row[0] if row else fallback
+    ei = nearest_idx - registry_count
+    if ei < len(existing_texts):
+        return existing_texts[ei]
+    return fallback
 
 
 def _get_text(item: dict[str, Any], text_key: str) -> str:
     """Extract text from an item dict, trying text_key then common alternatives."""
     if text_key in item:
         return str(item[text_key])
-    # Fallback keys
     for key in ("name", "rule", "question", "tension", "description", "claim"):
         if key in item:
             return str(item[key])
-    # Last resort: serialize the whole item
     return str(item)
 
 
@@ -159,4 +274,12 @@ def _haiku_classify(
     result = text.strip().upper()
     if result in ("DUPLICATE", "RELATED", "DISTINCT"):
         return result
-    return "RELATED"  # Default to keeping on ambiguity
+    return "RELATED"
+
+
+def reset_db_singleton() -> None:
+    """Reset the DB connection singleton (for testing)."""
+    global _db_conn
+    if _db_conn is not None:
+        _db_conn.close()
+    _db_conn = None
