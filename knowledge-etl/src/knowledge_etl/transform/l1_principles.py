@@ -12,8 +12,10 @@ from pydantic import BaseModel
 from rich.console import Console
 
 from knowledge_etl.config import (
+    CHECKPOINTS,
     DEFAULT_MODEL_L1,
     MAX_OUTPUT_L1,
+    MAX_OUTPUT_REDUCE,
     PROMPTS_DIR,
     STAGING,
 )
@@ -58,7 +60,7 @@ def extract_l1(
     l1_dir = STAGING / book_slug / "l1"
     l1_dir.mkdir(parents=True, exist_ok=True)
 
-    checkpoint = Checkpoint(STAGING / book_slug / ".checkpoints", book_slug, "l1")
+    checkpoint = Checkpoint(CHECKPOINTS, book_slug, "l1")
 
     prompt_template = (PROMPTS_DIR / "l1_principles.xml").read_text(encoding="utf-8")
 
@@ -193,7 +195,60 @@ def _extract_map_reduce(
         checkpoint.mark_done(chapter_key, principles, usage.cost_usd)
         chapter_results.extend(principles)
 
-    return chapter_results
+    # Reduce: deduplicate and compress across chapters
+    console.print("[cyan]L1 Reduce:[/cyan] Cross-chapter dedup + compression")
+    return _reduce_l1(
+        chapter_results=chapter_results,
+        book_title=book_title,
+        author=author,
+        llm=llm,
+        cost_tracker=cost_tracker,
+    )
+
+
+
+def _reduce_l1(
+    chapter_results: list[dict],
+    book_title: str,
+    author: str,
+    llm: LLMClient,
+    cost_tracker: CostTracker,
+) -> list[dict]:
+    """Run the Reduce pass to deduplicate and compress cross-chapter principles."""
+    if not chapter_results:
+        return []
+
+    reduce_template = (PROMPTS_DIR / "l1_reduce.xml").read_text(encoding="utf-8")
+    reduce_system = _get_system_prompt(reduce_template)
+
+    candidates_json = json.dumps(chapter_results, indent=2, ensure_ascii=False)
+
+    task_prompt = (
+        reduce_template
+        .replace("{{BOOK_TITLE}}", book_title)
+        .replace("{{AUTHOR}}", author)
+        .replace("{{TOTAL_CHAPTERS}}", str(len({p.get("chapter_ref", "") for p in chapter_results})))
+        .replace("{{JSON_ARRAY_OF_CANDIDATES}}", candidates_json)
+    )
+
+    text, usage = llm.call(
+        model=DEFAULT_MODEL_L1,
+        system_prompt=reduce_system,
+        task_prompt=task_prompt,
+        max_tokens=MAX_OUTPUT_REDUCE,
+    )
+    cost_tracker.record("l1_reduce", usage)
+
+    import re
+    json_match = re.search(r"\{.*\}", text, re.DOTALL)
+    if not json_match:
+        return chapter_results
+
+    try:
+        data = json.loads(json_match.group())
+        return data.get("principles", chapter_results)
+    except json.JSONDecodeError:
+        return chapter_results
 
 
 def _fill_template(
