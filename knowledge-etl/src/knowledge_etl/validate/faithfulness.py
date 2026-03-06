@@ -55,7 +55,7 @@ def validate_faithfulness(
     assert llm is not None, "LLMClient is required for validation"
     assert cost_tracker is not None, "CostTracker is required for validation"
 
-    validate_dir = STAGING / book_slug / "validate"
+    validate_dir = STAGING / book_slug / "validation"
     validate_dir.mkdir(parents=True, exist_ok=True)
 
     prompt_template = (PROMPTS_DIR / "verify_faithfulness.xml").read_text(encoding="utf-8")

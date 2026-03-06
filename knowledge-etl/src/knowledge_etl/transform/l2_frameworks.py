@@ -14,6 +14,7 @@ from pydantic import BaseModel, ValidationError
 from rich.console import Console
 
 from knowledge_etl.config import (
+    CHECKPOINTS,
     DEFAULT_MODEL_L2,
     MAX_OUTPUT_L2,
     PROMPTS_DIR,
@@ -81,7 +82,7 @@ def extract_l2(
     l2_dir = STAGING / book_slug / "l2"
     l2_dir.mkdir(parents=True, exist_ok=True)
 
-    checkpoint = Checkpoint(STAGING / book_slug / ".checkpoints", book_slug, "l2")
+    checkpoint = Checkpoint(CHECKPOINTS, book_slug, "l2")
 
     prompt_template = (PROMPTS_DIR / "l2_frameworks.xml").read_text(encoding="utf-8")
     reduce_template = (PROMPTS_DIR / "reduce_synthesis.xml").read_text(encoding="utf-8")
