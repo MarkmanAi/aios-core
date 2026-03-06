@@ -15,6 +15,7 @@ from pydantic import BaseModel, ValidationError
 from rich.console import Console
 
 from knowledge_etl.config import (
+    CHECKPOINTS,
     DEFAULT_MODEL_L3,
     MAX_OUTPUT_L3,
     PROMPTS_DIR,
@@ -42,6 +43,7 @@ class ThinkingDNA(BaseModel):
     mental_models: list[str] = []
     epistemic_style: str = ""
     favorite_analogies: list[str] = []
+    exemplar_reasoning_quote: str = ""
 
 
 class Contradiction(BaseModel):
@@ -90,7 +92,7 @@ def extract_l3(
     contradictions_template = (PROMPTS_DIR / "l3_contradictions.xml").read_text(encoding="utf-8")
 
     # Checkpoint for resume support
-    checkpoint = Checkpoint(STAGING / book_slug / ".checkpoints", book_slug, "l3")
+    checkpoint = Checkpoint(CHECKPOINTS, book_slug, "l3")
 
     # P4 fix: cache book content for STUFF strategy — 60% cost reduction via prompt cache
     book_content_for_cache: str | None = None
