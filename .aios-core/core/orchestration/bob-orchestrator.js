@@ -1,7 +1,7 @@
 /**
  * Bob Orchestrator - Decision Tree Entry Point
  *
- * Story 12.3: Bob Orchestration Logic (Decision Tree)
+ * Story 13.1: Bob Orchestrator — Decision Tree Entry Point
  * PRD Reference: §3.3 (Decision Tree), §3.7 (Router not God Class)
  *
  * This is the main entry point for Bob (PM agent). It detects project state
@@ -34,18 +34,18 @@ const { SessionState } = require('./session-state');
 const LockManager = require('./lock-manager');
 const { DataLifecycleManager } = require('./data-lifecycle-manager');
 
-// Story 12.8: Brownfield Handler
+// Story 13.5: Brownfield Handler
 const { BrownfieldHandler } = require('./brownfield-handler');
 
-// Story 12.13: Greenfield Handler
+// Story 13.6: Greenfield Handler
 const { GreenfieldHandler } = require('./greenfield-handler');
 
-// Story 12.6: Observability Panel Integration + Dashboard Bridge
+// Story 13.3: Dashboard Bridge
 const { ObservabilityPanel, PanelMode } = require('../ui/observability-panel');
 const { BobStatusWriter } = require('./bob-status-writer');
 const { getDashboardEmitter } = require('../events/dashboard-emitter');
 
-// Story 12.7: Educational Mode
+// Story 13.4: Educational Mode
 const { MessageFormatter } = require('./message-formatter');
 const { setUserConfigValue } = require('../config/config-resolver');
 
@@ -97,10 +97,10 @@ class BobOrchestrator {
     this.workflowExecutor = new WorkflowExecutor(projectRoot, { debug: this.options.debug });
     this.lockManager = new LockManager(projectRoot, { debug: this.options.debug });
 
-    // Story 12.5: Data Lifecycle Manager
+    // Story 13.2: Data Lifecycle Manager
     this.dataLifecycleManager = new DataLifecycleManager(projectRoot, { debug: this.options.debug });
 
-    // Story 12.8: Brownfield Handler
+    // Story 13.5: Brownfield Handler
     this.brownfieldHandler = new BrownfieldHandler(projectRoot, {
       debug: this.options.debug,
       workflowExecutor: this.workflowExecutor,
@@ -108,7 +108,7 @@ class BobOrchestrator {
       sessionState: this.sessionState,
     });
 
-    // Story 12.13: Greenfield Handler
+    // Story 13.6: Greenfield Handler
     this.greenfieldHandler = new GreenfieldHandler(projectRoot, {
       debug: this.options.debug,
       workflowExecutor: this.workflowExecutor,
@@ -116,30 +116,30 @@ class BobOrchestrator {
       sessionState: this.sessionState,
     });
 
-    // Story 12.7: Educational Mode (AC1-2)
+    // Story 13.4: Educational Mode (AC1-2)
     // Educational mode is resolved from: session override > user config > default (false)
     this.educationalMode = this._resolveEducationalMode();
     this.messageFormatter = new MessageFormatter({ educationalMode: this.educationalMode });
 
-    // Story 12.6: Observability Panel Integration (AC1-5)
-    // Story 12.7: Panel mode based on educational mode (AC2, AC7)
+    // Story 13.3: Dashboard Bridge
+    // Story 13.4: Panel mode based on educational mode
     this.observabilityPanel = new ObservabilityPanel({
       mode: this.educationalMode ? PanelMode.DETAILED : PanelMode.MINIMAL,
       refreshRate: 1000, // 1 second refresh (AC3)
     });
 
-    // Story 12.6: Dashboard Bridge (AC6-11)
+    // Story 13.3: Dashboard Bridge
     this.bobStatusWriter = new BobStatusWriter(projectRoot, { debug: this.options.debug });
     this.dashboardEmitter = getDashboardEmitter();
 
-    // Story 12.6: Wire up callbacks (AC1, AC2)
+    // Story 13.3: Wire up callbacks
     this._setupObservabilityCallbacks();
 
     this._log('BobOrchestrator initialized');
   }
 
   /**
-   * Sets up observability panel callbacks (Story 12.6 - AC1, AC2, AC6-11)
+   * Sets up observability panel callbacks (Story 13.3)
    * @private
    */
   _setupObservabilityCallbacks() {
@@ -206,7 +206,7 @@ class BobOrchestrator {
       });
     });
 
-    // Story 12.13: Greenfield handler observability callbacks (AC10)
+    // Story 13.6: Greenfield handler observability callbacks
     this.greenfieldHandler.on('phaseStart', ({ phase }) => {
       this.observabilityPanel.setPipelineStage(phase);
       this._log(`Greenfield panel updated: phase=${phase}`);
@@ -255,7 +255,7 @@ class BobOrchestrator {
   }
 
   /**
-   * Resolves the educational mode value (Story 12.7 - AC1, AC2)
+   * Resolves the educational mode value (Story 13.4)
    *
    * Priority: session override > user config (L5) > default (false)
    *
@@ -287,7 +287,7 @@ class BobOrchestrator {
   }
 
   /**
-   * Detects educational mode toggle commands in user input (Story 12.7 - AC5)
+   * Detects educational mode toggle commands in user input (Story 13.4 - AC5)
    *
    * Supported commands (case-insensitive):
    * - "ativa modo educativo", "ativa educativo", "modo educativo on", "educational mode on"
@@ -345,7 +345,7 @@ class BobOrchestrator {
   }
 
   /**
-   * Handles educational mode toggle (Story 12.7 - AC5, AC6)
+   * Handles educational mode toggle (Story 13.4 - AC5, AC6)
    *
    * @param {boolean} enable - Whether to enable educational mode
    * @param {string} [persistenceType='session'] - 'session' or 'permanent'
@@ -395,7 +395,7 @@ class BobOrchestrator {
   }
 
   /**
-   * Gets the persistence prompt for educational mode toggle (Story 12.7 - AC6)
+   * Gets the persistence prompt for educational mode toggle (Story 13.4 - AC6)
    * @returns {string} Prompt message
    */
   getEducationalModePersistencePrompt() {
@@ -413,7 +413,7 @@ class BobOrchestrator {
   async orchestrate(context = {}) {
     const resource = 'bob-orchestration';
 
-    // Story 12.7: Detect educational mode toggle BEFORE any routing (AC5)
+    // Story 13.4: Detect educational mode toggle BEFORE any routing (AC5)
     // This allows toggle to work regardless of project state
     if (context.userGoal) {
       const toggleResult = this._detectEducationalModeToggle(context.userGoal);
@@ -445,22 +445,22 @@ class BobOrchestrator {
         };
       }
 
-      // Story 12.7: Refresh educational mode from session state after loading (AC2)
+      // Story 13.4: Refresh educational mode from session state after loading (AC2)
       // Session state might have been loaded by previous operations
       this.educationalMode = this._resolveEducationalMode();
       this.messageFormatter.setEducationalMode(this.educationalMode);
       this.observabilityPanel.setMode(this.educationalMode ? PanelMode.DETAILED : PanelMode.MINIMAL);
       this._log(`Educational mode resolved: ${this.educationalMode}`);
 
-      // Story 12.6: Start observability panel (AC1, AC3, AC7)
+      // Story 13.3: Start observability panel (AC1, AC3, AC7)
       this.observabilityPanel.start();
       this._log('Observability panel started');
 
-      // Story 12.6: Initialize Dashboard Bridge (AC6, AC11)
+      // Story 13.3: Initialize Dashboard Bridge (AC6, AC11)
       await this.bobStatusWriter.initialize();
       this._log('Bob status writer initialized');
 
-      // Story 12.5: Run data lifecycle cleanup BEFORE session check (AC8-11)
+      // Story 13.2: Run data lifecycle cleanup BEFORE session check (AC8-11)
       const cleanupResult = await this.dataLifecycleManager.runStartupCleanup();
       this._log(`Startup cleanup: ${JSON.stringify(cleanupResult)}`);
 
@@ -468,7 +468,7 @@ class BobOrchestrator {
       const projectState = this.detectProjectState(this.projectRoot);
       this._log(`Detected project state: ${projectState}`);
 
-      // Story 12.5: Check for existing session with formatted summary (AC1-4)
+      // Story 13.2: Check for existing session with formatted summary (AC1-4)
       const sessionCheck = await this._checkExistingSession();
       if (sessionCheck.hasSession) {
         this._log(`Session found: ${sessionCheck.summary}`);
@@ -480,7 +480,7 @@ class BobOrchestrator {
         });
 
         if (surfaceResult.should_surface) {
-          // Story 12.6: Stop panel when returning early (AC7)
+          // Story 13.3: Stop panel when returning early (AC7)
           this.observabilityPanel.stop();
           await this.bobStatusWriter.complete().catch(() => {});
           await this.lockManager.releaseLock(resource);
@@ -503,7 +503,7 @@ class BobOrchestrator {
       // Step 3: Route based on project state (AC7 — codified decision tree)
       const result = await this._routeByState(projectState, context);
 
-      // Story 12.6: Stop observability panel and complete status (AC7)
+      // Story 13.3: Stop observability panel and complete status (AC7)
       this.observabilityPanel.stop();
       await this.bobStatusWriter.complete();
       this._log('Observability panel stopped');
@@ -518,7 +518,7 @@ class BobOrchestrator {
         ...result,
       };
     } catch (error) {
-      // Story 12.6: Stop observability panel on error (AC7)
+      // Story 13.3: Stop observability panel on error (AC7)
       this.observabilityPanel.stop();
       await this.bobStatusWriter.complete().catch(() => {});
 
@@ -535,7 +535,7 @@ class BobOrchestrator {
   }
 
   /**
-   * Checks for existing session and builds formatted summary (Story 12.5 - AC1, AC2, AC4)
+   * Checks for existing session and builds formatted summary (Story 13.2)
    *
    * @returns {Promise<Object>} Session check result
    * @private
@@ -600,7 +600,7 @@ class BobOrchestrator {
   }
 
   /**
-   * Handles session resume based on user selection (Story 12.5 - AC3, AC7)
+   * Handles session resume based on user selection (Story 13.2)
    *
    * @param {string} option - Resume option (continue|review|restart|discard)
    * @returns {Promise<Object>} Resume result
@@ -662,7 +662,7 @@ class BobOrchestrator {
 
   /**
    * Resolves story ID to full path
-   * @param {string} storyId - Story ID (e.g., "12.5" or "story-12.5")
+   * @param {string} storyId - Story ID (e.g., "13.1" or "story-13.1")
    * @returns {string} Full path to story file
    * @private
    */
@@ -781,7 +781,7 @@ class BobOrchestrator {
   /**
    * Handles EXISTING_NO_DOCS state — Brownfield Discovery (AC4)
    *
-   * Story 12.8: Delegates to BrownfieldHandler for first execution behavior.
+   * Story 13.5: Delegates to BrownfieldHandler for first execution behavior.
    * - AC1: Detects first execution (EXISTING_NO_DOCS state)
    * - AC2: Presents welcome message with time estimate
    * - AC3: Executes brownfield-discovery.yaml workflow
@@ -796,14 +796,14 @@ class BobOrchestrator {
   async _handleBrownfield(context) {
     this._log('🔍 First execution detected — project has code but no AIOS docs');
 
-    // Delegate to BrownfieldHandler (Story 12.8 - Task 3.6)
+    // Delegate to BrownfieldHandler (Story 13.5)
     return this.brownfieldHandler.handle(context);
   }
 
   /**
    * Handles brownfield user decision (accept/decline analysis)
    *
-   * Story 12.8 - AC2: User accepts or declines the brownfield discovery.
+   * Story 13.5 - AC2: User accepts or declines the brownfield discovery.
    *
    * @param {boolean} accepted - Whether user accepted analysis
    * @param {Object} [context={}] - Execution context
@@ -817,7 +817,7 @@ class BobOrchestrator {
   /**
    * Handles brownfield phase failure action (retry/skip/abort)
    *
-   * Story 12.8 - AC3 Task 3.5: User chooses action on phase failure.
+   * Story 13.5 - AC3: User chooses action on phase failure.
    *
    * @param {string} phase - Failed phase
    * @param {string} action - User action (retry/skip/abort)
@@ -832,7 +832,7 @@ class BobOrchestrator {
   /**
    * Handles post-discovery choice (resolve debts vs add feature)
    *
-   * Story 12.8 - AC5: User chooses next step after discovery.
+   * Story 13.5 - AC5: User chooses next step after discovery.
    *
    * @param {string} choice - User choice (resolve_debts/add_feature)
    * @param {Object} [context={}] - Execution context
@@ -881,7 +881,7 @@ class BobOrchestrator {
   /**
    * Handles GREENFIELD state — delegates to GreenfieldHandler (AC6)
    *
-   * Story 12.13: Greenfield Workflow via Bob
+   * Story 13.6: Greenfield Workflow via Bob
    * - AC1: Greenfield detected (no package.json, .git, docs/)
    * - AC2-5: Orchestrates 4 phases via GreenfieldHandler
    * - AC6-10: Integrates with all Epic 11 modules
@@ -893,14 +893,14 @@ class BobOrchestrator {
   async _handleGreenfield(context) {
     this._log('Greenfield project — delegating to greenfield-handler');
 
-    // Delegate to GreenfieldHandler (Story 12.13)
+    // Delegate to GreenfieldHandler (Story 13.6)
     return this.greenfieldHandler.handle(context);
   }
 
   /**
    * Handles greenfield surface decision (GO/PAUSE/text input)
    *
-   * Story 12.13 - AC11-14: Surface decisions between phases
+   * Story 13.6 - AC2-5: Surface decisions between phases
    *
    * @param {string} decision - User decision
    * @param {number} nextPhase - Next phase number
@@ -915,7 +915,7 @@ class BobOrchestrator {
   /**
    * Handles greenfield phase failure action (retry/skip/abort)
    *
-   * Story 12.13 - AC15: Error handling with Retry/Skip/Abort
+   * Story 13.6 - AC6: Error handling with Retry/Skip/Abort
    *
    * @param {string} phase - Failed phase
    * @param {string} action - User action (retry/skip/abort)
@@ -935,7 +935,7 @@ class BobOrchestrator {
    * - TerminalSpawner for agent spawning (AC9)
    * - WorkflowExecutor for development cycle (AC10)
    *
-   * Story 12.5 AC5: Updates session state at each phase transition.
+   * Story 13.2: Updates session state at each phase transition.
    *
    * @param {string} storyPath - Path to story file
    * @returns {Promise<Object>} Execution result
@@ -957,29 +957,29 @@ class BobOrchestrator {
       await this.sessionState.loadSessionState();
     }
 
-    // Story 12.5 AC5: Track validation phase
+    // Story 13.2: Track validation phase
     await this._updatePhase('validation', storyId, assignment.executor);
 
-    // Story 12.5 AC5: Track development phase
+    // Story 13.2: Track development phase
     await this._updatePhase('development', storyId, assignment.executor);
 
     // AC10: Execute development cycle via WorkflowExecutor
     const result = await this.workflowExecutor.execute(storyPath);
 
-    // Story 12.5 AC5: Track self_healing phase (if applicable)
+    // Story 13.2: Track self_healing phase (if applicable)
     if (result.selfHealing) {
       await this._updatePhase('self_healing', storyId, assignment.executor);
     }
 
-    // Story 12.5 AC5: Track quality_gate phase
+    // Story 13.2: Track quality_gate phase
     await this._updatePhase('quality_gate', storyId, assignment.quality_gate);
 
-    // Story 12.5 AC5: Track push phase (if applicable)
+    // Story 13.2: Track push phase (if applicable)
     if (result.success) {
       await this._updatePhase('push', storyId, '@devops');
     }
 
-    // Story 12.5 AC5: Track checkpoint
+    // Story 13.2: Track checkpoint
     await this._updatePhase('checkpoint', storyId, assignment.executor);
 
     return {
@@ -993,7 +993,7 @@ class BobOrchestrator {
   }
 
   /**
-   * Updates session state for a phase transition (Story 12.5 - AC5)
+   * Updates session state for a phase transition (Story 13.2)
    *
    * @param {string} phase - Phase name
    * @param {string} storyId - Story ID

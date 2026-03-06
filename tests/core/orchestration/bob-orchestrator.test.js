@@ -1,6 +1,6 @@
 /**
  * Bob Orchestrator Tests
- * Story 12.3: Bob Orchestration Logic (Decision Tree)
+ * Story 13.1: Bob Orchestrator — Decision Tree Entry Point
  */
 
 const path = require('path');
@@ -24,7 +24,7 @@ jest.mock('../../../.aios-core/core/config/config-resolver', () => ({
   LEVELS: {},
 }));
 
-// Story 12.7: Mock MessageFormatter
+// Story 13.4: Mock MessageFormatter
 jest.mock('../../../.aios-core/core/orchestration/message-formatter', () => ({
   MessageFormatter: jest.fn().mockImplementation(() => ({
     format: jest.fn().mockReturnValue('formatted message'),
@@ -38,7 +38,7 @@ jest.mock('../../../.aios-core/core/orchestration/message-formatter', () => ({
   })),
 }));
 
-// Story 12.8: Mock BrownfieldHandler
+// Story 13.5: Mock BrownfieldHandler
 jest.mock('../../../.aios-core/core/orchestration/brownfield-handler', () => ({
   BrownfieldHandler: jest.fn().mockImplementation(() => ({
     handle: jest.fn().mockResolvedValue({
@@ -55,6 +55,25 @@ jest.mock('../../../.aios-core/core/orchestration/brownfield-handler', () => ({
   BrownfieldPhase: {},
   PostDiscoveryChoice: {},
   PhaseFailureAction: {},
+}));
+
+// Story 13.6: Mock GreenfieldHandler
+jest.mock('../../../.aios-core/core/orchestration/greenfield-handler', () => ({
+  GreenfieldHandler: jest.fn().mockImplementation(() => ({
+    handle: jest.fn().mockResolvedValue({
+      action: 'greenfield_surface',
+      data: { phase: 0, message: 'New project detected' },
+    }),
+    handleSurfaceDecision: jest.fn().mockResolvedValue({
+      action: 'greenfield_phase_started',
+      phase: 1,
+    }),
+    handlePhaseFailureAction: jest.fn().mockResolvedValue({
+      action: 'retry',
+      phase: 'bootstrap',
+    }),
+    on: jest.fn(),
+  })),
 }));
 
 jest.mock('../../../.aios-core/core/orchestration/executor-assignment', () => ({
@@ -92,7 +111,7 @@ jest.mock('../../../.aios-core/core/orchestration/workflow-executor', () => {
   };
 });
 
-// Story 12.6: Mock UI components
+// Story 13.3: Mock UI components
 jest.mock('../../../.aios-core/core/ui/observability-panel', () => ({
   ObservabilityPanel: jest.fn().mockImplementation(() => ({
     setStage: jest.fn(),
@@ -104,7 +123,7 @@ jest.mock('../../../.aios-core/core/ui/observability-panel', () => ({
     setError: jest.fn(),
     start: jest.fn(),
     stop: jest.fn(),
-    // Story 12.7: Educational mode support
+    // Story 13.4: Educational mode support
     setMode: jest.fn(),
     updateState: jest.fn(),
   })),
@@ -204,7 +223,7 @@ jest.mock('../../../.aios-core/core/orchestration/lock-manager', () => {
   }));
 });
 
-// Story 12.5: Mock DataLifecycleManager
+// Story 13.2: Mock DataLifecycleManager
 jest.mock('../../../.aios-core/core/orchestration/data-lifecycle-manager', () => {
   const mockRunStartupCleanup = jest.fn().mockResolvedValue({
     locksRemoved: 0,
@@ -407,7 +426,7 @@ describe('BobOrchestrator', () => {
       // Then
       expect(result.success).toBe(true);
       expect(result.projectState).toBe(ProjectState.EXISTING_NO_DOCS);
-      // Story 12.8: BrownfieldHandler now returns 'brownfield_welcome' action
+      // Story 13.5: BrownfieldHandler now returns 'brownfield_welcome' action
       expect(result.action).toBe('brownfield_welcome');
     });
 
@@ -546,10 +565,10 @@ describe('BobOrchestrator', () => {
   });
 
   // ==========================================
-  // Story 12.5: Session Detection (AC1, AC2, AC4)
+  // Story 13.2: Session Detection (AC1, AC2, AC4)
   // ==========================================
 
-  describe('_checkExistingSession (Story 12.5)', () => {
+  describe('_checkExistingSession (Story 13.2)', () => {
     it('should return hasSession: false when no session exists (AC1)', async () => {
       // Given - session does not exist (default mock)
 
@@ -649,10 +668,10 @@ describe('BobOrchestrator', () => {
   });
 
   // ==========================================
-  // Story 12.5: Session Resume (AC3, AC7)
+  // Story 13.2: Session Resume (AC3, AC7)
   // ==========================================
 
-  describe('handleSessionResume (Story 12.5)', () => {
+  describe('handleSessionResume (Story 13.2)', () => {
     beforeEach(() => {
       // Setup session state mock with handleResumeOption
       orchestrator.sessionState.handleResumeOption = jest.fn();
@@ -740,10 +759,10 @@ describe('BobOrchestrator', () => {
   });
 
   // ==========================================
-  // Story 12.5: Data Lifecycle Integration
+  // Story 13.2: Data Lifecycle Integration
   // ==========================================
 
-  describe('data lifecycle integration (Story 12.5)', () => {
+  describe('data lifecycle integration (Story 13.2)', () => {
     it('should initialize DataLifecycleManager in constructor', () => {
       // Then - verify the DataLifecycleManager was initialized
       expect(orchestrator.dataLifecycleManager).toBeDefined();
@@ -757,10 +776,10 @@ describe('BobOrchestrator', () => {
   });
 
   // ==========================================
-  // Story 12.5: Phase Tracking (AC5)
+  // Story 13.2: Phase Tracking (AC5)
   // ==========================================
 
-  describe('_updatePhase (Story 12.5 - AC5)', () => {
+  describe('_updatePhase (Story 13.2 - AC5)', () => {
     it('should update session state on phase change', async () => {
       // Given
       orchestrator.sessionState.exists = jest.fn().mockResolvedValue(true);
@@ -788,10 +807,10 @@ describe('BobOrchestrator', () => {
   });
 
   // ==========================================
-  // Story 12.7: Educational Mode (AC1-7)
+  // Story 13.4: Educational Mode (AC1-7)
   // ==========================================
 
-  describe('Educational Mode (Story 12.7)', () => {
+  describe('Educational Mode (Story 13.4)', () => {
     describe('_detectEducationalModeToggle (AC5)', () => {
       it('should detect "ativa modo educativo" command', () => {
         // When
@@ -1009,6 +1028,108 @@ describe('BobOrchestrator', () => {
         expect(result).toBeDefined();
         expect(typeof result).toBe('string');
       });
+    });
+  });
+
+  // ==========================================
+  // Story 13.1: Delegate methods — AC-2 routing coverage
+  // ==========================================
+
+  describe('handleBrownfieldDecision (Story 13.5 delegate)', () => {
+    it('should delegate to brownfieldHandler.handleUserDecision when accepted', async () => {
+      orchestrator.brownfieldHandler.handleUserDecision = jest.fn().mockResolvedValue({
+        action: 'analysis_started',
+      });
+
+      const result = await orchestrator.handleBrownfieldDecision(true);
+
+      expect(orchestrator.brownfieldHandler.handleUserDecision).toHaveBeenCalledWith(true, {});
+      expect(result.action).toBe('analysis_started');
+    });
+
+    it('should delegate with false when user declines', async () => {
+      orchestrator.brownfieldHandler.handleUserDecision = jest.fn().mockResolvedValue({
+        action: 'declined',
+      });
+
+      const result = await orchestrator.handleBrownfieldDecision(false, { extra: true });
+
+      expect(orchestrator.brownfieldHandler.handleUserDecision).toHaveBeenCalledWith(false, {
+        extra: true,
+      });
+      expect(result.action).toBe('declined');
+    });
+  });
+
+  describe('handleBrownfieldPhaseFailure (Story 13.5 delegate)', () => {
+    it('should delegate to brownfieldHandler.handlePhaseFailureAction', async () => {
+      orchestrator.brownfieldHandler.handlePhaseFailureAction = jest.fn().mockResolvedValue({
+        action: 'retry',
+      });
+
+      const result = await orchestrator.handleBrownfieldPhaseFailure('discovery', 'retry');
+
+      expect(orchestrator.brownfieldHandler.handlePhaseFailureAction).toHaveBeenCalledWith(
+        'discovery',
+        'retry',
+        {},
+      );
+      expect(result.action).toBe('retry');
+    });
+  });
+
+  describe('handlePostDiscoveryChoice (Story 13.5 delegate)', () => {
+    it('should delegate to brownfieldHandler.handle with postDiscoveryChoice', async () => {
+      orchestrator.brownfieldHandler.handle = jest.fn().mockResolvedValue({
+        action: 'debt_resolution_started',
+      });
+
+      const result = await orchestrator.handlePostDiscoveryChoice('resolve_debts');
+
+      expect(orchestrator.brownfieldHandler.handle).toHaveBeenCalledWith({
+        postDiscoveryChoice: 'resolve_debts',
+      });
+      expect(result.action).toBe('debt_resolution_started');
+    });
+  });
+
+  describe('handleGreenfieldSurfaceDecision (Story 13.6 delegate)', () => {
+    it('should delegate to greenfieldHandler.handleSurfaceDecision', async () => {
+      orchestrator.greenfieldHandler.handleSurfaceDecision = jest.fn().mockResolvedValue({
+        action: 'greenfield_phase_started',
+        phase: 1,
+      });
+
+      const result = await orchestrator.handleGreenfieldSurfaceDecision('GO', 1);
+
+      expect(orchestrator.greenfieldHandler.handleSurfaceDecision).toHaveBeenCalledWith('GO', 1, {});
+      expect(result.action).toBe('greenfield_phase_started');
+    });
+  });
+
+  describe('handleGreenfieldPhaseFailure (Story 13.6 delegate)', () => {
+    it('should delegate to greenfieldHandler.handlePhaseFailureAction', async () => {
+      orchestrator.greenfieldHandler.handlePhaseFailureAction = jest.fn().mockResolvedValue({
+        action: 'retry',
+      });
+
+      const result = await orchestrator.handleGreenfieldPhaseFailure('bootstrap', 'retry');
+
+      expect(orchestrator.greenfieldHandler.handlePhaseFailureAction).toHaveBeenCalledWith(
+        'bootstrap',
+        'retry',
+        {},
+      );
+      expect(result.action).toBe('retry');
+    });
+  });
+
+  describe('_routeByState unknown state (AC-2 exhaustive)', () => {
+    it('should return error result for unknown state', async () => {
+      const result = await orchestrator._routeByState('UNKNOWN_STATE', {});
+
+      expect(result.action).toBe('unknown_state');
+      expect(result.error).toContain('UNKNOWN_STATE');
     });
   });
 });
