@@ -45,6 +45,15 @@ const DashboardEventType = {
   BOB_ERROR: 'BobError',
 };
 
+/**
+ * Bob-specific event types (Story 13.3)
+ * Separate from DashboardEventType to avoid namespace collision
+ */
+const BobEventTypes = {
+  STATUS_UPDATE: 'BobStatusUpdate',
+};
+
 module.exports = {
   DashboardEventType,
+  BobEventTypes,
 };

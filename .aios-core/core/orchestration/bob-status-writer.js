@@ -22,6 +22,9 @@
 const fs = require('fs-extra');
 const path = require('path');
 const os = require('os');
+const { getDashboardEmitter } = require('../events/dashboard-emitter');
+const { BobEventTypes } = require('../events/types');
+const { PanelMode } = require('../ui/observability-panel');
 
 /**
  * Bob Status Schema version
@@ -147,6 +150,9 @@ class BobStatusWriter {
     this._status = createDefaultBobStatus();
     this._sessionStartTime = Date.now();
     this._storyStartTime = null;
+
+    // AC-4: Optional observability panel (injected for testability)
+    this._panel = options.panel || null;
   }
 
   /**
@@ -163,34 +169,85 @@ class BobStatusWriter {
   }
 
   /**
-   * Writes Bob status atomically (temp file + rename) (AC6, AC11)
+   * Validates Bob status schema — throws TypeError naming the failing field (AC-2)
+   * @param {*} state - Status to validate
+   * @throws {TypeError} If any required field is missing or has wrong type
+   * @private
+   */
+  _validateStatus(state) {
+    if (!state || typeof state !== 'object' || Array.isArray(state)) {
+      throw new TypeError('BobStatusWriter: status must be a non-null object');
+    }
+    if (!state.version || typeof state.version !== 'string') {
+      throw new TypeError('BobStatusWriter: status.version must be a non-empty string');
+    }
+    if (!state.orchestration || typeof state.orchestration !== 'object') {
+      throw new TypeError('BobStatusWriter: status.orchestration must be an object');
+    }
+    if (!state.pipeline || typeof state.pipeline !== 'object') {
+      throw new TypeError('BobStatusWriter: status.pipeline must be an object');
+    }
+    if (!state.current_agent || typeof state.current_agent !== 'object') {
+      throw new TypeError('BobStatusWriter: status.current_agent must be an object');
+    }
+    if (!state.elapsed || typeof state.elapsed !== 'object') {
+      throw new TypeError('BobStatusWriter: status.elapsed must be an object');
+    }
+    if (!state.educational || typeof state.educational !== 'object') {
+      throw new TypeError('BobStatusWriter: status.educational must be an object');
+    }
+  }
+
+  /**
+   * Writes Bob status atomically (temp file + rename, Windows-safe fallback) (AC-1)
+   * Validates schema before writing (AC-2)
+   * Emits dashboard event after successful write (AC-3)
    * @param {BobStatusSchema} state - Status to write
    * @returns {Promise<void>}
+   * @throws {Error} If dashboard directory cannot be created (AC-1)
+   * @throws {TypeError} If state fails schema validation (AC-2)
    */
   async writeBobStatus(state) {
+    // AC-1: Ensure dir — throw descriptively if it fails
     try {
       await fs.ensureDir(this.dashboardDir);
-
-      // Update timestamp
-      state.timestamp = new Date().toISOString();
-
-      // Update elapsed times
-      const now = Date.now();
-      state.elapsed.session_seconds = Math.floor((now - this._sessionStartTime) / 1000);
-      if (this._storyStartTime) {
-        state.elapsed.story_seconds = Math.floor((now - this._storyStartTime) / 1000);
-      }
-
-      // Atomic write: write to temp file, then rename
-      const tempPath = path.join(os.tmpdir(), `bob-status-${Date.now()}.json`);
-      await fs.writeJson(tempPath, state, { spaces: 2 });
-      await fs.move(tempPath, this.statusPath, { overwrite: true });
-
-      this._status = state;
-      this._log(`Status written: stage=${state.pipeline.current_stage}, agent=${state.current_agent.id}`);
     } catch (error) {
-      this._log(`Failed to write status: ${error.message}`);
-      // Silent failure - never interrupt CLI (CLI First principle)
+      throw new Error(
+        `BobStatusWriter: failed to create dashboard directory "${this.dashboardDir}": ${error.message}`,
+      );
+    }
+
+    // AC-2: Schema validation — throws TypeError, prevents partial write
+    this._validateStatus(state);
+
+    // Update timestamp and elapsed times
+    state.timestamp = new Date().toISOString();
+    const now = Date.now();
+    state.elapsed.session_seconds = Math.floor((now - this._sessionStartTime) / 1000);
+    if (this._storyStartTime) {
+      state.elapsed.story_seconds = Math.floor((now - this._storyStartTime) / 1000);
+    }
+
+    // AC-1: Atomic write — temp file + rename; Windows-safe fallback if rename fails
+    const tempPath = path.join(os.tmpdir(), `bob-status-${Date.now()}-${process.pid}.json`);
+    await fs.writeJson(tempPath, state, { spaces: 2 });
+    try {
+      await fs.rename(tempPath, this.statusPath);
+    } catch {
+      // Windows cross-drive fallback: direct write
+      await fs.writeJson(this.statusPath, state, { spaces: 2 });
+      await fs.remove(tempPath).catch(() => {});
+    }
+
+    this._status = state;
+    this._log(`Status written: stage=${state.pipeline.current_stage}, agent=${state.current_agent.id}`);
+
+    // AC-3: Emit dashboard event — failure is logged but never propagates
+    try {
+      const emitter = getDashboardEmitter();
+      await emitter.emit(BobEventTypes.STATUS_UPDATE, state);
+    } catch (error) {
+      this._log(`Dashboard event emission failed (non-fatal): ${error.message}`);
     }
   }
 
@@ -205,7 +262,7 @@ class BobStatusWriter {
   }
 
   /**
-   * Updates pipeline phase (AC6)
+   * Updates pipeline phase (AC-4)
    * @param {string} phase - Current phase
    * @param {string} [storyProgress] - Story progress string
    * @returns {Promise<void>}
@@ -215,6 +272,15 @@ class BobStatusWriter {
     if (storyProgress) {
       this._status.pipeline.story_progress = storyProgress;
     }
+
+    // AC-4: Update observability panel on each phase change
+    if (this._panel) {
+      this._panel.setPipelineStage(phase, storyProgress || undefined);
+      // Panel mode reflects educational mode; refresh rate hardcoded to 1000ms
+      const panelMode = this._status.educational.enabled ? PanelMode.DETAILED : PanelMode.MINIMAL;
+      this._panel.setMode(panelMode);
+    }
+
     await this.writeBobStatus(this._status);
   }
 
