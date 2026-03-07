@@ -9,11 +9,11 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 | Priority | TODO | In Progress | Blocked | Done | Total |
 |----------|------|-------------|---------|------|-------|
 | 🔴 HIGH   | 0    | 0           | 0       | 0    | 0     |
-| 🟡 MEDIUM | 3    | 0           | 0       | 0    | 3     |
+| 🟡 MEDIUM | 4    | 0           | 0       | 0    | 4     |
 | 🟢 LOW    | 1    | 0           | 0       | 0    | 1     |
-| **Total** | **4** | **0**      | **0**   | **0** | **4** |
+| **Total** | **5** | **0**      | **0**   | **0** | **5** |
 
-*Last updated: 2026-03-04*
+*Last updated: 2026-03-06*
 
 ---
 
@@ -60,6 +60,25 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
   - [ ] 316/316 synapse suite tests still pass
   - [ ] No production code modified — test-only change
 - **Acceptance**: `getStatus` test is fully self-contained and passes in any execution order, including `--randomize` and `--runInBand`.
+
+---
+
+#### [13.3-T1] Fix writeBobStatus state mutation (M1)
+
+- **Source**: QA Review — Story 13.3 (gate: `docs/qa/gates/13.3-bob-status-writer.yml`, M1)
+- **Priority**: 🟡 MEDIUM
+- **Effort**: ~30 min
+- **Status**: 📋 TODO
+- **Assignee**: Dev
+- **Sprint**: Backlog — address before Bob CLI (Story 13.7) consumers call `getStatus()`
+- **Risk**: MEDIUM — any caller that passes a status object and later inspects it will see unexpected mutation of `timestamp` and `elapsed` fields; latent reliability risk as more consumers are added in Epic 13 Part B
+- **Description**: `writeBobStatus()` in `.aios-core/core/orchestration/bob-status-writer.js:224-229` mutates the `state` argument directly by assigning `state.timestamp = new Date().toISOString()` and `state.elapsed.session_seconds = ...`. Callers do not expect their object to be modified. The fix is to clone the state before mutation (e.g. `const payload = { ...state, elapsed: { ...state.elapsed } }`) or clearly document the mutation contract in JSDoc.
+- **Success Criteria**:
+  - [ ] `writeBobStatus()` does not mutate the caller's `state` argument
+  - [ ] Caller can inspect `state.timestamp` and `state.elapsed` after calling `writeBobStatus()` and see original values
+  - [ ] All 55 tests in `bob-status-writer.test.js` still pass
+  - [ ] `npm run lint` 0 errors on modified file
+- **Acceptance**: A test that captures `state.timestamp` before and after calling `writeBobStatus()` confirms the value is unchanged on the caller's object.
 
 ---
 
