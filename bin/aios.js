@@ -922,6 +922,14 @@ async function initProject() {
 // Command routing (async main function)
 async function main() {
   switch (command) {
+    case 'bob': {
+      // Bob mode CLI entry point - Story 13.7
+      const { createBobCommand } = require('../src/bob/cli.js');
+      const bobCmd = createBobCommand();
+      await bobCmd.parseAsync(['node', 'aios', ...args.slice(1)]);
+      break;
+    }
+
     case 'workers':
       // Service Discovery CLI - Story 2.7
       try {
