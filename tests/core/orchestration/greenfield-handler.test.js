@@ -314,6 +314,17 @@ describe('GreenfieldHandler', () => {
       expect(result.data.promptType).toBe('text_input');
     });
 
+    test('should handle Phase 0 failure when spawner fails', async () => {
+      mockTerminalSpawner.isSpawnerAvailable.mockReturnValue(true);
+      mockTerminalSpawner.spawnAgent.mockResolvedValue({ success: false, error: 'Bootstrap failed' });
+
+      const result = await handler._executePhase0({});
+
+      expect(result.action).toBe('greenfield_phase_failure');
+      expect(result.phase).toBe(GreenfieldPhase.BOOTSTRAP);
+      expect(result.options).toHaveLength(3);
+    });
+
     test('should emit phaseStart and phaseComplete events', async () => {
       const events = [];
       handler.on('phaseStart', (e) => events.push({ type: 'start', ...e }));
@@ -363,6 +374,17 @@ describe('GreenfieldHandler', () => {
       expect(result.phase).toBe(GreenfieldPhase.SHARDING);
       expect(result.nextPhase).toBe(3);
       expect(result.data.promptType).toBe('go_pause');
+    });
+
+    test('should handle Phase 2 failure when spawner fails', async () => {
+      mockTerminalSpawner.isSpawnerAvailable.mockReturnValue(true);
+      mockTerminalSpawner.spawnAgent.mockResolvedValue({ success: false, error: 'Sharding failed' });
+
+      const result = await handler._executePhase2({});
+
+      expect(result.action).toBe('greenfield_phase_failure');
+      expect(result.phase).toBe(GreenfieldPhase.SHARDING);
+      expect(result.options).toHaveLength(3);
     });
   });
 
@@ -469,6 +491,29 @@ describe('GreenfieldHandler', () => {
       expect(result.action).toBe('invalid_action');
     });
 
+    test('RETRY with unrecognized phase + failedStep should re-execute Phase 1', async () => {
+      const result = await handler.handlePhaseFailureAction(
+        'unknown_sub_step',
+        PhaseFailureAction.RETRY,
+        { failedStep: { agent: '@analyst', task: 'project-brief' } },
+      );
+
+      // _getPhaseNumber returns -1 for 'unknown_sub_step', so falls through to failedStep branch
+      expect(result.action).toBe('greenfield_surface');
+      expect(result.phase).toBe(GreenfieldPhase.DISCOVERY);
+    });
+
+    test('RETRY with unrecognized phase and no failedStep should return retry_failed', async () => {
+      const result = await handler.handlePhaseFailureAction(
+        'unknown_phase',
+        PhaseFailureAction.RETRY,
+        {},
+      );
+
+      expect(result.action).toBe('retry_failed');
+      expect(result.error).toContain('unknown_phase');
+    });
+
     test('should return greenfield_complete when skipping last phase (Phase 3)', async () => {
       const result = await handler.handlePhaseFailureAction(
         GreenfieldPhase.DEV_CYCLE,
@@ -569,6 +614,15 @@ describe('GreenfieldHandler', () => {
   // ═══════════════════════════════════════════════════════════════════════════════════
   //                              HELPERS
   // ═══════════════════════════════════════════════════════════════════════════════════
+
+  describe('_executeFromPhase edge cases', () => {
+    test('should return error for invalid phase number', async () => {
+      const result = await handler._executeFromPhase(99, {});
+
+      expect(result.action).toBe('greenfield_error');
+      expect(result.error).toContain('Invalid phase number: 99');
+    });
+  });
 
   describe('Helper methods', () => {
     test('_getPhaseEnum should map phase numbers', () => {
