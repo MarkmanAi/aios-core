@@ -8,7 +8,6 @@ Cross-run persistence via SQLite registry + FAISS index.
 from __future__ import annotations
 
 import hashlib
-import pickle
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
@@ -89,7 +88,7 @@ def _load_faiss_index(conn: sqlite3.Connection) -> tuple[Any, list[str]]:
     if rows:
         embeddings = []
         for text_hash, blob in rows:
-            emb = pickle.loads(blob)
+            emb = np.frombuffer(blob, dtype=np.float32).copy()
             embeddings.append(emb)
             hashes.append(text_hash)
         embeddings_array = np.array(embeddings, dtype=np.float32)
@@ -107,7 +106,7 @@ def _persist_embedding(
 ) -> None:
     """Persist an accepted item embedding to SQLite."""
     text_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
-    blob = pickle.dumps(embedding.astype(np.float32))
+    blob = embedding.astype(np.float32).tobytes()
     now = datetime.now(timezone.utc).isoformat()
     try:
         conn.execute(

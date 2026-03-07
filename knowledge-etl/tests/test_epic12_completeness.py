@@ -92,6 +92,56 @@ class TestThinkingDNASchema:
 
         assert result["exemplar_reasoning_quote"] == "The map is not the territory."
 
+    def test_parse_json_unwraps_single_key_wrapper(self):
+        """[12.1-QA-L1]: _parse_json unwraps {"thinking_dna": {...}} before Pydantic validation.
+
+        Real LLM responses may wrap fields under a named key. Without unwrapping,
+        Pydantic silently produces all-default values (no ValidationError raised).
+        """
+        from knowledge_etl.transform.l3_authorial import ThinkingDNA, _parse_json
+
+        wrapped_response = json.dumps({
+            "thinking_dna": {
+                "primary_reasoning_pattern": "dialectical",
+                "favorite_argumentative_move": "reframe",
+                "mental_models": ["first principles"],
+                "epistemic_style": "assertive",
+                "favorite_analogies": ["map vs territory"],
+                "exemplar_reasoning_quote": "The map is not the territory.",
+            }
+        })
+
+        result = _parse_json(wrapped_response, ThinkingDNA)
+
+        assert result is not None
+        assert result["exemplar_reasoning_quote"] == "The map is not the territory."
+        assert result["primary_reasoning_pattern"] == "dialectical"
+
+    def test_parse_json_does_not_unwrap_contradictions_list(self):
+        """[12.1-QA-L1]: _parse_json does NOT unwrap when single-key value is a list.
+
+        ContradictionsResult uses {"productive_contradictions": [...]} — a single key
+        with a list value. This must NOT be unwrapped.
+        """
+        from knowledge_etl.transform.l3_authorial import ContradictionsResult, _parse_json
+
+        contradictions_response = json.dumps({
+            "productive_contradictions": [
+                {
+                    "tension": "Freedom vs Structure",
+                    "pole_a": {"label": "Freedom"},
+                    "pole_b": {"label": "Structure"},
+                    "generative_insight": "Constraint enables creativity.",
+                }
+            ]
+        })
+
+        result = _parse_json(contradictions_response, ContradictionsResult)
+
+        assert result is not None
+        assert "productive_contradictions" in result
+        assert len(result["productive_contradictions"]) == 1
+
 
 # ─── Story 12.2: L1 MAP-REDUCE Reduce Pass ───────────────────────────────────
 

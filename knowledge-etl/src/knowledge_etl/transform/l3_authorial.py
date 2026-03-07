@@ -361,6 +361,8 @@ def _parse_json(text: str, pydantic_model: Type[BaseModel] | None = None) -> dic
     """Parse JSON from LLM response, handling markdown code blocks.
 
     If pydantic_model is provided, validates the parsed data against the schema.
+    Handles LLM single-key wrapping: {"thinking_dna": {...}} is unwrapped to {...}
+    before validation, preventing silent all-default Pydantic output.
     On ValidationError, falls back to raw parsed dict with a yellow warning.
     """
     json_match = re.search(r"\{.*\}", text, re.DOTALL)
@@ -374,9 +376,21 @@ def _parse_json(text: str, pydantic_model: Type[BaseModel] | None = None) -> dic
     if pydantic_model is None:
         return data
 
+    # Unwrap single-key wrapper dicts: {"thinking_dna": {...}} → {...}
+    # LLMs sometimes wrap the payload under a named key. If we pass the wrapper
+    # directly to Pydantic, all fields silently default (no ValidationError raised).
+    # Only unwrap when the single value is a dict (not a list, as in ContradictionsResult).
+    payload = data
+    if len(data) == 1:
+        inner = next(iter(data.values()))
+        if isinstance(inner, dict):
+            wrapper_key = next(iter(data))
+            console.print(f"[dim]L3 parse: unwrapping '{wrapper_key}' wrapper for {pydantic_model.__name__}[/dim]")
+            payload = inner
+
     try:
-        validated = pydantic_model.model_validate(data)
+        validated = pydantic_model.model_validate(payload)
         return validated.model_dump()
     except ValidationError as ve:
         console.print(f"[yellow]L3 schema warning ({pydantic_model.__name__}):[/yellow] {ve.error_count()} field(s) invalid — using raw")
-        return data
+        return payload

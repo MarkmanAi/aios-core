@@ -6,6 +6,7 @@ Output: {staging}/{book}/l1/final_principles.json
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from pydantic import BaseModel
@@ -168,8 +169,7 @@ def _extract_map_reduce(
         chapter_num = chapter_path.stem.split("-")[0]
 
         # Extract page range from chapter frontmatter (<!-- pages: X-Y -->)
-        import re as _re
-        pages_match = _re.search(r"<!--\s*pages:\s*(\d+-\d+|unknown)\s*-->", chapter_text)
+        pages_match = re.search(r"<!--\s*pages:\s*(\d+-\d+|unknown)\s*-->", chapter_text)
         chapter_pages = f"pp. {pages_match.group(1)}" if (pages_match and pages_match.group(1) != "unknown") else ""
 
         task_prompt = _fill_template(
@@ -227,6 +227,7 @@ def _reduce_l1(
         reduce_template
         .replace("{{BOOK_TITLE}}", book_title)
         .replace("{{AUTHOR}}", author)
+        # Note: principles with empty chapter_ref all collapse to one bucket in the set count
         .replace("{{TOTAL_CHAPTERS}}", str(len({p.get("chapter_ref", "") for p in chapter_results})))
         .replace("{{JSON_ARRAY_OF_CANDIDATES}}", candidates_json)
     )
@@ -239,15 +240,16 @@ def _reduce_l1(
     )
     cost_tracker.record("l1_reduce", usage)
 
-    import re
     json_match = re.search(r"\{.*\}", text, re.DOTALL)
     if not json_match:
+        console.print("[yellow]L1 Reduce warning:[/yellow] LLM returned unparseable response — returning raw chapter results")
         return chapter_results
 
     try:
         data = json.loads(json_match.group())
         return data.get("principles", chapter_results)
     except json.JSONDecodeError:
+        console.print("[yellow]L1 Reduce warning:[/yellow] JSON decode failed — returning raw chapter results")
         return chapter_results
 
 
@@ -273,14 +275,12 @@ def _fill_template(
 
 def _get_system_prompt(template: str) -> str:
     """Extract system prompt from XML template."""
-    import re
     match = re.search(r"<system_prompt>(.*?)</system_prompt>", template, re.DOTALL)
     return match.group(1).strip() if match else "You are an expert knowledge extractor."
 
 
 def _parse_principles(text: str, output_path: Path) -> list[dict]:
     """Parse JSON from LLM response, save to file, return list."""
-    import re
     # Extract JSON from response (LLM might wrap in markdown code blocks)
     json_match = re.search(r"\{.*\}", text, re.DOTALL)
     if not json_match:
