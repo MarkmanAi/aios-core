@@ -248,7 +248,7 @@ class BobStatusWriter {
     // AC-3: Emit dashboard event — failure is logged but never propagates
     try {
       const emitter = getDashboardEmitter();
-      await emitter.emit(BobEventTypes.STATUS_UPDATE, state);
+      await emitter.emit(BobEventTypes.STATUS_UPDATE, payload);
     } catch (error) {
       this._log(`Dashboard event emission failed (non-fatal): ${error.message}`);
     }

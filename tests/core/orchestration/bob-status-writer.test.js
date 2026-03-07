@@ -143,6 +143,18 @@ describe('BobStatusWriter', () => {
 
       expect(status.elapsed.session_seconds).toBeGreaterThanOrEqual(0);
     });
+
+    it('should not mutate the caller state object', async () => {
+      await writer.initialize();
+      const state = createDefaultBobStatus();
+      const originalTimestamp = state.timestamp;
+      const originalSessionSeconds = state.elapsed.session_seconds;
+
+      await writer.writeBobStatus(state);
+
+      expect(state.timestamp).toBe(originalTimestamp);
+      expect(state.elapsed.session_seconds).toBe(originalSessionSeconds);
+    });
   });
 
   describe('updatePhase', () => {
