@@ -219,6 +219,7 @@ class GreenfieldHandler extends EventEmitter {
    * @param {Object} context - Execution context
    * @param {string} [context.userGoal] - User's project description
    * @param {number} [context.resumeFromPhase] - Phase to resume from (0-3)
+   * @param {boolean} [context.userAccepted] - Whether user accepted the welcome prompt
    * @returns {Promise<Object>} Handler result
    */
   async handle(context = {}) {
@@ -228,6 +229,11 @@ class GreenfieldHandler extends EventEmitter {
     const resumePhase = context.resumeFromPhase;
     if (typeof resumePhase === 'number' && resumePhase >= 0) {
       return this._executeFromPhase(resumePhase, context);
+    }
+
+    // Pre-flight welcome: present GO/NO-GO before any phase execution (AC2)
+    if (context.userAccepted !== true) {
+      return this._presentWelcomeMessage(context);
     }
 
     // Determine starting phase
@@ -240,6 +246,83 @@ class GreenfieldHandler extends EventEmitter {
 
     // Start orchestration from the appropriate phase
     return this._executeFromPhase(startPhase, context);
+  }
+
+  /**
+   * Presents pre-flight welcome message with time estimate (AC2)
+   *
+   * Surfaces BEFORE Phase 0 — no files created, no agents spawned.
+   * Mirrors BrownfieldHandler._presentWelcomeMessage() pattern.
+   *
+   * @param {Object} context - Execution context
+   * @returns {Object} Welcome result with surface prompt
+   * @private
+   */
+  _presentWelcomeMessage(context) {
+    this._log('Presenting welcome message for greenfield project');
+
+    const welcomeMessage = `Welcome! I detected a brand new project (empty directory).
+I can bootstrap the complete project structure in 4 phases:
+Phase 0: Environment setup, Phase 1: Discovery & Planning,
+Phase 2: Document Sharding, Phase 3: Dev Cycle handoff.
+This typically takes 2-4 hours. Ready to start?`;
+
+    const surfaceChecker = this._getSurfaceChecker();
+    const surfaceResult = surfaceChecker
+      ? surfaceChecker.shouldSurface({
+        valid_options_count: 2,
+        options_with_tradeoffs: [
+          '1. GO — Start full greenfield bootstrap (2-4 hours)',
+          '2. NO-GO — Skip bootstrap',
+        ].join('\n'),
+      })
+      : { should_surface: true };
+
+    return {
+      action: 'greenfield_welcome',
+      phase: GreenfieldPhase.DETECTION,
+      data: {
+        message: welcomeMessage,
+        options: ['GO', 'NO-GO'],
+        timeEstimate: '2-4 hours',
+        surfaceResult,
+        context,
+      },
+    };
+  }
+
+  /**
+   * Handles user GO/NO-GO decision from pre-flight welcome (AC2)
+   *
+   * @param {boolean} accepted - Whether user accepted (GO)
+   * @param {Object} context - Execution context
+   * @returns {Promise<Object>} Next step result
+   */
+  async handleUserDecision(accepted, context = {}) {
+    this._log(`User decision: ${accepted ? 'ACCEPTED' : 'DECLINED'}`);
+
+    if (!accepted) {
+      return {
+        success: false,
+        reason: 'user_declined',
+        action: 'greenfield_declined',
+        data: {
+          message: 'Greenfield bootstrap declined.',
+          nextStep: 'none',
+          context,
+        },
+      };
+    }
+
+    // User accepted — proceed with greenfield workflow
+    const skipBootstrap = this.shouldSkipBootstrap();
+    const startPhase = skipBootstrap ? 1 : 0;
+
+    if (skipBootstrap) {
+      this._log('Phase 0 skipped: package.json + .git already exist (AC16)');
+    }
+
+    return this._executeFromPhase(startPhase, { ...context, userAccepted: true });
   }
 
   /**
@@ -469,6 +552,8 @@ class GreenfieldHandler extends EventEmitter {
       action: 'greenfield_dev_cycle',
       phase: GreenfieldPhase.DEV_CYCLE,
       data: {
+        success: true,
+        phasesCompleted: 4,
         message: 'Greenfield workflow completo! Entrando no ciclo de desenvolvimento.',
         nextStep: 'development_cycle',
         workflowExecutorAvailable: !!workflowExecutor,

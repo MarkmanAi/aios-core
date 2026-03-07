@@ -1,11 +1,12 @@
 /**
- * Tests for GreenfieldHandler - Story 12.13
+ * Tests for GreenfieldHandler - Story 13.6
  *
- * Epic 12: Bob Full Integration — Completando o PRD v2.0
+ * Epic 13: Bob Full Integration — Completando o PRD v2.0
  *
  * Test coverage:
  * - AC1: Greenfield detection (no package.json, .git, docs/)
- * - AC2-5: 4-phase orchestration
+ * - AC2: Pre-flight welcome + GO/NO-GO decision
+ * - AC3-5: 4-phase orchestration
  * - AC6-10: Epic 11 module integration
  * - AC11-14: Surface decisions between phases with PAUSE/resume
  * - AC15-17: Error handling and idempotency
@@ -215,9 +216,19 @@ describe('GreenfieldHandler', () => {
   // ═══════════════════════════════════════════════════════════════════════════════════
 
   describe('handle (main entry)', () => {
-    test('should start from Phase 0 when nothing exists (not skippable)', async () => {
-      fs.existsSync.mockReturnValue(false); // Nothing exists
+    test('should return welcome message when userAccepted is not true', async () => {
+      fs.existsSync.mockReturnValue(false);
       const result = await handler.handle({});
+
+      expect(result.action).toBe('greenfield_welcome');
+      expect(result.phase).toBe(GreenfieldPhase.DETECTION);
+      expect(result.data.options).toEqual(['GO', 'NO-GO']);
+      expect(result.data.timeEstimate).toBe('2-4 hours');
+    });
+
+    test('should start from Phase 0 when userAccepted is true (not skippable)', async () => {
+      fs.existsSync.mockReturnValue(false); // Nothing exists
+      const result = await handler.handle({ userAccepted: true });
 
       // Should surface between Phase 0 → 1 (after bootstrap succeeds or returns manual)
       expect(result.action).toBe('greenfield_surface');
@@ -230,19 +241,65 @@ describe('GreenfieldHandler', () => {
         return p.endsWith('package.json') || p.endsWith('.git');
       });
 
-      const result = await handler.handle({});
+      const result = await handler.handle({ userAccepted: true });
 
       // Should start Phase 1 (Discovery) directly
       expect(result.action).toBe('greenfield_surface');
       expect(result.phase).toBe(GreenfieldPhase.DISCOVERY);
     });
 
-    test('should resume from specified phase', async () => {
+    test('should resume from specified phase (bypasses welcome)', async () => {
       const result = await handler.handle({ resumeFromPhase: 2 });
 
       // Should start Phase 2 (Sharding)
       expect(result.action).toBe('greenfield_surface');
       expect(result.phase).toBe(GreenfieldPhase.SHARDING);
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════════════
+  //                              PRE-FLIGHT WELCOME (AC2)
+  // ═══════════════════════════════════════════════════════════════════════════════════
+
+  describe('Pre-flight welcome (AC2)', () => {
+    test('should return welcome surface with GO/NO-GO options', () => {
+      const result = handler._presentWelcomeMessage({});
+
+      expect(result.action).toBe('greenfield_welcome');
+      expect(result.phase).toBe(GreenfieldPhase.DETECTION);
+      expect(result.data.options).toEqual(['GO', 'NO-GO']);
+      expect(result.data.timeEstimate).toBe('2-4 hours');
+      expect(result.data.message).toContain('brand new project');
+    });
+
+    test('handleUserDecision GO should proceed to phases', async () => {
+      fs.existsSync.mockReturnValue(false);
+      const result = await handler.handleUserDecision(true, {});
+
+      // Should proceed to Phase 0 (bootstrap)
+      expect(result.action).toBe('greenfield_surface');
+      expect(result.phase).toBe(GreenfieldPhase.BOOTSTRAP);
+    });
+
+    test('handleUserDecision NO-GO should return declined', async () => {
+      const result = await handler.handleUserDecision(false, {});
+
+      expect(result.success).toBe(false);
+      expect(result.reason).toBe('user_declined');
+      expect(result.action).toBe('greenfield_declined');
+      expect(result.data.message).toContain('declined');
+    });
+
+    test('handleUserDecision GO should skip Phase 0 when package.json + .git exist', async () => {
+      fs.existsSync.mockImplementation((p) => {
+        return p.endsWith('package.json') || p.endsWith('.git');
+      });
+
+      const result = await handler.handleUserDecision(true, {});
+
+      // Should skip to Phase 1 (Discovery)
+      expect(result.action).toBe('greenfield_surface');
+      expect(result.phase).toBe(GreenfieldPhase.DISCOVERY);
     });
   });
 
@@ -310,13 +367,15 @@ describe('GreenfieldHandler', () => {
   });
 
   describe('Phase 3: Dev Cycle (AC5)', () => {
-    test('should return dev cycle handoff', async () => {
+    test('should return dev cycle handoff with phasesCompleted', async () => {
       const result = await handler._executePhase3({});
 
       expect(result.action).toBe('greenfield_dev_cycle');
       expect(result.phase).toBe(GreenfieldPhase.DEV_CYCLE);
       expect(result.data.nextStep).toBe('development_cycle');
       expect(result.data.handoff).toContain('@sm');
+      expect(result.data.success).toBe(true);
+      expect(result.data.phasesCompleted).toBe(4);
     });
   });
 
@@ -408,6 +467,17 @@ describe('GreenfieldHandler', () => {
       );
 
       expect(result.action).toBe('invalid_action');
+    });
+
+    test('should return greenfield_complete when skipping last phase (Phase 3)', async () => {
+      const result = await handler.handlePhaseFailureAction(
+        GreenfieldPhase.DEV_CYCLE,
+        PhaseFailureAction.SKIP,
+        {},
+      );
+
+      expect(result.action).toBe('greenfield_complete');
+      expect(result.data.message).toContain('fases puladas');
     });
   });
 

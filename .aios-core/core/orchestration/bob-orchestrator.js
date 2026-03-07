@@ -844,6 +844,20 @@ class BobOrchestrator {
   }
 
   /**
+   * Handles greenfield user decision (accept/decline bootstrap)
+   *
+   * Story 13.6 - AC2: User accepts or declines the greenfield bootstrap.
+   *
+   * @param {boolean} accepted - Whether user accepted bootstrap
+   * @param {Object} [context={}] - Execution context
+   * @returns {Promise<Object>} Next step result
+   */
+  async handleGreenfieldDecision(accepted, context = {}) {
+    this._log(`Greenfield decision: ${accepted ? 'ACCEPTED' : 'DECLINED'}`);
+    return this.greenfieldHandler.handleUserDecision(accepted, context);
+  }
+
+  /**
    * Handles EXISTING_WITH_DOCS state — ask user goal (AC5)
    * @param {Object} context - Execution context
    * @returns {Promise<Object>} Handler result
