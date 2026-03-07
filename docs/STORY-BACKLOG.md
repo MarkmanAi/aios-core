@@ -9,9 +9,9 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 | Priority | TODO | In Progress | Blocked | Done | Total |
 |----------|------|-------------|---------|------|-------|
 | 🔴 HIGH   | 0    | 0           | 0       | 0    | 0     |
-| 🟡 MEDIUM | 4    | 0           | 0       | 0    | 4     |
+| 🟡 MEDIUM | 3    | 0           | 0       | 1    | 4     |
 | 🟢 LOW    | 1    | 0           | 0       | 0    | 1     |
-| **Total** | **5** | **0**      | **0**   | **0** | **5** |
+| **Total** | **4** | **0**      | **0**   | **1** | **5** |
 
 *Last updated: 2026-03-06*
 
@@ -68,9 +68,9 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 - **Source**: QA Review — Story 13.3 (gate: `docs/qa/gates/13.3-bob-status-writer.yml`, M1)
 - **Priority**: 🟡 MEDIUM
 - **Effort**: ~30 min
-- **Status**: 📋 TODO
+- **Status**: ✅ Done
 - **Assignee**: Dev
-- **Sprint**: Backlog — address before Bob CLI (Story 13.7) consumers call `getStatus()`
+- **Sprint**: Epic 13 — address before Bob CLI (Story 13.7) consumers call `getStatus()`
 - **Risk**: MEDIUM — any caller that passes a status object and later inspects it will see unexpected mutation of `timestamp` and `elapsed` fields; latent reliability risk as more consumers are added in Epic 13 Part B
 - **Description**: `writeBobStatus()` in `.aios-core/core/orchestration/bob-status-writer.js:224-229` mutates the `state` argument directly by assigning `state.timestamp = new Date().toISOString()` and `state.elapsed.session_seconds = ...`. Callers do not expect their object to be modified. The fix is to clone the state before mutation (e.g. `const payload = { ...state, elapsed: { ...state.elapsed } }`) or clearly document the mutation contract in JSDoc.
 - **Success Criteria**:
