@@ -306,6 +306,75 @@ describe('DataLifecycleManager', () => {
       expect(index.removed_snapshots[1].filename).toBe('snapshot-stale.json');
     });
 
+    it('should NOT record snapshot in index if unlink fails (13.2-T1)', async () => {
+      // Given - stale snapshot exists
+      const snapshotPath = path.join(TEST_PROJECT_ROOT, '.aios/snapshots/snapshot-fail.json');
+      await fs.writeFile(snapshotPath, JSON.stringify({ epic_id: 'test', story_id: '1.0' }));
+      const hundredDaysAgo = new Date();
+      hundredDaysAgo.setDate(hundredDaysAgo.getDate() - 100);
+      await fs.utimes(snapshotPath, hundredDaysAgo, hundredDaysAgo);
+
+      // Mock unlink to fail
+      const unlinkSpy = jest.spyOn(fs, 'unlink').mockRejectedValue(new Error('EACCES: permission denied'));
+
+      // When
+      const result = await manager.cleanupStaleSnapshots();
+
+      // Then - nothing removed, index NOT created
+      expect(result).toBe(0);
+      const indexPath = path.join(TEST_PROJECT_ROOT, '.aios/snapshots/index.json');
+      expect(fsSync.existsSync(indexPath)).toBe(false);
+
+      unlinkSpy.mockRestore();
+    });
+
+    it('should use atomic write (temp + rename) when updating index (13.2-T2)', async () => {
+      // Given - stale snapshot
+      const snapshotPath = path.join(TEST_PROJECT_ROOT, '.aios/snapshots/snapshot-atomic.json');
+      await fs.writeFile(snapshotPath, JSON.stringify({ epic_id: 'test', story_id: '1.0' }));
+      const hundredDaysAgo = new Date();
+      hundredDaysAgo.setDate(hundredDaysAgo.getDate() - 100);
+      await fs.utimes(snapshotPath, hundredDaysAgo, hundredDaysAgo);
+
+      // Spy on rename to confirm atomic swap is called
+      const renameSpy = jest.spyOn(fs, 'rename');
+
+      // When
+      await manager.cleanupStaleSnapshots();
+
+      // Then - rename called with .tmp → index.json
+      const indexPath = path.join(TEST_PROJECT_ROOT, '.aios/snapshots/index.json');
+      const tmpPath = indexPath + '.tmp';
+      expect(renameSpy).toHaveBeenCalledWith(tmpPath, indexPath);
+
+      renameSpy.mockRestore();
+    });
+
+    it('should preserve original index if temp write fails (13.2-T2)', async () => {
+      // Given - existing index with a prior entry
+      const indexPath = path.join(TEST_PROJECT_ROOT, '.aios/snapshots/index.json');
+      const existing = { removed_snapshots: [{ filename: 'old.json' }], last_cleanup: '2026-01-01T00:00:00.000Z' };
+      await fs.writeFile(indexPath, JSON.stringify(existing));
+
+      // And - stale snapshot
+      const snapshotPath = path.join(TEST_PROJECT_ROOT, '.aios/snapshots/snapshot-space.json');
+      await fs.writeFile(snapshotPath, JSON.stringify({ epic_id: 'test' }));
+      const hundredDaysAgo = new Date();
+      hundredDaysAgo.setDate(hundredDaysAgo.getDate() - 100);
+      await fs.utimes(snapshotPath, hundredDaysAgo, hundredDaysAgo);
+
+      // Mock writeFile to fail on tmp write
+      jest.spyOn(fs, 'writeFile').mockRejectedValueOnce(new Error('ENOSPC: no space left'));
+
+      // When - error propagates out
+      await expect(manager.cleanupStaleSnapshots()).rejects.toThrow('ENOSPC');
+
+      // Then - original index is untouched (tmp never renamed over it)
+      const content = JSON.parse(await fs.readFile(indexPath, 'utf8'));
+      expect(content.removed_snapshots).toHaveLength(1);
+      expect(content.removed_snapshots[0].filename).toBe('old.json');
+    });
+
     it('should not remove index.json itself', async () => {
       // Given - index.json in snapshots
       const indexPath = path.join(TEST_PROJECT_ROOT, '.aios/snapshots/index.json');

@@ -9,9 +9,9 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 | Priority | TODO | In Progress | Blocked | Done | Total |
 |----------|------|-------------|---------|------|-------|
 | 🔴 HIGH   | 0    | 0           | 0       | 0    | 0     |
-| 🟡 MEDIUM | 0    | 0           | 0       | 4    | 4     |
+| 🟡 MEDIUM | 0    | 0           | 0       | 6    | 6     |
 | 🟢 LOW    | 0    | 0           | 0       | 1    | 1     |
-| **Total** | **0** | **0**      | **0**   | **5** | **5** |
+| **Total** | **0** | **0**      | **0**   | **7** | **7** |
 
 *Last updated: 2026-03-06*
 
@@ -24,6 +24,44 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 ---
 
 ## 🟡 MEDIUM Priority
+
+#### [13.2-T1] cleanupStaleSnapshots: push before unlink causes false index entry on failure
+
+- **Source**: QA Review — Story 13.2 (gate: `docs/qa/gates/13.2-data-lifecycle-manager.yml`)
+- **Priority**: 🟡 MEDIUM
+- **Effort**: ~30 min
+- **Status**: ✅ Done
+- **Assignee**: Dev
+- **Sprint**: Epic 13 — before production rollout
+- **Risk**: MEDIUM — if `fs.unlink` fails and is caught by inner catch, the snapshot is recorded in `index.json` as removed even though the file still exists on disk, causing index/filesystem inconsistency
+- **Description**: In `cleanupStaleSnapshots()` at `.aios-core/core/orchestration/data-lifecycle-manager.js:211`, `removedSnapshots.push()` occurs before `fs.unlink()` at line 221. If `unlink` throws and is caught by the inner `catch` (line 225), the snapshot entry is added to the index as "removed" but the file persists on disk.
+- **Success Criteria**:
+  - [ ] `removedSnapshots.push()` moved to after `await fs.unlink(filePath)` succeeds
+  - [ ] A test confirms: when `unlink` throws, the snapshot is NOT recorded in `index.json`
+  - [ ] All 23 tests in `data-lifecycle-manager.test.js` still pass
+  - [ ] `npm run lint` 0 errors on modified file
+- **Acceptance**: Index only contains entries for snapshots whose `unlink` completed successfully.
+
+---
+
+#### [13.2-T2] _updateSnapshotsIndex: non-atomic fs.writeFile risks index corruption on process kill
+
+- **Source**: QA Review — Story 13.2 (gate: `docs/qa/gates/13.2-data-lifecycle-manager.yml`)
+- **Priority**: 🟡 MEDIUM
+- **Effort**: ~45 min
+- **Status**: ✅ Done
+- **Assignee**: Dev
+- **Sprint**: Epic 13 — before production rollout
+- **Risk**: MEDIUM — `fs.writeFile` truncates before writing; a process kill between truncate and write completion corrupts `index.json`, permanently losing all archived snapshot history
+- **Description**: `_updateSnapshotsIndex()` at `.aios-core/core/orchestration/data-lifecycle-manager.js:285` uses `fs.writeFile` which is not OS-atomic (truncate-then-write). AC-2 requires index atomicity. Fix: write to a temp file (e.g. `index.json.tmp`) then `fs.rename` to `index.json` — `rename` is atomic on the same filesystem.
+- **Success Criteria**:
+  - [ ] `_updateSnapshotsIndex()` writes to a `.tmp` file and renames atomically
+  - [ ] A test confirms existing entries survive a simulated concurrent write scenario
+  - [ ] All 23 tests in `data-lifecycle-manager.test.js` still pass
+  - [ ] `npm run lint` 0 errors on modified file
+- **Acceptance**: Index file is never left in a partially-written state. `fs.rename` used as the final write step.
+
+---
 
 #### [10.7-T1] inject() no input validation — null crash + path traversal risk
 

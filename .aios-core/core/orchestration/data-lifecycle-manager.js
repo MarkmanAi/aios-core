@@ -207,7 +207,9 @@ class DataLifecycleManager {
             const content = await fs.readFile(filePath, 'utf8');
             const snapshot = JSON.parse(content);
 
-            // Record removal info
+            // Remove the file first — only record in index if unlink succeeds (AC-2, 13.2-T1)
+            await fs.unlink(filePath);
+
             removedSnapshots.push({
               filename: file,
               removed_at: now.toISOString(),
@@ -217,8 +219,6 @@ class DataLifecycleManager {
               story_id: snapshot?.story_id || 'unknown',
             });
 
-            // Remove the file
-            await fs.unlink(filePath);
             removed++;
             this._log(`Removed stale snapshot: ${file}`);
           }
@@ -260,6 +260,7 @@ class DataLifecycleManager {
    */
   async _updateSnapshotsIndex(removedSnapshots) {
     const indexPath = path.join(this.snapshotsDir, SNAPSHOTS_INDEX);
+    const tmpPath = indexPath + '.tmp';
 
     let index = { removed_snapshots: [] };
 
@@ -281,8 +282,9 @@ class DataLifecycleManager {
     index.removed_snapshots.push(...removedSnapshots);
     index.last_cleanup = new Date().toISOString();
 
-    // Write updated index
-    await fs.writeFile(indexPath, JSON.stringify(index, null, 2), 'utf8');
+    // Atomic write: write to temp file then rename — prevents index corruption on process kill (13.2-T2)
+    await fs.writeFile(tmpPath, JSON.stringify(index, null, 2), 'utf8');
+    await fs.rename(tmpPath, indexPath);
     this._log(`Updated snapshots index with ${removedSnapshots.length} removed entries`);
   }
 
