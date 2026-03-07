@@ -1,7 +1,7 @@
 /**
- * Tests for BrownfieldHandler - Story 12.8
+ * Tests for BrownfieldHandler - Story 13.5
  *
- * Epic 12: Bob Full Integration — Completando o PRD v2.0
+ * Epic 13: Bob Full Integration — Completando o PRD v2.0
  *
  * Test coverage:
  * - AC1: Detection of first execution (EXISTING_NO_DOCS state)
@@ -40,6 +40,7 @@ jest.mock('fs', () => ({
   readFileSync: jest.fn(),
   writeFileSync: jest.fn(),
   mkdirSync: jest.fn(),
+  unlinkSync: jest.fn(),
 }));
 
 // Mock dependencies
@@ -64,7 +65,11 @@ describe('BrownfieldHandler', () => {
     jest.clearAllMocks();
 
     // Default mock implementations
-    fs.existsSync.mockReturnValue(true);
+    // Workflow file exists, output files do not (simulates first run; prevents idempotency trigger)
+    fs.existsSync.mockImplementation((p) => {
+      if (p.includes('brownfield-discovery.yaml')) return true;
+      return false;
+    });
     fs.readFileSync.mockReturnValue('# Test content');
     mockSurfaceChecker.shouldSurface.mockReturnValue({ should_surface: true });
     mockSessionState.exists.mockResolvedValue(false);
@@ -162,6 +167,8 @@ describe('BrownfieldHandler', () => {
     test('handleUserDecision(false) should skip to defaults', async () => {
       const result = await handler.handleUserDecision(false, {});
 
+      expect(result.success).toBe(false);
+      expect(result.reason).toBe('user_declined');
       expect(result.action).toBe('brownfield_declined');
       expect(result.data.nextStep).toBe('existing_project_defaults');
     });
@@ -204,8 +211,22 @@ describe('BrownfieldHandler', () => {
 
       const result = await handler.handleUserDecision(true, {});
 
+      expect(result.success).toBe(false);
+      expect(result.reason).toBe('workflow_error');
       expect(result.action).toBe('brownfield_error');
       expect(result.error).toContain('Workflow failed');
+    });
+
+    test('should return workflow_error when WorkflowExecutor is not available', async () => {
+      // Simulate lazy-loader failure: _getWorkflowExecutor returns null
+      jest.spyOn(handler, '_getWorkflowExecutor').mockReturnValue(null);
+
+      const result = await handler.handleUserDecision(true, {});
+
+      expect(result.success).toBe(false);
+      expect(result.reason).toBe('workflow_error');
+      expect(result.action).toBe('brownfield_error');
+      expect(result.error).toContain('WorkflowExecutor not available');
     });
 
     test('should handle missing workflow file', async () => {
@@ -213,8 +234,59 @@ describe('BrownfieldHandler', () => {
 
       const result = await handler.handleUserDecision(true, {});
 
+      expect(result.success).toBe(false);
+      expect(result.reason).toBe('workflow_error');
       expect(result.action).toBe('brownfield_error');
       expect(result.error).toContain('Workflow file not found');
+    });
+
+    test('should remove partial output files on workflow execution error', async () => {
+      mockWorkflowExecutor.executeWorkflow.mockRejectedValue(new Error('Workflow crashed'));
+      // Simulate partial files created before failure
+      fs.existsSync.mockImplementation((p) => {
+        if (p.includes('brownfield-discovery.yaml')) return true;
+        if (p.includes('system-architecture.md')) return true;
+        if (p.includes('TECHNICAL-DEBT-REPORT.md')) return true;
+        return false;
+      });
+
+      await handler.handleUserDecision(true, {});
+
+      expect(fs.unlinkSync).toHaveBeenCalled();
+    });
+
+    test('should remove partial output files when workflow returns success: false', async () => {
+      mockWorkflowExecutor.executeWorkflow.mockResolvedValue({ success: false, cancelled: true });
+      fs.existsSync.mockImplementation((p) => {
+        if (p.includes('brownfield-discovery.yaml')) return true;
+        if (p.includes('system-architecture.md')) return true;
+        return false;
+      });
+
+      const result = await handler.handleUserDecision(true, {});
+
+      expect(result.success).toBe(false);
+      expect(result.reason).toBe('workflow_error');
+      expect(fs.unlinkSync).toHaveBeenCalled();
+    });
+
+    test('should log warning but not throw when cleanup file deletion fails', async () => {
+      // Covers _cleanupPartialFiles() catch block (unlinkSync throwing)
+      mockWorkflowExecutor.executeWorkflow.mockRejectedValue(new Error('Workflow crashed'));
+      fs.existsSync.mockImplementation((p) => {
+        if (p.includes('brownfield-discovery.yaml')) return true;
+        if (p.includes('system-architecture.md')) return true;
+        return false;
+      });
+      fs.unlinkSync.mockImplementation(() => {
+        throw new Error('Permission denied');
+      });
+
+      // Should not throw — catch block in _cleanupPartialFiles handles unlinkSync errors
+      const result = await handler.handleUserDecision(true, {});
+
+      expect(result.success).toBe(false);
+      expect(result.reason).toBe('workflow_error');
     });
   });
 
@@ -350,6 +422,18 @@ describe('BrownfieldHandler', () => {
 
       expect(result.action).toBe('invalid_choice');
     });
+
+    test('should call SurfaceChecker C003 with post-discovery options on completion', async () => {
+      const result = await handler.handleUserDecision(true, {});
+
+      expect(mockSurfaceChecker.shouldSurface).toHaveBeenCalledWith(
+        expect.objectContaining({
+          valid_options_count: 2,
+          options_with_tradeoffs: expect.stringContaining('Resolver débitos'),
+        }),
+      );
+      expect(result.data.surfaceResult).toBeDefined();
+    });
   });
 
   // ═══════════════════════════════════════════════════════════════════════════════════
@@ -399,7 +483,21 @@ describe('BrownfieldHandler', () => {
       );
     });
 
-    test('re-execution should update existing files, not duplicate', async () => {
+    test('handle({ userAccepted: true }) returns { success: true, action: "updated" } when docs already exist', async () => {
+      fs.existsSync.mockImplementation((p) => {
+        if (p.includes('brownfield-discovery.yaml')) return true;
+        if (p.includes('system-architecture.md')) return true;
+        return false;
+      });
+
+      const result = await handler.handle({ userAccepted: true });
+
+      expect(result.success).toBe(true);
+      expect(result.action).toBe('updated');
+      expect(mockWorkflowExecutor.executeWorkflow).not.toHaveBeenCalled();
+    });
+
+    test('re-execution via handleUserDecision does not short-circuit (idempotency enforced at handle() level)', async () => {
       fs.existsSync.mockReturnValue(true);
       mockWorkflowExecutor.executeWorkflow.mockResolvedValue({ success: true });
 
@@ -450,6 +548,8 @@ describe('BrownfieldHandler', () => {
 
       const result = await handler.handleUserDecision(true, {});
 
+      expect(result.success).toBe(false);
+      expect(result.reason).toBe('workflow_error');
       expect(result.action).toBe('brownfield_failed');
     });
 
