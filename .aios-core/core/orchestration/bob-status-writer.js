@@ -220,27 +220,30 @@ class BobStatusWriter {
     // AC-2: Schema validation — throws TypeError, prevents partial write
     this._validateStatus(state);
 
-    // Update timestamp and elapsed times
-    state.timestamp = new Date().toISOString();
+    // Clone state to avoid mutating the caller's object
+    const payload = { ...state, elapsed: { ...state.elapsed } };
+
+    // Update timestamp and elapsed times on the clone
+    payload.timestamp = new Date().toISOString();
     const now = Date.now();
-    state.elapsed.session_seconds = Math.floor((now - this._sessionStartTime) / 1000);
+    payload.elapsed.session_seconds = Math.floor((now - this._sessionStartTime) / 1000);
     if (this._storyStartTime) {
-      state.elapsed.story_seconds = Math.floor((now - this._storyStartTime) / 1000);
+      payload.elapsed.story_seconds = Math.floor((now - this._storyStartTime) / 1000);
     }
 
     // AC-1: Atomic write — temp file + rename; Windows-safe fallback if rename fails
     const tempPath = path.join(os.tmpdir(), `bob-status-${Date.now()}-${process.pid}.json`);
-    await fs.writeJson(tempPath, state, { spaces: 2 });
+    await fs.writeJson(tempPath, payload, { spaces: 2 });
     try {
       await fs.rename(tempPath, this.statusPath);
     } catch {
       // Windows cross-drive fallback: direct write
-      await fs.writeJson(this.statusPath, state, { spaces: 2 });
+      await fs.writeJson(this.statusPath, payload, { spaces: 2 });
       await fs.remove(tempPath).catch(() => {});
     }
 
-    this._status = state;
-    this._log(`Status written: stage=${state.pipeline.current_stage}, agent=${state.current_agent.id}`);
+    this._status = payload;
+    this._log(`Status written: stage=${payload.pipeline.current_stage}, agent=${payload.current_agent.id}`);
 
     // AC-3: Emit dashboard event — failure is logged but never propagates
     try {
