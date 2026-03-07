@@ -1,7 +1,7 @@
 /**
  * Tests for Message Formatter
  *
- * Story 12.7: Modo Educativo (Opt-in)
+ * Story 13.4: MessageFormatter — Educational Mode
  *
  * Tests cover:
  * - formatActionResult: concise (OFF) vs detailed (ON)
@@ -9,6 +9,8 @@
  * - formatAgentAssignment: silence (OFF) vs explained (ON)
  * - formatToggleFeedback: enable/disable messages
  * - formatError: basic vs detailed with context
+ * - getEducationalMode: AC-4 API contract
+ * - format: AC-5 output contract (null/undefined safety, concise/educational)
  */
 
 'use strict';
@@ -25,6 +27,26 @@ describe('MessageFormatter', () => {
     it('should create instance with educationalMode ON when specified', () => {
       const formatter = new MessageFormatter({ educationalMode: true });
       expect(formatter.isEducationalMode()).toBe(true);
+    });
+  });
+
+  describe('getEducationalMode', () => {
+    it('should return false by default (AC-4)', () => {
+      const formatter = new MessageFormatter();
+      expect(formatter.getEducationalMode()).toBe(false);
+    });
+
+    it('should return true when set to true (AC-4)', () => {
+      const formatter = new MessageFormatter({ educationalMode: true });
+      expect(formatter.getEducationalMode()).toBe(true);
+    });
+
+    it('should reflect changes from setEducationalMode (AC-4)', () => {
+      const formatter = new MessageFormatter();
+      formatter.setEducationalMode(true);
+      expect(formatter.getEducationalMode()).toBe(true);
+      formatter.setEducationalMode(false);
+      expect(formatter.getEducationalMode()).toBe(false);
     });
   });
 
@@ -268,6 +290,68 @@ describe('MessageFormatter', () => {
       expect(result).toContain('Fase: qa');
       expect(result).toContain('Agente: @qa');
       expect(result).toContain('💡 Sugestão: Check test configuration');
+    });
+  });
+
+  describe('format', () => {
+    describe('AC-5: output contract — always returns string', () => {
+      it('should return message in concise mode', () => {
+        const formatter = new MessageFormatter({ educationalMode: false });
+        const result = formatter.format('Tarefa concluída', { agent: '@dev', reasoning: 'fast' });
+        expect(typeof result).toBe('string');
+        expect(result).toBe('Tarefa concluída');
+      });
+
+      it('should return message with context in educational mode', () => {
+        const formatter = new MessageFormatter({ educationalMode: true });
+        const result = formatter.format('Tarefa concluída', { agent: '@dev', reasoning: 'Best agent for code' });
+        expect(typeof result).toBe('string');
+        expect(result).toContain('Tarefa concluída');
+        expect(result).toContain('🤖 Agente: @dev');
+        expect(result).toContain('📚 Raciocínio: Best agent for code');
+      });
+
+      it('should not throw when context is null (AC-5)', () => {
+        const formatter = new MessageFormatter({ educationalMode: true });
+        expect(() => formatter.format('msg', null)).not.toThrow();
+        expect(formatter.format('msg', null)).toBe('msg');
+      });
+
+      it('should not throw when context is undefined (AC-5)', () => {
+        const formatter = new MessageFormatter({ educationalMode: true });
+        expect(() => formatter.format('msg', undefined)).not.toThrow();
+        expect(formatter.format('msg', undefined)).toBe('msg');
+      });
+
+      it('should include tradeoffs in educational mode when provided', () => {
+        const formatter = new MessageFormatter({ educationalMode: true });
+        const result = formatter.format('Decision made', {
+          agent: '@architect',
+          tradeoffs: ['JWT vs Session', 'REST vs GraphQL'],
+        });
+        expect(result).toContain('📊 Trade-offs: JWT vs Session, REST vs GraphQL');
+      });
+
+      it('should return only message in concise mode regardless of context (AC-5)', () => {
+        const formatter = new MessageFormatter({ educationalMode: false });
+        const result = formatter.format('Done', { agent: '@dev', reasoning: 'fast', tradeoffs: ['A vs B'] });
+        expect(result).toBe('Done');
+        expect(result).not.toContain('Agente');
+        expect(result).not.toContain('Raciocínio');
+        expect(result).not.toContain('Trade-offs');
+      });
+    });
+  });
+
+  describe('formatActionResult — singular branch coverage', () => {
+    it('should handle singular file in educational mode', () => {
+      const formatter = new MessageFormatter({ educationalMode: true });
+      const result = formatter.formatActionResult('Fix', {
+        filesCreated: 1,
+        filesModified: 1,
+      });
+      expect(result).toContain('1 criado');
+      expect(result).toContain('1 modificado');
     });
   });
 

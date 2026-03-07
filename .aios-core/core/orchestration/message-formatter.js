@@ -44,6 +44,50 @@ class MessageFormatter {
   }
 
   /**
+   * Gets the current educational mode state (AC-4 API contract alias)
+   * @returns {boolean} Current educational mode state
+   */
+  getEducationalMode() {
+    return this.educationalMode;
+  }
+
+  /**
+   * Formats a message with optional context (AC-5 API contract)
+   *
+   * Concise mode (OFF): returns only the message string.
+   * Educational mode (ON): appends agent, reasoning, and trade-offs from context.
+   *
+   * @param {string} message - The result message
+   * @param {Object|null|undefined} context - Optional context
+   * @param {string} [context.agent] - Agent name involved
+   * @param {string} [context.reasoning] - Reasoning behind the action
+   * @param {string[]} [context.tradeoffs] - Trade-offs considered
+   * @returns {string} Always a string — never null/undefined, never throws for valid inputs
+   */
+  format(message, context) {
+    const msg = String(message != null ? message : '');
+
+    if (!this.educationalMode || !context) {
+      return msg;
+    }
+
+    const { agent, reasoning, tradeoffs } = context;
+    let output = msg;
+
+    if (agent) {
+      output += `\n🤖 Agente: ${agent}`;
+    }
+    if (reasoning) {
+      output += `\n📚 Raciocínio: ${reasoning}`;
+    }
+    if (tradeoffs && tradeoffs.length > 0) {
+      output += '\n📊 Trade-offs: ' + tradeoffs.join(', ');
+    }
+
+    return output;
+  }
+
+  /**
    * Formats an action result message
    *
    * @param {string} action - Action name (e.g., 'Autenticação JWT')
