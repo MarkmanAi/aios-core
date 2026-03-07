@@ -1,69 +1,26 @@
 schema: 1
 story: '13.3'
 story_title: 'BobStatusWriter — Dashboard Bridge'
-gate: CONCERNS
+gate: PASS
 status_reason: >
-  All 5 ACs correctly implemented and tested (56 tests, 0 failures). M1 fixed since prior review.
-  Gate remains CONCERNS due to 2 open medium-severity issues: shallow copy in getStatus() (M2)
-  and temp file placed in os.tmpdir() instead of dashboardDir (M3, spec deviation).
+  All 5 ACs implemented and tested (57 tests, 0 failures). All prior CONCERNS resolved:
+  M2 (deep copy via structuredClone), M3 (temp file in dashboardDir per story spec),
+  L1/L2 (stale JSDoc cleaned), L3 (initialize() dir-failure test added).
+  Coverage 97.26%, 0 lint errors. One new LOW observation (L4) noted, no action required.
 reviewer: 'Quinn (Test Architect)'
 updated: '2026-03-07T00:00:00-03:00'
 
 top_issues:
-  - id: M2
-    severity: medium
-    title: 'getStatus() returns shallow copy — nested refs shared'
-    description: >
-      { ...this._status } only copies top-level keys. Nested objects (orchestration, pipeline,
-      current_agent, etc.) are shared references. A consumer that mutates status.pipeline.stages
-      corrupts internal state. Pre-existing behavior.
-    file: '.aios-core/core/orchestration/bob-status-writer.js'
-    lines: '496'
-    suggested_owner: dev
-    pre_existing: true
-
-  - id: M3
-    severity: medium
-    title: 'Temp file in os.tmpdir() — non-atomic on Windows cross-drive'
-    description: >
-      The story spec called for a same-directory temp file (${targetPath}.tmp.${pid}) to
-      guarantee atomic rename on same filesystem. Using os.tmpdir() causes fs.rename() to fail
-      on Windows when project is on a different drive, falling back to non-atomic writeJson.
-      Functional fallback exists but atomicity guarantee is lost.
-    file: '.aios-core/core/orchestration/bob-status-writer.js'
-    lines: '235-243'
-    suggested_owner: dev
-    pre_existing: false
-
-  - id: L1
+  - id: L4
     severity: low
-    title: 'Stale JSDoc (AC6) references'
+    title: 'Temp path per-PID not per-call — shared across concurrent same-process writes'
     description: >
-      updateAgent, addTerminal, recordSurfaceDecision, addError all have @param docs referencing
-      "(AC6)" — leftover from pre-formal-story numbering. This story has 5 ACs (AC-1 through AC-5).
+      The temp file path ${statusPath}.tmp.${process.pid} is unique per process but shared
+      across concurrent writeBobStatus() calls within the same process. Theoretical interleaved
+      write risk exists; however the concurrent test passes (last write wins per AC-1 spec)
+      and this matches the story spec pattern exactly. No action required before merge.
     file: '.aios-core/core/orchestration/bob-status-writer.js'
-    suggested_owner: dev
-    pre_existing: true
-
-  - id: L2
-    severity: low
-    title: 'BOB_STATUS_SCHEMA comment references AC9'
-    description: >
-      BOB_STATUS_SCHEMA JSDoc says "(AC9: Single source of truth)" but this story only has
-      ACs 1-5. Stale reference from original code.
-    file: '.aios-core/core/orchestration/bob-status-writer.js'
-    lines: '535-543'
-    suggested_owner: dev
-    pre_existing: true
-
-  - id: L3
-    severity: low
-    title: 'initialize() dir-failure path not tested'
-    description: >
-      initialize() calls fs.ensureDir() directly (outside writeBobStatus). If ensureDir fails
-      there, it throws without the descriptive message added by writeBobStatus. AC-1 dir-failure
-      test only covers the writeBobStatus path.
-    file: 'tests/core/orchestration/bob-status-writer.test.js'
+    lines: '232'
     suggested_owner: dev
     pre_existing: false
 
@@ -72,27 +29,64 @@ closed_issues:
     severity: medium
     title: 'writeBobStatus mutated caller state object'
     resolution: >
-      Fixed: writeBobStatus() now clones the input before modifying timestamp/elapsed fields:
-      const payload = { ...state, elapsed: { ...state.elapsed } }. Non-mutation test added.
+      Fixed in prior pass: writeBobStatus() clones input before modifying timestamp/elapsed.
+    closed_date: '2026-03-07'
+
+  - id: M2
+    severity: medium
+    title: 'getStatus() returned shallow copy — nested refs shared'
+    resolution: >
+      Fixed: getStatus() now returns structuredClone(this._status), providing a full deep copy.
+      Consumer mutations no longer corrupt internal state.
+    closed_date: '2026-03-07'
+
+  - id: M3
+    severity: medium
+    title: 'Temp file in os.tmpdir() — non-atomic on Windows cross-drive'
+    resolution: >
+      Fixed: temp file moved to ${this.statusPath}.tmp.${process.pid}, placing it in the same
+      directory as the target. Matches story spec pattern exactly. os import removed.
+    closed_date: '2026-03-07'
+
+  - id: L1
+    severity: low
+    title: 'Stale JSDoc (AC6) references'
+    resolution: >
+      Fixed: (AC6) removed from updateAgent, addTerminal, recordSurfaceDecision, addError JSDoc.
+    closed_date: '2026-03-07'
+
+  - id: L2
+    severity: low
+    title: 'BOB_STATUS_SCHEMA comment referenced AC9'
+    resolution: >
+      Fixed: (AC9: Single source of truth) removed from BOB_STATUS_SCHEMA JSDoc comment.
+    closed_date: '2026-03-07'
+
+  - id: L3
+    severity: low
+    title: 'initialize() dir-failure path not tested'
+    resolution: >
+      Fixed: Test added in describe('L3: initialize() dir-failure path') — verifies that
+      initialize() throws when ensureDir fails.
     closed_date: '2026-03-07'
 
 waiver:
   active: false
 
-quality_score: 80
+quality_score: 95
 
 expires: '2026-03-21T00:00:00-03:00'
 
 evidence:
-  tests_reviewed: 56
-  tests_added: 20
-  risks_identified: 5
+  tests_reviewed: 57
+  tests_added: 21
+  risks_identified: 1
   lint_errors: 0
   regression_suites: 187
   coverage:
-    statements: 97.27
-    branches: 97.1
-    lines: 97.27
+    statements: 97.26
+    branches: 97.14
+    lines: 97.26
     functions: 84.61
   trace:
     ac_covered: [1, 2, 3, 4, 5]
@@ -102,51 +96,33 @@ nfr_validation:
   security:
     status: PASS
     notes: >
-      No API keys or secrets in code or logs. Path construction uses path.join() throughout.
-      No user-controlled path concatenation. BobEventTypes.STATUS_UPDATE payload contains
-      full status object but no credentials.
+      No API keys or secrets in code or logs. Path construction uses path.join() and template
+      literals on controlled internal values only. No user-controlled path concatenation.
   performance:
     status: PASS
     notes: >
-      Atomic writes use temp+rename (fast). DashboardEmitter is non-blocking (fire-and-forget
-      with isolated catch). ObservabilityPanel calls are synchronous but cheap (no I/O).
-      No performance regressions detected.
+      structuredClone() is O(n) on _status object size — small, bounded, no measurable impact.
+      Temp file placement change has no performance difference. DashboardEmitter remains
+      non-blocking (fire-and-forget with isolated catch).
   reliability:
-    status: CONCERNS
+    status: PASS
     notes: >
-      M3: Temp file in os.tmpdir() breaks atomicity guarantee on Windows cross-drive.
-      Fallback exists but atomic write contract is weakened. M2: Shallow copy in getStatus()
-      is a latent reliability risk for downstream consumers that mutate nested fields.
-      M1 resolved — no longer a concern.
+      M2 resolved: deep copy prevents consumer mutation of internal state. M3 resolved:
+      same-directory temp file guarantees atomic rename on same filesystem. All prior
+      reliability concerns addressed.
   maintainability:
-    status: CONCERNS
+    status: PASS
     notes: >
-      L1/L2: Stale JSDoc references (AC6, AC9) create confusion for future maintainers.
-      Overall code quality is high — well-structured, comprehensive coverage at 97%.
+      L1/L2 resolved: JSDoc is now accurate and free of stale AC references. Code is
+      clean, well-structured, and consistent with project standards. 97.26% coverage
+      provides strong regression protection for future maintainers.
 
 recommendations:
   immediate: []
   future:
     - action: >
-        Fix getStatus() to return deep copy: use structuredClone(this._status) instead of
-        shallow spread to prevent consumer mutations from corrupting internal state.
+        Consider making temp file path per-call unique (e.g., append Date.now()) to eliminate
+        theoretical concurrent same-process write race on the temp file itself, while keeping
+        the file in dashboardDir for same-filesystem atomicity.
       refs: ['.aios-core/core/orchestration/bob-status-writer.js']
-      issue_ref: M2
-
-    - action: >
-        Move temp file to same directory as target (path.join(this.dashboardDir, ...)) to
-        guarantee atomic rename on same filesystem, matching story spec pattern.
-      refs: ['.aios-core/core/orchestration/bob-status-writer.js']
-      issue_ref: M3
-
-    - action: >
-        Update stale JSDoc references: replace (AC6) with correct method purpose, remove AC9
-        from BOB_STATUS_SCHEMA comment.
-      refs: ['.aios-core/core/orchestration/bob-status-writer.js']
-      issue_ref: L1,L2
-
-    - action: >
-        Add test for initialize() dir-failure path to complete AC-1 coverage of all code paths
-        that call ensureDir().
-      refs: ['tests/core/orchestration/bob-status-writer.test.js']
-      issue_ref: L3
+      issue_ref: L4
