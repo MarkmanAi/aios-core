@@ -28,6 +28,8 @@ class DomainInjector {
    * @returns {string} Formatted markdown content
    */
   inject(activeDomains) {
+    if (!activeDomains || !Array.isArray(activeDomains)) return '';
+
     // Sort domains by layer order
     const sorted = [...activeDomains].sort((a, b) => {
       const ai = LAYER_ORDER.indexOf(a.layer);
@@ -39,6 +41,11 @@ class DomainInjector {
     const sections = [];
 
     for (const { file, layer } of sorted) {
+      if (typeof file !== 'string' || file.includes('..')) {
+        console.warn(`[DomainInjector] WARNING: skipping domain with invalid file path: ${file}`);
+        continue;
+      }
+
       const filePath = path.join(this.domainDir, file);
 
       if (!fs.existsSync(filePath)) {

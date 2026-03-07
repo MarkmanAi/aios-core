@@ -149,19 +149,24 @@ describe('SYNAPSE full pipeline smoke test', () => {
   });
 
   it('getStatus() returns initialized=true after writeSessionFile()', () => {
-    const parser = new ManifestParser(SYNAPSE_DIR);
-    const registry = parser.parse();
-    const active = parser.getActiveDomains(registry, { agentId: 'dev' });
-    const injector = new DomainInjector(SYNAPSE_DIR);
-    const content = injector.inject(active);
-    injector.writeSessionFile(content, tmpDir);
+    const localTmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'synapse-status-'));
+    try {
+      const parser = new ManifestParser(SYNAPSE_DIR);
+      const registry = parser.parse();
+      const active = parser.getActiveDomains(registry, { agentId: 'dev' });
+      const injector = new DomainInjector(SYNAPSE_DIR);
+      const content = injector.inject(active);
+      injector.writeSessionFile(content, localTmpDir);
 
-    const status = injector.getStatus(tmpDir);
+      const status = injector.getStatus(localTmpDir);
 
-    expect(status.initialized).toBe(true);
-    expect(Array.isArray(status.activeDomains)).toBe(true);
-    expect(status.activeDomains.length).toBeGreaterThan(0);
-    expect(typeof status.updatedAt).toBe('string');
+      expect(status.initialized).toBe(true);
+      expect(Array.isArray(status.activeDomains)).toBe(true);
+      expect(status.activeDomains.length).toBeGreaterThan(0);
+      expect(typeof status.updatedAt).toBe('string');
+    } finally {
+      fs.rmSync(localTmpDir, { recursive: true, force: true });
+    }
   });
 
   it('getStatus() returns initialized=false when .aios/active-domains.md missing', () => {

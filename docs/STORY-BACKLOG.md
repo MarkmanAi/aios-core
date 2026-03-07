@@ -9,9 +9,9 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 | Priority | TODO | In Progress | Blocked | Done | Total |
 |----------|------|-------------|---------|------|-------|
 | 🔴 HIGH   | 0    | 0           | 0       | 0    | 0     |
-| 🟡 MEDIUM | 0    | 3           | 0       | 1    | 4     |
+| 🟡 MEDIUM | 0    | 0           | 0       | 4    | 4     |
 | 🟢 LOW    | 1    | 0           | 0       | 0    | 1     |
-| **Total** | **1** | **3**      | **0**   | **1** | **5** |
+| **Total** | **1** | **0**      | **0**   | **4** | **5** |
 
 *Last updated: 2026-03-06*
 
@@ -30,7 +30,7 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 - **Source**: QA Review — Story 10.7 (gate: `docs/qa/gates/10.7-synapse-domain-injector.yml`, MNT-001)
 - **Priority**: 🟡 MEDIUM
 - **Effort**: ~1 hour
-- **Status**: 🔄 In Progress
+- **Status**: ✅ Done
 - **Assignee**: Dev
 - **Sprint**: Epic 11 or standalone story
 - **Risk**: MEDIUM — null/undefined activeDomains causes spread crash in production; crafted `file` values in array pose theoretical path traversal risk via `path.join()`
@@ -49,7 +49,7 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 - **Source**: QA Review — Story 10.7 (gate: `docs/qa/gates/10.7-synapse-domain-injector.yml`, TEST-001)
 - **Priority**: 🟡 MEDIUM
 - **Effort**: ~30 min
-- **Status**: 🔄 In Progress
+- **Status**: ✅ Done
 - **Assignee**: Dev
 - **Sprint**: Epic 11 or standalone story
 - **Risk**: LOW — currently passes in sequence, but will fail if test order changes or Jest parallelism is increased
@@ -87,7 +87,7 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 - **Source**: QA Review re-assessment (Story 11.2 post-11.4/11.5)
 - **Priority**: 🟡 MEDIUM
 - **Effort**: ~4–8 hours
-- **Status**: 🔄 In Progress
+- **Status**: ✅ Done
 - **Assignee**: Dev
 - **Sprint**: Next available CI Health sprint
 - **Risk**: MEDIUM — blocks Story 11.2 AC5 (≤5 failing suites) and AC7 (CI pipeline green), which in turn blocks PR #6 from merging without `--admin`
