@@ -21,7 +21,6 @@
 
 const fs = require('fs-extra');
 const path = require('path');
-const os = require('os');
 const { getDashboardEmitter } = require('../events/dashboard-emitter');
 const { BobEventTypes } = require('../events/types');
 const { PanelMode } = require('../ui/observability-panel');
@@ -231,8 +230,8 @@ class BobStatusWriter {
       payload.elapsed.story_seconds = Math.floor((now - this._storyStartTime) / 1000);
     }
 
-    // AC-1: Atomic write — temp file + rename; Windows-safe fallback if rename fails
-    const tempPath = path.join(os.tmpdir(), `bob-status-${Date.now()}-${process.pid}.json`);
+    // AC-1: Atomic write — temp file in same dir as target (guarantees same-filesystem rename)
+    const tempPath = `${this.statusPath}.tmp.${process.pid}`;
     await fs.writeJson(tempPath, payload, { spaces: 2 });
     try {
       await fs.rename(tempPath, this.statusPath);
@@ -300,7 +299,7 @@ class BobStatusWriter {
   }
 
   /**
-   * Updates current agent (AC6)
+   * Updates current agent
    * @param {string} id - Agent ID
    * @param {string} name - Agent name
    * @param {string} task - Current task
@@ -334,7 +333,7 @@ class BobStatusWriter {
   }
 
   /**
-   * Adds an active terminal (AC6)
+   * Adds an active terminal
    * @param {string} agent - Agent ID
    * @param {number} pid - Process ID
    * @param {string} task - Task description
@@ -361,7 +360,7 @@ class BobStatusWriter {
   }
 
   /**
-   * Records a surface decision (AC6)
+   * Records a surface decision
    * @param {string} criteria - Decision criteria ID
    * @param {string} action - Action taken
    * @param {Object} [context] - Additional context
@@ -393,7 +392,7 @@ class BobStatusWriter {
   }
 
   /**
-   * Adds an error (AC6)
+   * Adds an error
    * @param {string} phase - Phase where error occurred
    * @param {string} message - Error message
    * @param {boolean} [recoverable=true] - Whether error is recoverable
@@ -493,7 +492,7 @@ class BobStatusWriter {
    * @returns {BobStatusSchema} Current status
    */
   getStatus() {
-    return { ...this._status };
+    return structuredClone(this._status);
   }
 
   /**
@@ -532,7 +531,7 @@ class BobStatusWriter {
 }
 
 /**
- * Bob Status Schema constant for export (AC9: Single source of truth)
+ * Bob Status Schema constant for export
  * Shared between BobStatusWriter and DashboardEmitter
  */
 const BOB_STATUS_SCHEMA = {

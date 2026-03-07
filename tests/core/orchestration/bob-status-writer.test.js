@@ -453,6 +453,30 @@ describe('Edge Cases', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// L3: initialize() dir-failure path
+// ─────────────────────────────────────────────────────────────────────────────
+describe('L3: initialize() dir-failure path', () => {
+  let tempDir;
+  let writer;
+
+  beforeEach(async () => {
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'bob-init-fail-'));
+    getDashboardEmitter.mockReturnValue({ emit: jest.fn().mockResolvedValue(undefined) });
+    writer = new BobStatusWriter(tempDir, { debug: false });
+  });
+
+  afterEach(async () => {
+    await fs.remove(tempDir);
+    jest.clearAllMocks();
+  });
+
+  it('should throw when ensureDir fails inside initialize()', async () => {
+    jest.spyOn(fs, 'ensureDir').mockRejectedValueOnce(new Error('EACCES: permission denied'));
+    await expect(writer.initialize()).rejects.toThrow();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // AC-1 Gap Tests: dir creation failure + concurrent serialization
 // ─────────────────────────────────────────────────────────────────────────────
 describe('AC-1: dir creation failure throws', () => {

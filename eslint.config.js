@@ -76,6 +76,8 @@ module.exports = [
         clearInterval: 'readonly',
         setImmediate: 'readonly',
         global: 'readonly',
+        // Node.js 17+ globals
+        structuredClone: 'readonly',
         // Node.js 18+ globals
         fetch: 'readonly',
         AbortController: 'readonly',
