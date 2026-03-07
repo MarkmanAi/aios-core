@@ -10,8 +10,8 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 |----------|------|-------------|---------|------|-------|
 | 🔴 HIGH   | 0    | 0           | 0       | 0    | 0     |
 | 🟡 MEDIUM | 0    | 0           | 0       | 4    | 4     |
-| 🟢 LOW    | 1    | 0           | 0       | 0    | 1     |
-| **Total** | **1** | **0**      | **0**   | **4** | **5** |
+| 🟢 LOW    | 0    | 0           | 0       | 1    | 1     |
+| **Total** | **0** | **0**      | **0**   | **5** | **5** |
 
 *Last updated: 2026-03-06*
 
@@ -116,7 +116,7 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 - **Source**: QA Review (Story 11.5)
 - **Priority**: 🟢 LOW
 - **Effort**: ~15 min
-- **Status**: 📋 TODO
+- **Status**: ✅ Done
 - **Assignee**: Dev
 - **Sprint**: Backlog (no urgency)
 - **Description**: The fixture at `tests/core/fixtures/bob-surface-criteria.yaml` is a verbatim copy of the production surface criteria file and is not specific to the "bob" user profile. The name is misleading — it suggests a bob-specific fixture but is actually a generic isolation fixture. Renaming to `surface-criteria.yaml` (or `surface-criteria-fixture.yaml`) would improve discoverability and reduce confusion when other suites need the same file.

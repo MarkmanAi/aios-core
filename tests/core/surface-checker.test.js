@@ -17,7 +17,7 @@ const {
 } = require('../../.aios-core/core/orchestration/surface-checker');
 
 // Use fixture copy so tests are independent of the live criteria file
-const FIXTURE_PATH = path.join(__dirname, 'fixtures', 'bob-surface-criteria.yaml');
+const FIXTURE_PATH = path.join(__dirname, 'fixtures', 'surface-criteria.yaml');
 
 describe('SurfaceChecker', () => {
   let checker;
