@@ -187,6 +187,11 @@ class BrownfieldHandler extends EventEmitter {
 
     // Step 1: Check if user has already accepted (resuming)
     if (context.userAccepted === true) {
+      // AC-6: Check idempotency before executing discovery
+      const idempotency = this.checkIdempotency('docs/architecture/system-architecture.md');
+      if (idempotency.exists) {
+        return { success: true, action: 'updated' };
+      }
       return this._executeDiscovery(context);
     }
 
@@ -252,6 +257,8 @@ Quer que eu comece?`;
     if (!accepted) {
       // User declined - route to existing project handler with defaults
       return {
+        success: false,
+        reason: 'user_declined',
         action: 'brownfield_declined',
         data: {
           message: 'Análise pulada. Usando configurações padrão.',
@@ -282,6 +289,8 @@ Quer que eu comece?`;
     const workflowExecutor = this._getWorkflowExecutor();
     if (!workflowExecutor) {
       return {
+        success: false,
+        reason: 'workflow_error',
         action: 'brownfield_error',
         error: 'WorkflowExecutor not available',
       };
@@ -290,6 +299,8 @@ Quer que eu comece?`;
     // Check if workflow file exists
     if (!fs.existsSync(this.workflowPath)) {
       return {
+        success: false,
+        reason: 'workflow_error',
         action: 'brownfield_error',
         error: `Workflow file not found: ${this.workflowPath}`,
       };
@@ -313,8 +324,11 @@ Quer que eu comece?`;
         return this._handleDiscoveryComplete(result, context);
       }
 
-      // Workflow failed
+      // Workflow failed - clean up any partial output files (AC-3)
+      this._cleanupPartialFiles();
       return {
+        success: false,
+        reason: 'workflow_error',
         action: 'brownfield_failed',
         data: {
           result,
@@ -324,11 +338,36 @@ Quer que eu comece?`;
       };
     } catch (error) {
       this._log(`Discovery execution error: ${error.message}`, 'error');
+      // Clean up any partial output files (AC-3)
+      this._cleanupPartialFiles();
       return {
+        success: false,
+        reason: 'workflow_error',
         action: 'brownfield_error',
         error: error.message,
         canRetry: true,
       };
+    }
+  }
+
+  /**
+   * Removes partial output files after a failed workflow execution (AC-3)
+   * @private
+   */
+  _cleanupPartialFiles() {
+    const outputPaths = [
+      path.join(this.projectRoot, 'docs/architecture/system-architecture.md'),
+      path.join(this.projectRoot, 'docs/reports/TECHNICAL-DEBT-REPORT.md'),
+    ];
+    for (const filePath of outputPaths) {
+      try {
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          this._log(`Cleaned up partial file: ${filePath}`);
+        }
+      } catch (error) {
+        this._log(`Failed to cleanup ${filePath}: ${error.message}`, 'warn');
+      }
     }
   }
 
@@ -456,6 +495,18 @@ Quer que eu comece?`;
     const nextStepQuestion =
       'Quer que eu monte um plano para resolver os débitos primeiro, ou prefere adicionar uma feature nova?';
 
+    // AC-5: Use SurfaceChecker (C003: Multiple Options) to present post-discovery options
+    const surfaceChecker = this._getSurfaceChecker();
+    const postDiscoverySurfaceResult = surfaceChecker
+      ? surfaceChecker.shouldSurface({
+        valid_options_count: 2,
+        options_with_tradeoffs: [
+          '1. Resolver débitos técnicos',
+          '2. Adicionar feature nova',
+        ].join('\n'),
+      })
+      : { should_surface: true };
+
     return {
       action: 'brownfield_complete',
       phase: BrownfieldPhase.COMPLETE,
@@ -477,6 +528,7 @@ Quer que eu comece?`;
           systemArchitecture: 'docs/architecture/system-architecture.md',
           technicalDebtReport: 'docs/reports/TECHNICAL-DEBT-REPORT.md',
         },
+        surfaceResult: postDiscoverySurfaceResult,
         result,
         context,
       },
