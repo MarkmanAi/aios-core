@@ -1,5 +1,6 @@
 module.exports = {
   testEnvironment: 'node',
+  coverageProvider: 'v8',
   coverageDirectory: 'coverage',
 
   // Test patterns from LOCAL (mais específico)
