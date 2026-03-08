@@ -7,19 +7,7 @@ const chalk = require('chalk');
 const { SessionState } = require('../../../.aios-core/core/orchestration/session-state');
 const LockManager = require('../../../.aios-core/core/orchestration/lock-manager');
 const { BobStatusWriter } = require('../../../.aios-core/core/orchestration/bob-status-writer');
-const { loadProjectStatus } = require('../../../.aios-core/infrastructure/scripts/project-status-loader');
-const { readBobStatus, formatOutput } = require('./status');
-
-async function showCurrentStatus() {
-  try {
-    const projectStatus = await loadProjectStatus();
-    const bobStatus = readBobStatus();
-    console.log(formatOutput(projectStatus, bobStatus));
-    console.log('');
-  } catch {
-    // Status display is non-critical — swallow errors
-  }
-}
+const { showCurrentStatus } = require('../utils/show-current-status');
 
 async function runStop(options) {
   const projectRoot = process.cwd();

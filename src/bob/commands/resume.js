@@ -5,19 +5,7 @@ const chalk = require('chalk');
 const ora = require('ora');
 const { SessionState } = require('../../../.aios-core/core/orchestration/session-state');
 const { BobOrchestrator } = require('../../../.aios-core/core/orchestration/bob-orchestrator');
-const { loadProjectStatus } = require('../../../.aios-core/infrastructure/scripts/project-status-loader');
-const { readBobStatus, formatOutput } = require('./status');
-
-async function showCurrentStatus() {
-  try {
-    const projectStatus = await loadProjectStatus();
-    const bobStatus = readBobStatus();
-    console.log(formatOutput(projectStatus, bobStatus));
-    console.log('');
-  } catch {
-    // Status display is non-critical — swallow errors
-  }
-}
+const { showCurrentStatus } = require('../utils/show-current-status');
 
 async function runResume() {
   const projectRoot = process.cwd();
@@ -35,8 +23,8 @@ async function runResume() {
   }
 
   // Describe checkpoint for user (AC-4 output)
-  const lastAction = state.session_state.last_action;
-  const progress = state.session_state.progress;
+  const lastAction = (state.session_state && state.session_state.last_action) || {};
+  const progress = (state.session_state && state.session_state.progress) || {};
   const description = `Story ${progress.current_story || 'unknown'} — phase: ${lastAction.phase || 'start'}`;
   console.log(chalk.blue(`Resuming from: ${description}`));
 

@@ -11,6 +11,9 @@ jest.mock('../commands/status', () => ({
   readBobStatus: jest.fn(),
   formatOutput: jest.fn().mockReturnValue(''),
 }));
+jest.mock('../utils/show-current-status', () => ({
+  showCurrentStatus: jest.fn().mockResolvedValue(undefined),
+}));
 jest.mock('ora');
 
 // fs.promises.unlink spy — fs is a Node native module, unaffected by resetModules
@@ -29,6 +32,8 @@ let mockWriteBobStatus;
 let mockOrchestrate;
 let mockHandleSessionResume;
 let mockSpinner;
+
+let mockShowCurrentStatus;
 
 let runStop;
 let runResume;
@@ -120,6 +125,11 @@ beforeEach(() => {
   const statusMod = require('../commands/status');
   statusMod.readBobStatus.mockReturnValue(null);
   statusMod.formatOutput.mockReturnValue('');
+
+  // show-current-status util mock
+  const scs = require('../utils/show-current-status');
+  mockShowCurrentStatus = scs.showCurrentStatus;
+  mockShowCurrentStatus.mockResolvedValue(undefined);
 
   // fs.promises.unlink spy (native module — not reset by resetModules)
   unlinkSpy = jest.spyOn(fs.promises, 'unlink').mockResolvedValue(undefined);
@@ -274,25 +284,12 @@ describe('stop command', () => {
   // ─── AC-6: status display ───────────────────────────────────────────────
 
   describe('AC-6 — status display before stop', () => {
-    it('calls formatOutput before performing stop', async () => {
-      const statusMod = require('../commands/status');
+    it('calls showCurrentStatus before performing stop', async () => {
       mockIsLocked.mockResolvedValue(false);
 
       await runStop({ force: false });
 
-      expect(statusMod.formatOutput).toHaveBeenCalled();
-    });
-
-    it('swallows loadProjectStatus errors without failing stop', async () => {
-      const psl = require('../../../.aios-core/infrastructure/scripts/project-status-loader');
-      psl.loadProjectStatus.mockRejectedValue(new Error('status error'));
-      mockIsLocked.mockResolvedValue(false);
-
-      await expect(runStop({ force: false })).resolves.not.toThrow();
-
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Nothing is running'),
-      );
+      expect(mockShowCurrentStatus).toHaveBeenCalled();
     });
   });
 });
@@ -437,24 +434,27 @@ describe('resume command', () => {
   // ─── AC-6: status display ───────────────────────────────────────────────
 
   describe('AC-6 — status display before resume', () => {
-    it('calls formatOutput before performing resume', async () => {
-      const statusMod = require('../commands/status');
+    it('calls showCurrentStatus before performing resume', async () => {
       mockLoadSessionState.mockResolvedValue(null);
 
       await runResume();
 
-      expect(statusMod.formatOutput).toHaveBeenCalled();
+      expect(mockShowCurrentStatus).toHaveBeenCalled();
     });
+  });
 
-    it('swallows loadProjectStatus errors without failing resume', async () => {
-      const psl = require('../../../.aios-core/infrastructure/scripts/project-status-loader');
-      psl.loadProjectStatus.mockRejectedValue(new Error('status error'));
-      mockLoadSessionState.mockResolvedValue(null);
+  // ─── partial session state (Fix 2 — null guards) ──────────────────────
 
-      await expect(runResume()).resolves.not.toThrow();
+  describe('partial session state — null guards on last_action/progress', () => {
+    it('handles partial session state gracefully', async () => {
+      mockLoadSessionState.mockResolvedValue({ session_state: {} });
+      mockOrchestrate.mockResolvedValue({ action: 'resume_prompt', success: true });
+      mockHandleSessionResume.mockResolvedValue({ action: 'continue' });
+
+      await runResume();
 
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('No session to resume'),
+        expect.stringContaining('Resuming from: Story unknown — phase: start'),
       );
     });
   });
