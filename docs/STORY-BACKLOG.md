@@ -10,10 +10,10 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 |----------|------|-------------|---------|------|-------|
 | 🔴 HIGH   | 0    | 0           | 0       | 0    | 0     |
 | 🟡 MEDIUM | 0    | 0           | 0       | 6    | 6     |
-| 🟢 LOW    | 2    | 0           | 0       | 1    | 3     |
-| **Total** | **2** | **0**      | **0**   | **7** | **9** |
+| 🟢 LOW    | 0    | 0           | 0       | 3    | 3     |
+| **Total** | **0** | **0**      | **0**   | **9** | **9** |
 
-*Last updated: 2026-03-08*
+*Last updated: 2026-03-08 — [13.11-T1] e [13.11-T2] agendados para Sprint atual (2026-03)*
 
 ---
 
@@ -154,9 +154,9 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 - **Source**: QA Review — Story 13.11 (gate: `docs/qa/gates/13.11-aios-bob-explain.yml`)
 - **Priority**: 🟢 LOW
 - **Effort**: ~15 min
-- **Status**: 📋 TODO
+- **Status**: ✅ Done
 - **Assignee**: Dev
-- **Sprint**: Backlog (no urgency)
+- **Sprint**: Sprint atual (2026-03)
 - **Risk**: LOW — `catch (_e)` block at `src/bob/commands/explain.js:37` is uncovered; the session sync error path is defensive (non-critical), but the test would complete coverage to 100% stmts
 - **Description**: The `catch (_e)` block that swallows session sync errors (line 38 of `src/bob/commands/explain.js`) is not covered by any test. Adding a test that mocks `SessionState.prototype.loadSessionState` to throw an error would verify: (1) the error is swallowed silently, (2) the config write already completed, (3) the confirmation message still prints. This requires no production code change — test-only addition.
 - **Success Criteria**:
@@ -173,9 +173,9 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 - **Source**: QA Review — Story 13.11 (gate: `docs/qa/gates/13.11-aios-bob-explain.yml`)
 - **Priority**: 🟢 LOW
 - **Effort**: ~20 min
-- **Status**: 📋 TODO
+- **Status**: ✅ Done
 - **Assignee**: Dev
-- **Sprint**: Backlog (no urgency)
+- **Sprint**: Sprint atual (2026-03)
 - **Risk**: LOW — lines 53–58 of `src/bob/commands/explain.js` (the `.action()` outer `try/catch`) are not covered; the wrapper protects against unexpected throws not caught internally, but this path is not exercised by unit tests on `runExplain` directly
 - **Description**: The outer `try/catch` in the `.action(async (state) => { ... })` handler at lines 52–59 would only trigger if `runExplain` threw an unexpected error not already handled internally. Testing via Commander's `parseAsync` (same approach as `do.test.js` T2.7) with a mocked `runExplain` that throws would cover lines 55–58. This requires a commander-level integration test, not a direct `runExplain` call.
 - **Success Criteria**:

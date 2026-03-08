@@ -193,3 +193,43 @@ describe('T2.8 — no session → setSessionOverride NOT called', () => {
     expect(mockSetSessionOverride).not.toHaveBeenCalled();
   });
 });
+
+// ─── T2.9: session sync throws → error swallowed ──────────────────────────
+
+describe('T2.9 — session sync throws → error swallowed, config and confirmation complete', () => {
+  it('swallows session sync error and still writes config and prints confirmation', async () => {
+    mockLoadSessionState.mockRejectedValue(new Error('session read failed'));
+
+    await expect(runExplain('on')).resolves.toBeUndefined();
+
+    expect(setUserConfigValue).toHaveBeenCalledWith('educational_mode', true);
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Educational mode: ON'),
+    );
+  });
+});
+
+// ─── T2.10: .action() outer error handler ─────────────────────────────────
+
+describe('T2.10 — .action() outer error handler → catches unexpected throws', () => {
+  it('catches unexpected error from runExplain and exits with 1', async () => {
+    setUserConfigValue.mockImplementation(() => {
+      throw new Error('unexpected config error');
+    });
+
+    const explainModule = require('../commands/explain');
+    const { Command } = require('commander');
+    const testProg = new Command();
+    testProg.exitOverride();
+    testProg.addCommand(explainModule);
+
+    await expect(
+      testProg.parseAsync(['explain', 'on'], { from: 'user' }),
+    ).rejects.toThrow();
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Bob explain error:'),
+    );
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
+});
