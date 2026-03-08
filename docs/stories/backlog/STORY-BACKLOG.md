@@ -1,0 +1,130 @@
+# Story Backlog — Tech Debt & Follow-ups
+
+> **Last Updated**: 2026-03-08
+> **Source**: PO Validation + QA Review — Epics 12, 13 (13.2 tech debt added) + QA Review PR #9 Story 13.10
+> **Managed by**: @po (Pax)
+> **Updated**: 2026-03-08 — Epic 13 closed: 12/12 stories Done, all moved to completed/. [13.10-T1], [13.10-T2] remain as LOW tech debt for future sprint.
+
+---
+
+## Statistics
+
+| Status | Count |
+|--------|-------|
+| TODO | 2 |
+| IN PROGRESS | 0 |
+| DONE | 14 |
+| Total | 16 |
+
+| Priority | Count |
+|----------|-------|
+| HIGH | 0 |
+| MEDIUM | 0 |
+| LOW | 2 |
+
+---
+
+## HIGH Priority
+
+#### [13-BLOCKER-COV] Fix `minimatch` coverage tooling bug — blocker for Epic 13 Part A AC-5
+- **Status**: ✅ DONE (2026-03-06)
+- **Fix**: Added `coverageProvider: 'v8'` to `jest.config.js`. Switched from `babel` (default) to Node.js native V8 coverage, eliminating the `babel-plugin-istanbul` → `test-exclude` → `minimatch` chain entirely.
+- **Result**: `npx jest tests/core/orchestration/ --coverage` → 454 tests pass, coverage report generated, no errors.
+
+---
+
+## MEDIUM Priority
+
+## LOW Priority
+
+#### [13.10-T1] Decouple hardcoded lock path in `stop.js` from LockManager internals
+- **Status**: TODO
+- **Source**: CodeRabbit PR #9 — Nitpick
+- **File**: `src/bob/commands/stop.js:28-34`
+- **Issue**: `force` stop constructs `.aios/locks/bob-orchestration.lock` directly, duplicating `LockManager._getLockPath()`. If the naming convention changes, the path will silently diverge.
+- **Fix**: Expose `lockMgr.getLockFilePath('bob-orchestration')` (or a shared constant) and use it in place of the hardcoded string.
+
+#### [13.10-T2] Handle additional resume actions explicitly in `resume.js`
+- **Status**: TODO
+- **Source**: CodeRabbit PR #9 — Nitpick
+- **File**: `src/bob/commands/resume.js:39-47`
+- **Issue**: `handleSessionResume()` can return `'review'`, `'restart'`, `'discard'`, `'unknown'` — only `'continue'` has explicit handling; others fall through to a generic `console.log`.
+- **Fix**: Add explicit branches for each action: `'review'` → prompt user to re-run with next steps; `'restart'`/`'discard'` → guidance message; `'unknown'` → diagnostic log.
+
+## Archive — Done
+
+#### [12.3-T1] Resolve FAISS fallback ambiguity
+- **Status**: DONE
+- **Resolved**: FAISS is a hard dep. No fallback implemented. pytest.importorskip used in tests.
+
+#### [12.3-T2] Add singleton validation subtask
+- **Status**: DONE
+- **Resolved**: Singleton implemented and tested via autouse fixture in conftest.py.
+
+#### [12.2-T1] Pre-decide prompt reuse for L1 Reduce
+- **Status**: DONE
+- **Resolved**: Dedicated l1_reduce.xml created. Decision documented in story Completion Notes.
+
+#### [12.X-T1] Clarify knowledge-etl repository location
+- **Status**: DONE
+- **Resolved**: knowledge-etl/ is a subdirectory of aios-core. Push authority via @devops applies normally.
+
+#### [13-BLOCKER-COV] Fix `minimatch` coverage tooling bug
+- **Status**: DONE
+- **Resolved**: Added `coverageProvider: 'v8'` to `jest.config.js`. V8 native coverage bypasses babel-plugin-istanbul/test-exclude/minimatch entirely. 454 tests pass with coverage.
+
+#### [13.2-T1] Fix premature index entry in cleanupStaleSnapshots before fs.unlink succeeds
+- **Status**: ✅ DONE (2026-03-07)
+- **Resolved**: Fixed via commit `d997262` — `removedSnapshots.push()` moved to after successful `fs.unlink()`. Push-after-unlink pattern applied.
+- **File**: `.aios-core/core/orchestration/data-lifecycle-manager.js`
+
+#### [13.2-T2] Make _updateSnapshotsIndex() atomic via temp file + fs.rename
+- **Status**: ✅ DONE (2026-03-07)
+- **Resolved**: Fixed via commit `d997262` — `_updateSnapshotsIndex()` now writes to temp file then renames atomically.
+- **File**: `.aios-core/core/orchestration/data-lifecycle-manager.js`
+
+#### [12.3-T4] Add parameterized query guidance for SQLite
+- **Status**: ✅ DONE (2026-03-07)
+- **Resolved**: Dev Notes section added to Story 12.3 with parameterized `?` pattern, correct and incorrect examples. Code already follows the pattern (`_persist_embedding`, `_resolve_nearest_text`).
+
+#### [12.1-QA-L1] _parse_json LLM response wrapping concern
+- **Status**: ✅ DONE (2026-03-07)
+- **Resolved**: `_parse_json` now unwraps single-key dict wrappers before Pydantic validation. `{"thinking_dna": {...}}` → `{...}` automatically. Lists not unwrapped (ContradictionsResult safe). 2 regression tests added. 14/14 tests pass.
+- **File**: `knowledge-etl/src/knowledge_etl/transform/l3_authorial.py`, `knowledge-etl/tests/test_epic12_completeness.py`
+
+#### [12.2-T2] Add concrete output format example for L1 Reduce
+- **Status**: ✅ DONE (2026-03-07)
+- **Resolved**: "Expected output format (AC-3)" section added to Story 12.2 Dev Notes with real `Principle` schema example (`principle`, `action`, `attribution`, `source_quote`, `chapter_ref`) and testability guidance.
+
+#### [12.3-T3] Replace pickle with tobytes for embedding serialization
+- **Status**: ✅ DONE (2026-03-07)
+- **Resolved**: `pickle.dumps/loads` replaced with `numpy.tobytes()/np.frombuffer()` in `dedup.py`. `import pickle` removed. 41/41 tests pass.
+- **File**: `knowledge-etl/src/knowledge_etl/load/dedup.py`
+
+#### [12.2-QA-L1] Remove redundant inline import re in _reduce_l1
+- **Status**: ✅ DONE (2026-03-07)
+- **Resolved**: `import re` added to top-level imports. All 4 inline `import re` / `import re as _re` statements removed from `_reduce_l1`, `_extract_map_reduce`, `_get_system_prompt`, `_parse_principles`.
+- **File**: `knowledge-etl/src/knowledge_etl/transform/l1_principles.py`
+
+#### [12.2-QA-L2] TOTAL_CHAPTERS counting via chapter_ref set
+- **Status**: ✅ DONE (2026-03-07)
+- **Resolved**: Comment added: `# Note: principles with empty chapter_ref all collapse to one bucket in the set count`.
+- **File**: `knowledge-etl/src/knowledge_etl/transform/l1_principles.py`
+
+#### [12.2-QA-L3] Reduce parse failure returns raw un-reduced chapter_results
+- **Status**: ✅ DONE (2026-03-07)
+- **Resolved**: Warning log added via Rich console on both failure paths (no JSON match + JSONDecodeError) in `_reduce_l1`.
+- **File**: `knowledge-etl/src/knowledge_etl/transform/l1_principles.py`
+
+---
+
+*Created: 2026-03-06 by @po — PO Validation of Epic 12*
+*Updated: 2026-03-06 — Epic 13 analysis: coverage tooling bug registered as HIGH blocker*
+*Updated: 2026-03-06 — 13.2 QA Review: 2 MEDIUM tech debt items registered ([13.2-T1], [13.2-T2])*
+*Updated: 2026-03-06 — [13-BLOCKER-COV] DONE: coverageProvider switched to v8 by @dev*
+*Updated: 2026-03-07 — [13.2-T1], [13.2-T2] DONE: resolved via commit d997262 by @dev*
+*Updated: 2026-03-07 — [12.3-T4], [12.2-T2] DONE: Dev Notes enriched by @po*
+*Updated: 2026-03-07 — [12.3-T3], [12.2-QA-L1], [12.2-QA-L2], [12.2-QA-L3] DONE: implemented by @dev, 41/41 tests pass*
+*Updated: 2026-03-07 — [12.1-QA-L1] DONE: _parse_json unwrapping fix by @architect + @dev, 14/14 tests pass*
+*Updated: 2026-03-08 — [13.10-T1], [13.10-T2] registered by @qa — CodeRabbit nitpicks from PR #9 (Story 13.10)*
+*Updated: 2026-03-08 — Epic 13 CLOSED: 12/12 stories Done. All 13.x stories archived to docs/stories/completed/ by @po**
