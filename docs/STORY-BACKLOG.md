@@ -36,4 +36,4 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 ---
 
 *Created: 2026-03-03 | Format: AIOS Story Backlog v1.0*
-*Archive: [2026-03](docs/qa/backlog-archive-2026-03.md) — 9 items*
+*Archive: [2026-03](qa/backlog-archive-2026-03.md) — 9 items*
