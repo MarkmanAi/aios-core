@@ -1,0 +1,47 @@
+schema: 1
+story: '13.8'
+story_title: 'aios bob status — Project Status'
+gate: PASS
+status_reason: 'All 6 ACs implemented. 24 tests passing. Branch coverage 89.06%, statements 98.88%, functions 100%. Branch gap fixed per @po spec. Zero regressions. NFRs all pass.'
+reviewer: 'Quinn (Test Architect) / Pax (Product Owner)'
+updated: '2026-03-08T02:00:00.000Z'
+
+top_issues: []
+waiver:
+  active: false
+
+quality_score: 95
+expires: '2026-03-22T00:00:00.000Z'
+
+evidence:
+  tests_reviewed: 24
+  risks_identified: 2
+  coverage:
+    statements: 98.88
+    branches: 89.06
+    functions: 100
+    lines: 98.88
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'Read-only operation. No user input in file paths. No secrets in logs or stdout. Veto conditions from story all respected.'
+  performance:
+    status: PASS
+    notes: 'readFileSync sync appropriate for CLI. loadProjectStatus called correctly as async/await.'
+  reliability:
+    status: PASS
+    notes: 'Both data sources (project-status.yaml, bob-status.json) have graceful null fallbacks. Action catches all errors and exits with code 1.'
+  maintainability:
+    status: PASS
+    notes: 'Small single-responsibility functions. Clear naming. Minor LOW debt: currentStory resolution duplicated in 3 functions.'
+
+recommendations:
+  immediate: []
+  future:
+    - action: 'Extract currentStory resolution into private helper to avoid 3-way duplication in formatOutput/formatConcise/formatEducational'
+      refs: ['src/bob/commands/status.js']
+      priority: LOW
