@@ -116,7 +116,7 @@ describe('T2.4 — lock_failed → error message + exit 1', () => {
     await expect(runBobDo('do something', { dryRun: false })).rejects.toThrow('process.exit called');
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Bob is already running')
+      expect.stringContaining('Bob is already running'),
     );
     expect(exitSpy).toHaveBeenCalledWith(1);
   });
@@ -131,7 +131,7 @@ describe('T2.5 — onboarding → install message', () => {
     await runBobDo('do something', { dryRun: false });
 
     expect(consoleLogSpy).toHaveBeenCalledWith(
-      expect.stringContaining('npx @synkra/aios-install')
+      expect.stringContaining('npx @synkra/aios-install'),
     );
   });
 });
@@ -152,10 +152,10 @@ describe('T2.6 — dry-run', () => {
     await runBobDo('do something', { dryRun: true });
 
     expect(consoleLogSpy).toHaveBeenCalledWith(
-      expect.stringContaining('[DRY-RUN]')
+      expect.stringContaining('[DRY-RUN]'),
     );
     expect(consoleLogSpy).toHaveBeenCalledWith(
-      expect.stringContaining('EXISTING_WITH_DOCS')
+      expect.stringContaining('EXISTING_WITH_DOCS'),
     );
   });
 
@@ -189,12 +189,12 @@ describe('T2.7 — missing request → usage error + exit 1', () => {
 
     // Pass only the subcommand name — [request] is optional so action fires with request=undefined
     await expect(
-      testProg.parseAsync(['do'], { from: 'user' })
+      testProg.parseAsync(['do'], { from: 'user' }),
     ).rejects.toThrow();
 
     expect(exitSpy).toHaveBeenCalledWith(1);
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Usage: aios bob do')
+      expect.stringContaining('Usage: aios bob do'),
     );
   });
 });
@@ -221,7 +221,7 @@ describe('T2.8 — resume_prompt → inquirer prompt + handleSessionResume calle
         expect.objectContaining({
           choices: expect.arrayContaining(['continue', 'review', 'restart', 'discard']),
         }),
-      ])
+      ]),
     );
     expect(mockHandleSessionResume).toHaveBeenCalledWith('continue');
   });
@@ -268,7 +268,7 @@ describe('T2.10 — educational_mode_toggle → inquirer prompt + handleEducatio
         expect.objectContaining({
           choices: expect.arrayContaining(['session', 'permanent']),
         }),
-      ])
+      ]),
     );
     expect(mockHandleEducationalModeToggle).toHaveBeenCalledWith(true, 'session');
   });
@@ -311,7 +311,7 @@ describe('T2.11 — ask_objective → inquirer prompt with 4 options', () => {
           name: 'objective',
           choices: expect.arrayContaining(['feature', 'bug', 'refactor', 'debt']),
         }),
-      ])
+      ]),
     );
     expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('feature'));
   });
@@ -330,7 +330,7 @@ describe('default action — unknown action with success=false', () => {
     await expect(runBobDo('do something', { dryRun: false })).rejects.toThrow('process.exit called');
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('something unknown')
+      expect.stringContaining('something unknown'),
     );
     expect(exitSpy).toHaveBeenCalledWith(1);
   });
@@ -374,7 +374,7 @@ describe('showDelegationMessage', () => {
       data: { agentName: 'Dex', agentId: '@dev' },
     });
     expect(consoleLogSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Bob delegated to Dex (@dev)')
+      expect.stringContaining('Bob delegated to Dex (@dev)'),
     );
   });
 

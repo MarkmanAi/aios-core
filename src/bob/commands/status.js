@@ -120,7 +120,7 @@ function formatEducational(projectStatus, bobStatus) {
     const agentLabel = agentId ? `${agentName} (${agentId})` : agentName;
     lines.push(`Agent:    ${agentLabel} is working on ${agentTask}`);
     lines.push(
-      `          ${agentName} is the implementation agent — writes code, runs tests, marks tasks done`
+      `          ${agentName} is the implementation agent — writes code, runs tests, marks tasks done`,
     );
   } else if (agentName) {
     lines.push(`Agent:    ${agentName} is active`);
@@ -160,7 +160,7 @@ function formatOutput(projectStatus, bobStatus) {
 }
 
 const statusCommand = new Command('status').description(
-  "Show current project status in Bob's voice"
+  "Show current project status in Bob's voice",
 );
 
 statusCommand.action(async () => {
