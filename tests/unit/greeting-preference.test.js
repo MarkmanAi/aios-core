@@ -54,7 +54,7 @@ describe('GreetingPreferenceManager', () => {
 
   afterEach(() => {
     // Clean up temp directory
-    try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch (_) {}
+    try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch (_e) { /* intentional: cleanup best-effort */ }
   });
 
   describe('getPreference', () => {

@@ -294,7 +294,7 @@ describe('statusCommand action', () => {
     await expect(statusCommand.parseAsync(['node', 'aios'])).rejects.toThrow('process.exit called');
     expect(exitSpy).toHaveBeenCalledWith(1);
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Bob encountered an error:')
+      expect.stringContaining('Bob encountered an error:'),
     );
   });
 });
