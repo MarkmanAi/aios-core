@@ -1,0 +1,45 @@
+schema: 1
+story: '13.9'
+story_title: 'aios bob do — Natural Language Task Delegation'
+gate: PASS
+status_reason: 'All 7 ACs implemented and tested. Spinner veto satisfied on all code paths. No security, routing, or functional gaps found. One LOW deferred item (ask_objective loop-back) is explicitly scoped out per Dev Notes.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-03-08T00:00:00.000Z'
+
+top_issues: []
+waiver:
+  active: false
+
+quality_score: 95
+expires: '2026-03-22T00:00:00.000Z'
+
+evidence:
+  tests_reviewed: 19
+  risks_identified: 2
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'No user input passed to shell/eval. No credentials in logs. process.cwd() used for orchestrator path — not user-controlled.'
+  performance:
+    status: PASS
+    notes: 'Spinner provides UX feedback for async wait. detectProjectState() is synchronous and appropriate for CLI dry-run.'
+  reliability:
+    status: PASS
+    notes: 'catch block covers orchestrator errors with spinner.fail(). All 7 action types handled. Minor gap: BobOrchestrator constructor errors in dry-run not wrapped — LOW risk, constructor is unlikely to throw.'
+  maintainability:
+    status: PASS
+    notes: 'use strict, JSDoc on all exported functions, AC references in inline comments, single-responsibility functions, clear naming.'
+
+recommendations:
+  immediate: []
+  future:
+    - action: 'Wrap dry-run path in try/catch — BobOrchestrator constructor could throw if projectRoot is invalid'
+      refs: ['src/bob/commands/do.js:48-60']
+    - action: 'Implement ask_objective loop-back to orchestrator with selected story/objective (explicitly deferred per Dev Notes)'
+      refs: ['src/bob/commands/do.js:108-118']
+    - action: 'Add test for spinner.stop() verification in dry-run path'
+      refs: ['src/bob/__tests__/do.test.js']
