@@ -48,13 +48,14 @@ describe('T2.1 — explanation is always printed first', () => {
     expect(allLogs).toContain('@architect');
   });
 
-  it('references 11 agents in explanation', async () => {
+  it('references dynamic agent count in explanation', async () => {
     confirm.mockResolvedValue(false);
+    const { getAgentCount } = require('../commands/switch');
 
     await runSwitch({});
 
     const allLogs = consoleLogSpy.mock.calls.map((c) => c[0]).join(' ');
-    expect(allLogs).toContain('11');
+    expect(allLogs).toContain(String(getAgentCount()));
   });
 
   it('mentions full command palette in explanation', async () => {
