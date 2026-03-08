@@ -1,13 +1,13 @@
 'use strict';
 
 jest.mock('../../../.aios-core/core/config/config-resolver', () => ({
-  toggleUserProfile: jest.fn(),
+  setUserConfigValue: jest.fn(),
 }));
 jest.mock('@clack/prompts', () => ({
   confirm: jest.fn(),
 }));
 
-let toggleUserProfile;
+let setUserConfigValue;
 let confirm;
 let runSwitch;
 let consoleLogSpy;
@@ -17,7 +17,7 @@ let exitSpy;
 beforeEach(() => {
   jest.resetModules();
 
-  toggleUserProfile = require('../../../.aios-core/core/config/config-resolver').toggleUserProfile;
+  setUserConfigValue = require('../../../.aios-core/core/config/config-resolver').setUserConfigValue;
   confirm = require('@clack/prompts').confirm;
   runSwitch = require('../commands/switch').runSwitch;
 
@@ -67,15 +67,16 @@ describe('T2.1 — explanation is always printed first', () => {
   });
 });
 
-// ─── T2.2: user confirms → toggleUserProfile called once ──────────────────
+// ─── T2.2: user confirms → setUserConfigValue called with 'advanced' ──────
 
-describe('T2.2 — user confirms → toggleUserProfile called once', () => {
-  it('calls toggleUserProfile exactly once on confirm', async () => {
+describe('T2.2 — user confirms → setUserConfigValue called with advanced', () => {
+  it('calls setUserConfigValue with user_profile=advanced on confirm', async () => {
     confirm.mockResolvedValue(true);
 
     await runSwitch({});
 
-    expect(toggleUserProfile).toHaveBeenCalledTimes(1);
+    expect(setUserConfigValue).toHaveBeenCalledWith('user_profile', 'advanced');
+    expect(setUserConfigValue).toHaveBeenCalledTimes(1);
   });
 
   it('prints success message on confirm', async () => {
@@ -89,15 +90,15 @@ describe('T2.2 — user confirms → toggleUserProfile called once', () => {
   });
 });
 
-// ─── T2.3: user cancels (false) → toggleUserProfile NOT called ────────────
+// ─── T2.3: user cancels (false) → setUserConfigValue NOT called ───────────
 
-describe('T2.3 — user cancels (false) → toggleUserProfile NOT called', () => {
-  it('does not call toggleUserProfile on cancel', async () => {
+describe('T2.3 — user cancels (false) → setUserConfigValue NOT called', () => {
+  it('does not call setUserConfigValue on cancel', async () => {
     confirm.mockResolvedValue(false);
 
     await runSwitch({});
 
-    expect(toggleUserProfile).not.toHaveBeenCalled();
+    expect(setUserConfigValue).not.toHaveBeenCalled();
   });
 
   it('prints cancel message on cancel', async () => {
@@ -114,12 +115,12 @@ describe('T2.3 — user cancels (false) → toggleUserProfile NOT called', () =>
 // ─── T2.4: Ctrl+C (symbol) → treated as cancel ────────────────────────────
 
 describe('T2.4 — Ctrl+C (symbol) → treated as cancel', () => {
-  it('does not call toggleUserProfile when confirm returns a symbol', async () => {
+  it('does not call setUserConfigValue when confirm returns a symbol', async () => {
     confirm.mockResolvedValue(Symbol('cancel'));
 
     await runSwitch({});
 
-    expect(toggleUserProfile).not.toHaveBeenCalled();
+    expect(setUserConfigValue).not.toHaveBeenCalled();
   });
 
   it('prints cancel message when confirm returns a symbol', async () => {
@@ -133,19 +134,20 @@ describe('T2.4 — Ctrl+C (symbol) → treated as cancel', () => {
   });
 });
 
-// ─── T2.5: --yes flag → no confirm, toggleUserProfile called ──────────────
+// ─── T2.5: --yes flag → no confirm, setUserConfigValue called ────────────
 
-describe('T2.5 — --yes flag → skips confirm, toggleUserProfile called directly', () => {
+describe('T2.5 — --yes flag → skips confirm, setUserConfigValue called directly', () => {
   it('does not call confirm when --yes is set', async () => {
     await runSwitch({ yes: true });
 
     expect(confirm).not.toHaveBeenCalled();
   });
 
-  it('calls toggleUserProfile directly with --yes', async () => {
+  it('calls setUserConfigValue with user_profile=advanced directly with --yes', async () => {
     await runSwitch({ yes: true });
 
-    expect(toggleUserProfile).toHaveBeenCalledTimes(1);
+    expect(setUserConfigValue).toHaveBeenCalledWith('user_profile', 'advanced');
+    expect(setUserConfigValue).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -181,11 +183,34 @@ describe('T2.7 — exit code 0 on cancel — process.exit NOT called', () => {
   });
 });
 
+// ─── T2.9: confirm rejection → error handler catches it ───────────────────
+
+describe('T2.9 — confirm rejection → error handler catches it', () => {
+  it('catches confirm rejection and exits with 1', async () => {
+    const switchModule = require('../commands/switch');
+    const { Command } = require('commander');
+    const testProg = new Command();
+    testProg.exitOverride();
+    testProg.addCommand(switchModule);
+
+    confirm.mockRejectedValue(new Error('prompt error'));
+
+    await expect(
+      testProg.parseAsync(['switch'], { from: 'user' }),
+    ).rejects.toThrow();
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Bob switch error:'),
+    );
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
+});
+
 // ─── T2.8: .action() outer error handler ──────────────────────────────────
 
 describe('T2.8 — .action() outer error handler catches unexpected throws', () => {
   it('catches unexpected error from runSwitch and exits with 1', async () => {
-    toggleUserProfile.mockImplementation(() => {
+    setUserConfigValue.mockImplementation(() => {
       throw new Error('unexpected config error');
     });
 

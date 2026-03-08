@@ -2,7 +2,7 @@
 
 const { Command } = require('commander');
 const chalk = require('chalk');
-const { toggleUserProfile } = require('../../../.aios-core/core/config/config-resolver');
+const { setUserConfigValue } = require('../../../.aios-core/core/config/config-resolver');
 const { confirm } = require('@clack/prompts');
 
 const ADVANCED_MODE_EXPLANATION = `
@@ -29,8 +29,8 @@ async function runSwitch(options = {}) {
     }
   }
 
-  // AC-4: Toggle profile bob→advanced (no argument — toggles deterministically)
-  toggleUserProfile();
+  // AC-4: Always set profile to advanced (idempotent — safe if already advanced)
+  setUserConfigValue('user_profile', 'advanced');
   console.log(chalk.green('Done.') + ' You now have access to all agents. Use @dev, @qa, @architect, etc.');
 }
 
