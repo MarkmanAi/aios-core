@@ -10,10 +10,14 @@ const { confirm } = require('@clack/prompts');
 const INTERNAL_AGENTS = new Set(['aios-master.md', 'squad-creator.md']);
 
 function getAgentCount() {
-  const agentsDir = path.join(__dirname, '../../../.aios-core/development/agents');
-  return fs.readdirSync(agentsDir).filter(
-    (f) => f.endsWith('.md') && !f.startsWith('_') && !INTERNAL_AGENTS.has(f)
-  ).length;
+  try {
+    const agentsDir = path.join(__dirname, '../../../.aios-core/development/agents');
+    return fs.readdirSync(agentsDir).filter(
+      (f) => f.endsWith('.md') && !f.startsWith('_') && !INTERNAL_AGENTS.has(f)
+    ).length;
+  } catch (_e) {
+    return 11;
+  }
 }
 
 const agentCount = getAgentCount();
