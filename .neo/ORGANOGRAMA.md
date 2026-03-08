@@ -95,6 +95,7 @@
 | **dev** (Dex) | Senior Developer | `.aios-core/development/agents/dev.md` | **22,912B** (largest agent) |
 | **qa** (Quinn) | Senior QA | `.aios-core/development/agents/qa.md` | 16,141B |
 | **squad-creator** (Craft) | Squad Builder | `.aios-core/development/agents/squad-creator.md` | 12,076B — 19 commands |
+| **ralph** | Autonomous Loop Orchestrator | `squads/ralph/` (v2: `.claude/commands/Ralph/agents/ralph.md`) | 🔄 — delegates to @dev, @architect, @qa, @ux-design-expert |
 
 ---
 
@@ -201,6 +202,7 @@
 |-------|------|--------|--------|-------|
 | **mmos-squad** | `squads/mmos-squad/` | Mind Mapper | 10 | 27 |
 | **squad-creator** | `squads/squad-creator/` | Squad Chief | 4 | 16 |
+| **ralph** | `squads/ralph/` | Ralph | 1 | 7 |
 
 ---
 
@@ -264,7 +266,7 @@
 | Squad-Creator Agents | 4 |
 | **Total Agents** | **51** |
 | Cloned Minds | 27 |
-| Departments | 2 |
+| Departments | 3 (mmos-squad, squad-creator, ralph) |
 | Workflows | 15 (1 OPERATIONAL: book-to-intelligence) |
 | Kernel Modules | 19 (18 operational + 1 positioned: synapse) |
 

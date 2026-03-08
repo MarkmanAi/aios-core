@@ -14,7 +14,7 @@ meta:
   total_files: 6315          # find . -type f | wc -l (REPO_PATH_MAP_v2 — 2026-02-22)
   constitution: .neo/CONSTITUICAO_MATRIX.md
   organograma: .neo/ORGANOGRAMA.md
-  last_updated: "2026-02-21"
+  last_updated: "2026-03-08"
   updated_by: neo
 
 # ------------------------------------------------------------
@@ -163,10 +163,11 @@ infrastructure:
 # ------------------------------------------------------------
 departments:
 
-  squads: 2
+  squads: 3
   names:
     - mmos-squad        # squads/mmos-squad/
     - squad-creator     # squads/squad-creator/
+    - ralph             # squads/ralph/ — autonomous loop orchestrator (Epic 14, 2026-03-08)
 
 # ------------------------------------------------------------
 # NEO META — Neo's own footprint (not counted in org totals)

@@ -23,6 +23,8 @@ DELEGATIONS:  [YYYY-MM-DD] TASK: ___ | DELEGATED_TO: ___ | STATUS: pending|compl
 
 ## Decisions
 
+- [2026-03-08] DECISION: Position Ralph (Autonomous Loop Orchestrator) in org chart — Level 5 Operations, 3rd department (squads/ralph/) | REASON: Epic 14 requires org chart positioning FIRST per Constitution Article II. Ralph is unique — no existing agent runs autonomous bash loops with fresh Claude sessions per story. P1 ✅ P2 ⚠️ (tasks pending) P3 ✅ | ORG IMPACT: departments 2→3. inventory.yaml updated. ORGANOGRAMA.md updated. v1 skill deprecated to redirect. v2 delegation paths corrected (fictional skill names → real AIOS agents). Story 14.6 complete.
+
 - [2026-03-02] DECISION: Position SYNAPSE as 19th kernel module | REASON: Context injection gap is real and grows with org size. No existing module manages selective rule injection. P1✅ P2✅ P3✅ P4✅. Owner: @devops. Design validator: @architect. Scope B (data + engine + hook). Path: .aios-core/core/synapse/ | ORG IMPACT: kernel_module_dirs 18→19. ORGANOGRAMA updated. Pending story creation → @pm.
 
 - [2026-03-02] DECISION: Upgrade Neo to v3 Tiger Archetype + DNA Layer | REASON: v2 lacked authentic identity — enforced Gold Layer on mind clones but had none himself. DNA layer separates concerns correctly: operational structure in NEO.md (lean, 681 lines), deep personality in .neo/dna/ (5 files, 888 lines total). Same pattern used by MMOS minds. | ORG IMPACT: .neo/dna/ created as new sub-layer. Context Loading expanded from 5 → 10 files. Bridge file updated. Story 9.1 completed. Commit 8a6cf1b.
@@ -46,6 +48,14 @@ DELEGATIONS:  [YYYY-MM-DD] TASK: ___ | DELEGATED_TO: ___ | STATUS: pending|compl
 ---
 
 ## New Members Approved
+
+- [2026-03-08] TYPE: agent | NAME: ralph | ROLE: Autonomous Loop Orchestrator | DEPT: ralph (Level 5 Operations) | APPROVED_BY: neo
+  - Squad: squads/ralph/ — 3rd department in the organization
+  - P1 ✅ @qa validates (14.5 + 14.7 owned by Quinn)
+  - P2 ⚠️ tasks pending creation (Stories 14.1-14.4) — acceptable WARN, not BLOCK
+  - P3 ✅ unique function: external bash loop + fresh session per story + state via files
+  - gitEnabled=false default — human controls push (P4 ✅)
+  - Delegation: AIOS:agents:dev/architect/qa/ux-design-expert + mmos-squad:mind-mapper
 
 - [2026-02-23] TYPE: mind | NAME: cagan_patton | ROLE: Product & Design consultant (combo_strategic) | DEPT: council | APPROVED_BY: human
   - Pipeline: 97.8% fidelity (4 cenários, EXCEEDS TARGET). Layer 8 Gold Layer validated. L6-L8 checkpoint approved 2026-02-23.
@@ -99,6 +109,8 @@ DELEGATIONS:  [YYYY-MM-DD] TASK: ___ | DELEGATED_TO: ___ | STATUS: pending|compl
 ---
 
 ## Organizational Evolution
+
+- [2026-03-08] CHANGE: 3rd department created — ralph squad | BEFORE: 2 departments (mmos-squad, squad-creator) | AFTER: 3 departments (+ squads/ralph/) | REASON: Epic 14 — Ralph Autonomous Loop Full Implementation. Story 14.6 executed. Constitution Article II complied. Delegation paths corrected from fictional skills → real AIOS agent paths.
 
 - [2026-03-01] CHANGE: book-to-intelligence workflow status updated to OPERATIONAL | BEFORE: positioned (2026-02-28), technically uncommitted | AFTER: Python package committed (30 files, commit 983ee3c) — pipeline fully executable. Story 8.2: L3 now produces RAG-ready `chunks/*.md` with YAML frontmatter (P2) + prompt cache for STUFF strategy ~60% cost reduction (P4). QA approved (29/29 tests). @devops pushed to main. | ORG IMPACT: ORGANOGRAMA.md workflow entry updated to OPERATIONAL. First cross-departmental workflow to reach production status.
 

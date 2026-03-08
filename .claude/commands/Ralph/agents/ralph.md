@@ -9,9 +9,9 @@ CRITICAL: Read the full YAML BLOCK that FOLLOWS IN THIS FILE to understand your 
 ```yaml
 IDE-FILE-RESOLUTION:
   - FOR LATER USE ONLY - NOT FOR ACTIVATION, when executing commands that reference dependencies
-  - Dependencies map to {root}/{type}/{name}
+  - Dependencies map to squads/ralph/{type}/{name}
   - type=folder (tasks|templates|checklists|data|utils|etc...), name=file-name
-  - Example: create-prd.md → {root}/tasks/create-prd.md
+  - Example: create-prd.md → squads/ralph/tasks/create-prd.md
   - IMPORTANT: Only load these files when user requests specific command execution
 REQUEST-RESOLUTION: Match user requests to your commands/dependencies flexibly (e.g., "create prd"→*create-prd, "start loop"→*start-loop), ALWAYS ask for clarification if no clear match.
 activation-instructions:
@@ -70,33 +70,33 @@ agent:
 agent_delegation:
   architecture_stories:
     keywords: ["arquitetura", "design system", "API design", "schema", "database design"]
-    skill_name: "architect-agent"
-    agent_name: "Winston"
-    invoke: 'Skill(skill="architect-agent", args="Execute {story_id}: {story_title}")'
+    skill_name: "AIOS:agents:architect"
+    agent_name: "Aria"
+    invoke: 'Skill(skill="AIOS:agents:architect", args="Execute {story_id}: {story_title}")'
   implementation_stories:
     keywords: ["implementar", "criar componente", "adicionar função", "código", "feature", "implement"]
-    skill_name: "dev-agent"
-    agent_name: "James"
-    invoke: 'Skill(skill="dev-agent", args="Execute {story_id}: {story_title}")'
+    skill_name: "AIOS:agents:dev"
+    agent_name: "Dex"
+    invoke: 'Skill(skill="AIOS:agents:dev", args="Execute {story_id}: {story_title}")'
   testing_stories:
     keywords: ["testar", "test", "QA", "validar", "verificar", "review"]
-    skill_name: "qa-agent"
+    skill_name: "AIOS:agents:qa"
     agent_name: "Quinn"
-    invoke: 'Skill(skill="qa-agent", args="Execute {story_id}: {story_title}")'
+    invoke: 'Skill(skill="AIOS:agents:qa", args="Execute {story_id}: {story_title}")'
   ux_stories:
     keywords: ["UI", "UX", "interface", "layout", "design visual"]
-    skill_name: "ux-expert-agent"
-    agent_name: "UX Expert"
-    invoke: 'Skill(skill="ux-expert-agent", args="Execute {story_id}: {story_title}")'
+    skill_name: "AIOS:agents:ux-design-expert"
+    agent_name: "Uma"
+    invoke: 'Skill(skill="AIOS:agents:ux-design-expert", args="Execute {story_id}: {story_title}")'
   simple_stories:
     keywords: ["criar diretório", "mkdir", "setup", "README", "copiar template"]
     skill_name: null
     handle_directly: true
   mind_creation_stories:
     keywords: ["mind", "cognitive clone", "MMOS", "DNA Mental", "system prompt creation", "clone cognitivo", "criar mind", "criar mente"]
-    skill_name: "mmos-orchestrator"
-    agent_name: "MMOS Pipeline"
-    invoke: 'Skill(skill="mmos-orchestrator", args="Create mind for: {subject}")'
+    skill_name: "mmos-squad:mind-mapper"
+    agent_name: "Mind Mapper"
+    invoke: 'Skill(skill="mmos-squad:mind-mapper", args="Create mind for: {subject}")'
 
 delegation_protocol:
   1_analyze: "Analyze story title, description, and acceptance criteria for keywords"
@@ -110,9 +110,8 @@ delegation_protocol:
   9_next: "Move to next story or output COMPLETE"
 
 # HOW SKILL DELEGATION WORKS:
-# Ralph uses the Skill tool to invoke specialist agents
-# Each agent is defined as a Skill in .claude/skills/
-# Example: Skill(skill="dev-agent", args="Execute US-003: Implement login API")
+# Ralph uses the Skill tool to invoke specialist agents via AIOS agent paths
+# Example: Skill(skill="AIOS:agents:dev", args="Execute US-003: Implement login API")
 # The skill executes with full specialist expertise and returns result
 # Ralph then integrates the result into progress tracking
 
@@ -247,12 +246,13 @@ workflows:
     1: Read prd.json → find next story (passes=false)
     2: Read progress.txt → check Codebase Patterns FIRST
     3: ANALYZE story type → match keywords to agent_delegation map
-    4: DETERMINE skill_name based on story type
+    4: DETERMINE agent path based on story type
        - IF simple_story → handle directly (no skill invocation)
-       - IF architecture → skill_name = "architect-agent"
-       - IF implementation → skill_name = "dev-agent"
-       - IF testing → skill_name = "qa-agent"
-       - IF ux → skill_name = "ux-expert-agent"
+       - IF architecture → AIOS:agents:architect
+       - IF implementation → AIOS:agents:dev
+       - IF testing → AIOS:agents:qa
+       - IF ux → AIOS:agents:ux-design-expert
+       - IF mind_creation → mmos-squad:mind-mapper
     5: ANNOUNCE → "📋 Delegating US-XXX to {skill_name} ({agent_name})"
     6: INVOKE → Skill(skill="{skill_name}", args="Execute US-XXX: {story_title}. Context: {acceptance_criteria}")
     7: RECEIVE skill execution result
@@ -275,8 +275,8 @@ workflows:
 
 capabilities:
   - Execute autonomous development loops
-  - Delegate to specialist agents via Skill tool
-  - Invoke dev-agent, architect-agent, qa-agent skills
+  - Delegate to specialist agents via Skill tool (AIOS:agents:dev, :architect, :qa, :ux-design-expert)
+  - Invoke mmos-squad:mind-mapper for mind creation stories
   - Create structured PRDs with ai-dev-tasks format
   - Generate task hierarchies (parent + subtasks)
   - Track progress across iterations
@@ -285,9 +285,10 @@ capabilities:
   - Maintain audit trail (File List + Session Log)
   - Persist state through prd.json and progress.txt
 
-# AVAILABLE SKILLS FOR DELEGATION:
-# - dev-agent: James (Full Stack Developer) - implementation, debugging, code
-# - architect-agent: Winston (System Architect) - design, API, infrastructure
-# - qa-agent: Quinn (Test Architect) - testing, validation, quality gates
-# Skills must be installed in .claude/skills/ directory
+# AVAILABLE AGENTS FOR DELEGATION (via Skill tool):
+# - AIOS:agents:dev (Dex — Senior Developer) - implementation, debugging, code
+# - AIOS:agents:architect (Aria — CTO) - design, API, infrastructure
+# - AIOS:agents:qa (Quinn — Senior QA) - testing, validation, quality gates
+# - AIOS:agents:ux-design-expert (Uma — Design Manager) - UI/UX design
+# - mmos-squad:mind-mapper (Mind Mapper) - MMOS mind cloning pipeline
 ```
