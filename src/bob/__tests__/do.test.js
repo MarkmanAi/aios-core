@@ -158,6 +158,23 @@ describe('T2.6 — dry-run', () => {
       expect.stringContaining('EXISTING_WITH_DOCS')
     );
   });
+
+  it('stops spinner in dry-run path', async () => {
+    await runBobDo('do something', { dryRun: true });
+
+    expect(mockSpinner.stop).toHaveBeenCalled();
+  });
+
+  it('calls spinner.fail and exits 1 when detectProjectState throws', async () => {
+    mockDetectProjectState.mockImplementation(() => {
+      throw new Error('bad root');
+    });
+
+    await expect(runBobDo('do something', { dryRun: true })).rejects.toThrow('process.exit called');
+
+    expect(mockSpinner.fail).toHaveBeenCalledWith(expect.stringContaining('bad root'));
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
 });
 
 // ─── T2.7: missing request ────────────────────────────────────────────────

@@ -46,16 +46,21 @@ async function runBobDo(userInput, options) {
 
   // AC-6: Dry-run — use detectProjectState, never call orchestrate()
   if (options.dryRun) {
-    const orchestrator = new BobOrchestrator(process.cwd());
-    const state = orchestrator.detectProjectState();
-    const actionMap = {
-      NO_CONFIG: 'run aios onboarding',
-      EXISTING_NO_DOCS: 'run brownfield discovery (4-8h)',
-      EXISTING_WITH_DOCS: 'ask for your objective (feature/bug/refactor/debt)',
-      GREENFIELD: 'bootstrap new project (4 phases)',
-    };
-    spinner.stop();
-    console.log(`[DRY-RUN] Bob would handle: ${state} — next: ${actionMap[state] || state}`);
+    try {
+      const orchestrator = new BobOrchestrator(process.cwd());
+      const state = orchestrator.detectProjectState();
+      const actionMap = {
+        NO_CONFIG: 'run aios onboarding',
+        EXISTING_NO_DOCS: 'run brownfield discovery (4-8h)',
+        EXISTING_WITH_DOCS: 'ask for your objective (feature/bug/refactor/debt)',
+        GREENFIELD: 'bootstrap new project (4 phases)',
+      };
+      spinner.stop();
+      console.log(`[DRY-RUN] Bob would handle: ${state} — next: ${actionMap[state] || state}`);
+    } catch (err) {
+      spinner.fail(`Bob dry-run error: ${err.message}`);
+      process.exit(1);
+    }
     return;
   }
 
