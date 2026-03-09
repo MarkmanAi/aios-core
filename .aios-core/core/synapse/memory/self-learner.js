@@ -88,6 +88,7 @@ class SelfLearner {
     this._stats = {
       corrections_found: 0,
       heuristics_extracted: 0,
+      heuristics_persisted: 0,
       promotions: 0,
       demotions: 0,
       gotchas_created: 0,
@@ -134,6 +135,7 @@ class SelfLearner {
     this._stats = {
       corrections_found: 0,
       heuristics_extracted: 0,
+      heuristics_persisted: 0,
       promotions: 0,
       demotions: 0,
       gotchas_created: 0,
@@ -201,6 +203,10 @@ class SelfLearner {
         const memoryCounts = await this._persistToMemoryStore(evidence, { dryRun });
         this._stats.memories_written_session = memoryCounts.session;
         this._stats.memories_written_daily = memoryCounts.daily;
+
+        // Story 16.3: Persist heuristic candidates to durable store
+        const heuristicResult = await this._persistHeuristics(heuristics, { dryRun });
+        this._stats.heuristics_persisted = heuristicResult.persisted;
       }
 
       const duration = performance.now() - startTime;
@@ -1324,6 +1330,64 @@ class SelfLearner {
     }
 
     return counts;
+  }
+
+  /**
+   * Persist qualifying heuristic candidates to the durable heuristics store via MemoryWriter.
+   *
+   * Called from run() after _extractHeuristics(). Only candidates already filtered by
+   * _extractHeuristics() (confidence > 0.9, evidence_count >= 5) are passed in — no
+   * threshold re-check here (AC-3).
+   *
+   * Deduplication is fully delegated to MemoryWriter._findDuplicate() — no own dedup (AC-4).
+   *
+   * @param {Object[]} heuristics - Heuristic candidates from _extractHeuristics()
+   * @param {Object} [options] - Options
+   * @param {boolean} [options.dryRun=false] - If true, skip all writes (AC-5)
+   * @returns {Promise<{persisted: number}>} Count of successfully written files
+   * @private
+   */
+  async _persistHeuristics(heuristics, options = {}) {
+    const { dryRun = false } = options;
+
+    // AC-5: dryRun guard — writeHeuristic must never be called when dryRun=true
+    if (dryRun) {
+      return { persisted: 0 };
+    }
+
+    if (heuristics.length === 0) {
+      return { persisted: 0 };
+    }
+
+    // AC-6: Lazy require — consistent with _persistToMemoryStore() pattern from Story 16.2
+    let MemoryWriter;
+    try {
+      MemoryWriter = require('./memory-writer').MemoryWriter;
+    } catch (err) {
+      console.warn('[SelfLearner] MemoryWriter not available for heuristic persistence:', err.message);
+      return { persisted: 0 };
+    }
+    const writer = new MemoryWriter(this.projectDir);
+
+    let persisted = 0;
+
+    for (const heuristic of heuristics) {
+      try {
+        // AC-2: Pass full heuristic object — writeHeuristic() handles field mapping internally
+        // AC-4: Deduplication delegated to MemoryWriter._findDuplicate() — no own dedup here
+        const result = await writer.writeHeuristic('shared', heuristic);
+        if (result.filePath === null) {
+          console.warn(`[SelfLearner] Failed to persist heuristic ${heuristic.id}`);
+        } else {
+          persisted++;
+        }
+      } catch (err) {
+        // AC-6: Per-entry error isolation — failure of one does not abort remaining
+        console.warn(`[SelfLearner] Failed to persist heuristic ${heuristic.id}:`, err.message);
+      }
+    }
+
+    return { persisted };
   }
 }
 
