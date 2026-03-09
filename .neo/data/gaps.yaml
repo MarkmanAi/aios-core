@@ -400,52 +400,161 @@ gaps:
 # SUMMARY — Updated by Neo on every *health run
 # ------------------------------------------------------------
 summary:
-  total_gaps: 22
-  open: 7
+  total_gaps: 27
+  open: 12
   in_progress: 1
   resolved: 14
   wont_fix: 0
-  last_updated: "2026-02-24"
+  last_updated: "2026-03-09"
 
   by_priority:
-    # OPEN gaps only (2026-02-24 after kent_beck resolved):
-    critical: 0    # all resolved
-    high: 1        # GAP-MIND-006 (mitchell_hashimoto — fabricated, P3+P7 risk)
-    medium: 2      # GAP-MIND-008,009 (don_norman, guillermo_rauch — source gaps)
-    low: 4         # GAP-INFRA-005,006 | GAP-DOC-002,003
+    # OPEN gaps only (2026-03-09 health check):
+    critical: 0
+    high: 2        # MIND-006 (mitchell_hashimoto) + ORG-002 (design dept) — ORG-003 resolved 2026-03-09
+    medium: 4      # MIND-008 (don_norman) + MIND-009 (guillermo_rauch) + INFRA-007 (synapse hook) + MIND-012 (napoleon_hill)
+    low: 5         # INFRA-005,006 | DOC-002,003 | MIND-013 (adriano_de_marqui record)
 
   by_type:
-    meta_layer_missing: 0   # resolved
+    meta_layer_missing: 0
     missing_component: 2    # INFRA-005,006
-    doc_inconsistency: 2    # DOC-002,003
-    undocumented_agent: 0   # resolved
-    mind_incomplete: 4      # MIND-006 (high) + MIND-008,009 (medium) + MIND-005 resolved
+    doc_inconsistency: 4    # DOC-002,003 + INFRA-007 + MIND-013
+    undocumented_agent: 1   # ORG-003 (synapse agent)
+    mind_incomplete: 3      # MIND-006 (high) + MIND-008,009 (medium)
+    mind_unconfirmed: 2     # MIND-012 (napoleon_hill) + MIND-013 (adriano_de_marqui)
     principle_at_risk: 0
-    squad_incomplete: 0
+    squad_incomplete: 1     # ORG-002 (design dept)
 
-  resolved_this_check:
-    - GAP-INFRA-001  # .neo/ meta-layer deployed
-    - GAP-INFRA-002  # CLAUDE.md Matrix Vision added
-    - GAP-INFRA-003  # docs/architecture/matrix-vision.md created
-    - GAP-INFRA-004  # .claude/commands/neo/ created
-    - GAP-DOC-001    # Agent count corrected
-    - GAP-DOC-004    # inventory.yaml: agents_claude_code=25, total=50
-    - GAP-ORG-001    # squad-architect confirmed in ORGANOGRAMA.md Level 4B
-    - GAP-MIND-004   # marty_cagan — PRODUCTION APPROVED (pipeline complete since 2025-10-30)
-    - GAP-MIND-010   # jeff_patton — PRODUCTION APPROVED 2026-02-23 (94.25% fidelity)
-    - GAP-MIND-003   # thiago_finch — PRODUCTION APPROVED (fidelity 9.0, enriched 2026-02-23)
-    - GAP-MIND-001   # brad_frost — PRODUCTION (system-prompt Generalista v1.0 confirmed 2026-02-23)
-    - GAP-MIND-002   # joao_lozano — PRODUCTION APPROVED 2026-02-23 (9.0/10)
-    - GAP-MIND-011   # pedro_valerio — PRODUCTION APPROVED 2026-02-23 (9.0/10, L2+L6=10/10)
-    - GAP-MIND-007   # cagan_patton — PRODUCTION APPROVED 2026-02-23 (97.8% fidelity, L6-L8 human checkpoint approved)
+  resolved_this_check: []   # No gaps resolved in 2026-03-09 check
+
+  new_this_check:
+    - GAP-ORG-002    # squads/design/ — 4th department not positioned
+    - GAP-ORG-003    # synapse.md — core agent not in ORGANOGRAMA as agent
+    - GAP-INFRA-007  # synapse-precompact.js hook not in inventory
+    - GAP-MIND-012   # napoleon_hill — pipeline files complete, L6-L8 checkpoint uncertified
+    - GAP-MIND-013   # adriano_de_marqui — PIPELINE-COMPLETE predates Neo, ORGANOGRAMA not updated
 
   # Formula: 100 - (critical*10) - (high*5) - (medium*2) - (low*1)
-  # Open: MIND-006 (high=1) + MIND-008,009 (medium=2) + INFRA-005,006,DOC-002,003 (low=4)
-  # = 100 - (1*5) - (2*2) - (4*1) = 100 - 5 - 4 - 4 = 87
-  compliance_score: 87
-  compliance_score_note: "87/100 — up from 82. kent_beck PRODUCTION APPROVED (93% fidelity, 5 primary sources, L6-L8 checkpoint 2026-02-24). 8 minds now production. Remaining high: mitchell_hashimoto (fabricated clone, P3+P7). Remaining medium: don_norman + guillermo_rauch (source collection needed)."
+  # Open: 2 high + 4 medium + 5 low
+  # = 100 - (2*5) - (4*2) - (5*1) = 100 - 10 - 8 - 5 = 77
+  compliance_score: 77
+  compliance_score_note: "77/100 — GAP-ORG-003 (synapse agent) resolved 2026-03-09. Syn positioned at Level 5 Operations. agents_core 12→13, total 51→52. Open: ORG-002 (design dept, alta), MIND-006 (mitchell, alta), INFRA-007+MIND-012 (media), INFRA-005,006+DOC-002,003+MIND-013 (baixa)."
+
+  # === NEW: Found in 2026-03-09 health check ===
+
+  - id: GAP-ORG-002
+    type: squad_incomplete
+    component: "squads/design/ (Design System Squad)"
+    path: "squads/design/"
+    description: |
+      Design System Squad (squads/design/) exists as 4th department with 8 agents,
+      90+ tasks, 9 workflows, checklists, templates, data. Created 2026-02-02,
+      last updated 2026-02-25. Squad agents ARE positioned in ORGANOGRAMA at Level 6,
+      but the DEPARTMENT itself was never approved by Neo as a squad.
+      Not in ORGANOGRAMA DEPARTMENTS section. Not in inventory.yaml departments.
+      inventory shows departments: 3 (reality is 4).
+    priority: high
+    recommended_action: |
+      1. Formally position squads/design/ as 4th department in ORGANOGRAMA
+      2. Update ORGANOGRAMA DEPARTMENTS section (add design row)
+      3. Update inventory.yaml: squads: 3→4 + add name: design
+      4. Register in MEMORY.md as approved department
+      CONDITION: agents already positioned at Level 6 — this is formalization, not new creation
+    principle_risk: "P3-org-position (department level, not agent level)"
+    identified_by: neo
+    identified_on: "2026-03-09"
+    resolved_on: null
+    status: open
+
+  - id: GAP-ORG-003
+    type: undocumented_agent
+    component: "synapse (agent Syn)"
+    path: ".aios-core/development/agents/synapse.md"
+    description: |
+      synapse.md exists as a full agent definition (agent id: synapse, name: Syn,
+      title: "SYNAPSE System Agent") at .aios-core/development/agents/.
+      Synapse was previously positioned as kernel MODULE (.aios-core/core/synapse/).
+      The agent was created without Neo positioning in ORGANOGRAMA as an agent.
+      inventory.yaml shows agents_core: 12 (reality: 13).
+    priority: high
+    recommended_action: "RESOLVED — see note below"
+    principle_risk: "P3-org-position (agent not in ORGANOGRAMA)"
+    identified_by: neo
+    identified_on: "2026-03-09"
+    resolved_on: "2026-03-09"
+    status: resolved
+    note: |
+      Positioned 2026-03-09 by Neo. Level 5 — Operations. Role: SYNAPSE Pipeline Operator.
+      P1: @devops validates (kernel owner). P2: read-only veto embedded in core_principles.
+      P3: unique function (no other agent operates SYNAPSE pipeline). All 7 checks passed.
+      ORGANOGRAMA, inventory.yaml, MEMORY.md updated. agents_core: 12→13, total_agents: 51→52.
+
+  - id: GAP-INFRA-007
+    type: doc_inconsistency
+    component: "synapse-precompact.js hook"
+    path: ".claude/hooks/synapse-precompact.js"
+    description: |
+      New governance hook synapse-precompact.js found in .claude/hooks/.
+      inventory.yaml records hooks: 9 (reality: 10 functional files excl. README).
+      Hook appears to be part of the Synapse context injection system.
+    priority: medium
+    recommended_action: "Update inventory.yaml: hooks: 9→10. Document in ORGANOGRAMA governance policies section."
+    identified_by: neo
+    identified_on: "2026-03-09"
+    resolved_on: null
+    status: open
+
+  - id: GAP-MIND-012
+    type: mind_incomplete
+    component: "napoleon_hill"
+    path: "squads/mmos-squad/minds/napoleon_hill/"
+    description: |
+      Full MMOS pipeline artifacts found: all 8 layers (layer-1 through layer-8),
+      PRODUCTION_RECOMMENDATION.md, validation_report.yaml, test_cases.yaml,
+      compilation_summary.md, operational_manual.md, sources, KB.
+      APEX 74% (Human Review threshold — not auto-approve).
+      L6-L8 human checkpoint status not logged in Neo MEMORY.
+      ORGANOGRAMA shows pipeline_status: "—" (unknown).
+    priority: medium
+    pipeline_state: "pipeline_files_complete — awaiting human checkpoint confirmation"
+    recommended_action: |
+      1. Human reads PRODUCTION_RECOMMENDATION.md and validation_report.yaml
+      2. Human confirms L6-L8 checkpoint (values, obsessions, contradictions)
+      3. If approved: update ORGANOGRAMA pipeline_status to PRODUCTION, log in MEMORY
+      4. Note APEX is 74% (HUMAN REVIEW threshold) — human must explicitly approve given
+         controversial biography (disputed Carnegie meeting, fraud allegations)
+    principle_risk: "P4-L6L8-checkpoint (not confirmed in Neo records)"
+    identified_by: neo
+    identified_on: "2026-03-09"
+    resolved_on: null
+    status: open
+
+  - id: GAP-MIND-013
+    type: doc_inconsistency
+    component: "adriano_de_marqui"
+    path: "squads/mmos-squad/minds/adriano_de_marqui/"
+    description: |
+      PIPELINE-COMPLETE.md exists. All 8 artifact layers present (including
+      layer8_productive_paradoxes.yaml). system_prompts/system-prompt-generalista-v1.0.md.
+      KB with chunks. AUDIT-REPORT-2026-01-14.md (predates Neo creation 2026-02-21).
+      Pipeline appears production-complete based on file structure.
+      ORGANOGRAMA shows pipeline_status: "—" — needs update to PRODUCTION.
+    priority: low
+    pipeline_state: "PRODUCTION (unconfirmed by Neo — predates Neo creation)"
+    recommended_action: |
+      1. Read AUDIT-REPORT-2026-01-14.md to confirm L6-L8 compliance
+      2. Update ORGANOGRAMA pipeline_status to ✅ PRODUCTION
+      3. Log in MEMORY.md as approved member
+      LOW URGENCY — mind appears fully operational, records need updating
+    identified_by: neo
+    identified_on: "2026-03-09"
+    resolved_on: null
+    status: open
+
+  # === END new gaps 2026-03-09 ===
 
   highest_roi_action: "Resolve mitchell_hashimoto (GAP-MIND-006) — fabricated system prompt violates P3+P7. Must restart from sources."
   quick_wins:
+    - "GAP-ORG-002: Position squads/design/ as 4th department — agents already on board, formalization only"
+    - "GAP-MIND-013: adriano_de_marqui — read AUDIT-REPORT-2026-01-14.md, update ORGANOGRAMA to PRODUCTION"
     - "GAP-MIND-008: don_norman — collect 2 more sources (has 1), then run pipeline"
     - "GAP-MIND-009: guillermo_rauch — collect 2 more sources (has 1), then pipeline"

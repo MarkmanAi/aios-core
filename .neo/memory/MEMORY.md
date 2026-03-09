@@ -23,6 +23,8 @@ DELEGATIONS:  [YYYY-MM-DD] TASK: ___ | DELEGATED_TO: ___ | STATUS: pending|compl
 
 ## Decisions
 
+- [2026-03-09] DECISION: Position synapse agent (Syn) at Level 5 — Operations | REASON: synapse.md exists as full agent (SYNAPSE Pipeline Operator) since 2026-03-04 but had no ORGANOGRAMA entry. Read .aios-core/development/agents/synapse.md — confirmed unique function: read-only operator for SYNAPSE context injection pipeline. P1 ✅ (@devops validates), P2 ✅ (no-modify veto in core_principles), P3 ✅ (unique: no agent operates SYNAPSE). | ORG IMPACT: agents_core 12→13, total_agents 51→52. GAP-ORG-003 resolved. Compliance 72→77.
+
 - [2026-03-08] DECISION: Position Ralph (Autonomous Loop Orchestrator) in org chart — Level 5 Operations, 3rd department (squads/ralph/) | REASON: Epic 14 requires org chart positioning FIRST per Constitution Article II. Ralph is unique — no existing agent runs autonomous bash loops with fresh Claude sessions per story. P1 ✅ P2 ⚠️ (tasks pending) P3 ✅ | ORG IMPACT: departments 2→3. inventory.yaml updated. ORGANOGRAMA.md updated. v1 skill deprecated to redirect. v2 delegation paths corrected (fictional skill names → real AIOS agents). Story 14.6 complete.
 
 - [2026-03-02] DECISION: Position SYNAPSE as 19th kernel module | REASON: Context injection gap is real and grows with org size. No existing module manages selective rule injection. P1✅ P2✅ P3✅ P4✅. Owner: @devops. Design validator: @architect. Scope B (data + engine + hook). Path: .aios-core/core/synapse/ | ORG IMPACT: kernel_module_dirs 18→19. ORGANOGRAMA updated. Pending story creation → @pm.
@@ -48,6 +50,15 @@ DELEGATIONS:  [YYYY-MM-DD] TASK: ___ | DELEGATED_TO: ___ | STATUS: pending|compl
 ---
 
 ## New Members Approved
+
+- [2026-03-09] TYPE: agent | NAME: synapse (Syn) | ROLE: SYNAPSE Pipeline Operator | DEPT: Level 5 Operations | APPROVED_BY: neo
+  - Path: .aios-core/development/agents/synapse.md
+  - Reports to: @devops (SYNAPSE kernel owner)
+  - Validator: @devops (P1 ✅)
+  - Function: diagnoses, monitors, reports on SYNAPSE context injection pipeline — read-only by design
+  - P2: core_principles "Never modify pipeline files directly" = veto condition ✅
+  - P3: unique — no other agent operates the SYNAPSE pipeline ✅
+  - Created 2026-03-04, positioned retroactively 2026-03-09 (GAP-ORG-003 resolved)
 
 - [2026-03-08] TYPE: agent | NAME: ralph | ROLE: Autonomous Loop Orchestrator | DEPT: ralph (Level 5 Operations) | APPROVED_BY: neo
   - Squad: squads/ralph/ — 3rd department in the organization
@@ -131,6 +142,8 @@ DELEGATIONS:  [YYYY-MM-DD] TASK: ___ | DELEGATED_TO: ___ | STATUS: pending|compl
 ---
 
 ## Audits
+
+- [2026-03-09] COMPONENT: Full organization | TYPE: health_check | STATUS: warn | FINDINGS: 5 new gaps. Compliance 72/100 (↓ from 87). New: GAP-ORG-002 squads/design/ unpositioned dept (4th dept, 8 agents, 90+ tasks, alta); GAP-ORG-003 synapse.md agent not in ORGANOGRAMA (alta); GAP-INFRA-007 synapse-precompact.js hook (media); GAP-MIND-012 napoleon_hill pipeline files complete but L6-L8 uncertified (media); GAP-MIND-013 adriano_de_marqui PIPELINE-COMPLETE predates Neo (baixa). Positive: ralph structure in place, 8 production minds confirmed, adriano_de_marqui+napoleon_hill likely 9th+10th production. 2/5 principle sample fully compliant.
 
 - [2026-02-21] COMPONENT: Full organization (baseline) | TYPE: health_check | STATUS: warn | FINDINGS: 21 gaps identified. Compliance 27/100. Critical: .neo/ meta-layer missing. Council: 11/27 minds with incomplete pipeline. See gaps.yaml.
 

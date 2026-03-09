@@ -14,7 +14,7 @@ meta:
   total_files: 6315          # find . -type f | wc -l (REPO_PATH_MAP_v2 — 2026-02-22)
   constitution: .neo/CONSTITUICAO_MATRIX.md
   organograma: .neo/ORGANOGRAMA.md
-  last_updated: "2026-03-08"
+  last_updated: "2026-03-09"
   updated_by: neo
 
 # ------------------------------------------------------------
@@ -22,10 +22,11 @@ meta:
 # ------------------------------------------------------------
 headcount:
 
-  agents_core: 12
+  agents_core: 13
   # Path: .aios-core/development/agents/
   # aios-master, analyst, architect, data-engineer, dev,
-  # devops, pm, po, qa, sm, squad-creator, ux-design-expert
+  # devops, pm, po, qa, sm, squad-creator, ux-design-expert,
+  # synapse (Syn — SYNAPSE Pipeline Operator, positioned 2026-03-09)
 
   agents_claude_code: 25
   # Path: .claude/agents/
@@ -46,20 +47,17 @@ headcount:
   # Path: squads/squad-creator/agents/
   # oalanicolas, sop-extractor, squad-architect, thiago_finch
 
-  total_agents: 51
+  total_agents: 52
   # NOTE: Neo is NOT counted here — he exists OUTSIDE the org hierarchy.
   # However, his bridge file (.claude/agents/neo.md) IS counted in the
   # claude_code agent tally above (slot 25).
-  # 12 core + 25 claude_code + 10 mmos + 4 squad_creator = 51
+  # 13 core + 25 claude_code + 10 mmos + 4 squad_creator = 52
   #
   # AUDIT NOTE: The 3 squad_creator agents (oalanicolas,
   # sop-extractor, squad-architect) overlap in function with
   # the 2 homonym Claude Code agents (oalanicolas, sop-extractor).
   # They live in different paths and serve different scopes.
-  # Total unique agents across all paths: 49.
-  # Previously documented as 46 (squad_creator agents not counted).
-  # This file reflects the real repo count: 49.
-  total_agents_note: "51 real agents across all paths (12+25+10+4). thiago_finch added to squad-creator 2026-02-23. neo.md bridge counted in claude_code tally. Legacy docs cited 46 — squad-creator agents were undercounted."
+  total_agents_note: "52 real agents across all paths (13+25+10+4). synapse (Syn) positioned 2026-03-09 at Level 5 Operations — SYNAPSE Pipeline Operator. thiago_finch added to squad-creator 2026-02-23. neo.md bridge counted in claude_code tally."
 
   minds_cloned: 27
   # Path: squads/mmos-squad/minds/ (directories only, excl. .yaml/.md files)

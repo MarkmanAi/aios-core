@@ -90,12 +90,13 @@
 
 ## LEVEL 5 — OPERATIONS
 
-| Agent | Role | Path | Size |
-|-------|------|------|------|
+| Agent | Role | Path | Notes |
+|-------|------|------|-------|
 | **dev** (Dex) | Senior Developer | `.aios-core/development/agents/dev.md` | **22,912B** (largest agent) |
 | **qa** (Quinn) | Senior QA | `.aios-core/development/agents/qa.md` | 16,141B |
 | **squad-creator** (Craft) | Squad Builder | `.aios-core/development/agents/squad-creator.md` | 12,076B — 19 commands |
-| **ralph** | Autonomous Loop Orchestrator | `squads/ralph/` (v2: `.claude/commands/Ralph/agents/ralph.md`) | 🔄 — delegates to @dev, @architect, @qa, @ux-design-expert |
+| **ralph** | Autonomous Loop Orchestrator | `squads/ralph/` (bridge: `.claude/commands/Ralph/agents/ralph.md`) | 🔄 — delegates to @dev, @architect, @qa, @ux-design-expert |
+| **synapse** (Syn) | SYNAPSE Pipeline Operator | `.aios-core/development/agents/synapse.md` | 🧠 — read-only operator: diagnoses, monitors, reports. Reports to: @devops |
 
 ---
 
@@ -107,8 +108,14 @@
 | **cyber-chief** | Cybersecurity | `.claude/agents/cyber-chief.md` |
 | **data-chief** | Data & Analytics | `.claude/agents/data-chief.md` |
 | **db-sage** | Database | `.claude/agents/db-sage.md` |
-| **design-chief** | Visual Design | `.claude/agents/design-chief.md` |
-| **design-system** | Design System | `.claude/agents/design-system.md` |
+| **design-chief** | Visual Design Orchestrator | `.claude/agents/design-chief.md` → persona: `.claude/commands/Design/agents/design-chief.md` |
+| **design-system** (brad-frost) | Design System Architect — Atomic Design, tokens, components | `.claude/agents/design-system.md` → persona: `.claude/commands/Design/agents/brad-frost.md` |
+| **dave-malouf** | DesignOps Specialist — processes, scaling, maturity | `.claude/commands/Design/agents/dave-malouf.md` (via design-chief) |
+| **dan-mall** | DS Adoption Specialist — stakeholder buy-in | `.claude/commands/Design/agents/dan-mall.md` (via design-chief) |
+| **ds-token-architect** (Atlas) | Token Architecture — DTCG, Figma variables, normalization | `.claude/commands/Design/agents/ds-token-architect.md` (via design-chief) |
+| **ds-foundations-lead** | Foundations Pipeline — F1/F2/F3 (Figma → shadcn → components) | `.claude/commands/Design/agents/ds-foundations-lead.md` (via design-chief) |
+| **storybook-expert** | Storybook / CSF3 / Visual Regression / Brownfield migration | `.claude/commands/Design/agents/storybook-expert.md` (via design-chief) |
+| **nano-banana-generator** | Visual Utility — AI image generation via Gemini/OpenRouter | `.claude/commands/Design/agents/nano-banana-generator.md` (via design-chief) |
 | **legal-chief** | Legal | `.claude/agents/legal-chief.md` |
 | **story-chief** | Stories & Narratives | `.claude/agents/story-chief.md` |
 | **tools-orchestrator** | Tools & Integrations | `.claude/agents/tools-orchestrator.md` |
@@ -260,14 +267,15 @@
 
 | Category | Count |
 |----------|-------|
-| Core Agents | 12 |
+| Core Agents | 13 |
 | Claude Code Agents | 25 |
 | MMOS Agents | 10 |
 | Squad-Creator Agents | 4 |
-| **Total Agents** | **51** |
+| **Total Agents** | **52** |
 | Cloned Minds | 27 |
 | Departments | 3 (mmos-squad, squad-creator, ralph) |
 | Workflows | 15 (1 OPERATIONAL: book-to-intelligence) |
 | Kernel Modules | 19 (18 operational + 1 positioned: synapse) |
 
 *Source: `.neo/data/inventory.yaml` — cross-validated with REPO_PATH_MAP_v2*
+*synapse (Syn) added 2026-03-09 — Level 5 Operations, P1-P3 validated by Neo*

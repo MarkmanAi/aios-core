@@ -1,20 +1,20 @@
 status:
   branch: main
   modifiedFiles:
-    - .aios-core/core/execution/subagent-dispatcher.js
-    - .aios-core/core/health-check/checks/services/index.js
-    - bin/aios-init.js
-    - .aios-core/core/execution/parallel-executor.js
-    - .aios-core/core/health-check/checks/services/gemini-cli.js
-  modifiedFilesTotalCount: 15
+    - .aios/project-status.yaml
+    - docs/fertilimap-v2-architecture.md
+    - docs/fertilimap-v2-backlog.md
+    - '"\357\200\252\357\200\252Last"'
+    - '"\357\200\252\357\200\252Source\357\200\252\357\200\252\357\200\272"'
+  modifiedFilesTotalCount: 5
   recentCommits:
-    - 'fix: align PR #63 workflows with AIOS standards'
+    - 'docs(epic-13): close Epic 13 — Bob Full Integration complete'
     - >-
-      feat(workflows): add design-system-build-quality and
-      story-development-cycle (#63)
+      fix(bob-switch): add try/catch fallback in getAgentCount — handles mocked
+      fs in cli.test.js [13.12]
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-02-03T19:10:54.583Z'
+  lastUpdate: '2026-03-08T21:37:20.200Z'
   isGitRepo: true
-timestamp: 1770145854584
+timestamp: 1773005840201
 ttl: 60
