@@ -223,9 +223,10 @@ class UnifiedActivationPipeline {
     try {
       const result = await Promise.race([
         loaderFn(),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error(`${loaderName} timeout (${LOADER_TIMEOUT_MS}ms)`)), LOADER_TIMEOUT_MS),
-        ),
+        new Promise((_, reject) => {
+          const t = setTimeout(() => reject(new Error(`${loaderName} timeout (${LOADER_TIMEOUT_MS}ms)`)), LOADER_TIMEOUT_MS);
+          t.unref();
+        }),
       ]);
       return result;
     } catch (error) {
@@ -359,6 +360,7 @@ class UnifiedActivationPipeline {
           fallback: true,
         });
       }, timeoutMs);
+      timerId.unref();
     });
     return { promise, timerId };
   }

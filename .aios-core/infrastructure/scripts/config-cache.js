@@ -219,12 +219,16 @@ class ConfigCache {
 const globalConfigCache = new ConfigCache();
 
 // Auto cleanup expired entries every minute
-setInterval(() => {
+// .unref() prevents this timer from keeping Node.js / Jest alive after tests finish
+const _cacheCleanupInterval = setInterval(() => {
   const cleared = globalConfigCache.clearExpired();
   if (cleared > 0) {
     console.log(`🗑️ Config cache: Cleared ${cleared} expired entries`);
   }
 }, 60 * 1000);
+if (_cacheCleanupInterval.unref) {
+  _cacheCleanupInterval.unref();
+}
 
 module.exports = {
   ConfigCache,

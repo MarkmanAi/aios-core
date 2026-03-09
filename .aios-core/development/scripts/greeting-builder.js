@@ -70,9 +70,10 @@ class GreetingBuilder {
 
       // Use session-aware logic (Story 6.1.2.5)
       const greetingPromise = this._buildContextualGreeting(agent, context);
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Greeting timeout')), GREETING_TIMEOUT),
-      );
+      const timeoutPromise = new Promise((_, reject) => {
+        const t = setTimeout(() => reject(new Error('Greeting timeout')), GREETING_TIMEOUT);
+        t.unref();
+      });
 
       return await Promise.race([greetingPromise, timeoutPromise]);
     } catch (error) {
@@ -1015,9 +1016,10 @@ class GreetingBuilder {
   async _safeBuildSection(builderFn, timeout = 200) {
     try {
       const resultPromise = Promise.resolve(builderFn());
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Section timeout')), timeout),
-      );
+      const timeoutPromise = new Promise((_, reject) => {
+        const t = setTimeout(() => reject(new Error('Section timeout')), timeout);
+        t.unref();
+      });
       const result = await Promise.race([resultPromise, timeoutPromise]);
       return result ?? null;
     } catch (_error) {
