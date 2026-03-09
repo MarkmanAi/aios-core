@@ -136,7 +136,7 @@ function main() {
   console.log(`  ✓ ${REPORT_JSON}`);
 
   // Generate Markdown report
-  let md = `# Curation Report — Clickmax Design System\n\n`;
+  let md = `# Curation Report — ${BRAND} Design System\n\n`;
   md += `**Generated:** ${report.timestamp}\n`;
   md += `**Source:** ${report.source} (${report.pagesIncluded} pages)\n`;
   md += `**Brand:** ${report.brand}\n\n`;
