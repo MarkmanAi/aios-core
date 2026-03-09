@@ -309,3 +309,6 @@ __pycache__/
 *.pyd
 .pytest_cache/
 *.egg-info/
+
+# Claude local settings (machine-specific)
+.claude/settings.local.json
