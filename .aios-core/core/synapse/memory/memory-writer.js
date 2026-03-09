@@ -567,23 +567,42 @@ class MemoryWriter {
   async _patchMasterIndex(entry) {
     await fs.mkdir(this.indexDir, { recursive: true });
 
-    let index = [];
+    // master.json must be a dict { [id]: entry } — format expected by MemoryIndexManager.search()
+    let index = {};
     try {
       const raw = await fs.readFile(this.masterIndexPath, 'utf8');
       const parsed = JSON.parse(raw);
-      index = Array.isArray(parsed) ? parsed : [];
+      if (Array.isArray(parsed)) {
+        // Migrate legacy array format to dict
+        parsed.forEach((e) => { if (e && e.id) index[e.id] = e; });
+      } else if (parsed && typeof parsed === 'object') {
+        index = parsed;
+      }
     } catch (_) {
       // File doesn't exist or is malformed — start fresh
-      index = [];
     }
 
-    // Remove duplicate entry (idempotent)
-    index = index.filter((e) => e.id !== entry.id);
-    index.push(entry);
+    // Upsert entry (idempotent)
+    index[entry.id] = entry;
 
     await fs.writeFile(this.masterIndexPath, JSON.stringify(index, null, 2), {
       encoding: 'utf8',
     });
+
+    // Patch by-agent/{agent}.json — required for MemoryIndexManager.search() agent filter
+    const byAgentDir = path.join(this.indexDir, 'by-agent');
+    await fs.mkdir(byAgentDir, { recursive: true });
+    const safeAgent = entry.agent.replace(/[^a-z0-9-]/g, '-');
+    const agentFile = path.join(byAgentDir, `${safeAgent}.json`);
+    let agentIds = [];
+    try {
+      agentIds = JSON.parse(await fs.readFile(agentFile, 'utf8'));
+      if (!Array.isArray(agentIds)) agentIds = [];
+    } catch (_) { /* file not found — start with empty array */ }
+    if (!agentIds.includes(entry.id)) {
+      agentIds.push(entry.id);
+      await fs.writeFile(agentFile, JSON.stringify(agentIds, null, 2), { encoding: 'utf8' });
+    }
   }
 
   // ─── Private: Utilities ────────────────────────────────────────────────────

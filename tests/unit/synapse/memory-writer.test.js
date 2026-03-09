@@ -218,8 +218,8 @@ describe('MemoryWriter', () => {
       const raw = await fs.readFile(writer.masterIndexPath, 'utf8');
       const index = JSON.parse(raw);
 
-      const entry = index.find((e) => e.id === result.id);
-      expect(entry).toBeDefined();
+      // master.json is a dict { [id]: entry } for MemoryIndexManager compatibility
+      expect(index[result.id]).toBeDefined();
     });
 
     it('should set filePath in index entry pointing to written file', async () => {
@@ -227,7 +227,7 @@ describe('MemoryWriter', () => {
 
       const raw = await fs.readFile(writer.masterIndexPath, 'utf8');
       const index = JSON.parse(raw);
-      const entry = index.find((e) => e.id === result.id);
+      const entry = index[result.id];
 
       expect(entry.filePath).toBe(result.filePath);
     });
@@ -237,7 +237,7 @@ describe('MemoryWriter', () => {
 
       const raw = await fs.readFile(writer.masterIndexPath, 'utf8');
       const index = JSON.parse(raw);
-      const entry = index.find((e) => e.id === result.id);
+      const entry = index[result.id];
 
       expect(entry.compact_trigger).toBe('memory-writer');
       expect(entry.duration_minutes).toBe(0);
@@ -250,7 +250,7 @@ describe('MemoryWriter', () => {
       const raw = await fs.readFile(writer.masterIndexPath, 'utf8');
       const index = JSON.parse(raw);
 
-      const ids = index.map((e) => e.id);
+      const ids = Object.keys(index);
       expect(ids).toContain(r1.id);
       expect(ids).toContain(r2.id);
     });
