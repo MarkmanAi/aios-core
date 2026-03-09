@@ -1,4 +1,35 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(npm run lint:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm test:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(node -e:*)",
+      "Edit(.neo/**)",
+      "Edit(.aios-core/**)",
+      "Edit(.claude/**)",
+      "Edit(src/**)",
+      "Edit(docs/**)",
+      "Edit(squads/**)",
+      "Edit(packages/**)",
+      "Edit(apps/**)",
+      "Edit(tests/**)",
+      "Edit(bin/**)",
+      "Write(.neo/**)",
+      "Write(.aios-core/**)",
+      "Write(.claude/**)",
+      "Write(src/**)",
+      "Write(docs/**)",
+      "Write(squads/**)",
+      "Write(packages/**)",
+      "Write(apps/**)",
+      "Write(tests/**)",
+      "Write(bin/**)"
+    ]
+  },
   "hooks": {
     "PreCompact": [
       {

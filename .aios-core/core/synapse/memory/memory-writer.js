@@ -313,8 +313,8 @@ class MemoryWriter {
       content.evidence_count != null
         ? content.evidence_count
         : content.evidence
-        ? content.evidence.length
-        : 1;
+          ? content.evidence.length
+          : 1;
 
     return {
       schema_version: '2.0',
@@ -548,7 +548,7 @@ class MemoryWriter {
       const files = await fs.readdir(dir);
       return files
         .filter(
-          (f) => f.includes(safeAgentId) && f.includes(dateStr) && f.endsWith('.yaml')
+          (f) => f.includes(safeAgentId) && f.includes(dateStr) && f.endsWith('.yaml'),
         )
         .map((f) => path.join(dir, f));
     } catch (_) {

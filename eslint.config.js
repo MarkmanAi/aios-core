@@ -51,6 +51,8 @@ module.exports = [
       'apps/dashboard/**',
       // Bun-based apps (different runtime, different globals)
       'apps/monitor-server/**',
+      // Design Squad scripts - imported external squad with own conventions
+      'squads/design/scripts/**',
     ],
   },
 

@@ -13,7 +13,7 @@ function getAgentCount() {
   try {
     const agentsDir = path.join(__dirname, '../../../.aios-core/development/agents');
     return fs.readdirSync(agentsDir).filter(
-      (f) => f.endsWith('.md') && !f.startsWith('_') && !INTERNAL_AGENTS.has(f)
+      (f) => f.endsWith('.md') && !f.startsWith('_') && !INTERNAL_AGENTS.has(f),
     ).length;
   } catch (_e) {
     return 11;

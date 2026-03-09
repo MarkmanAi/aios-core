@@ -356,7 +356,7 @@ function analyzeAsset(sourceRepoPath, assetRelPath, targetRepoPath) {
 
   if (report.pathRewriting) {
     report.risks.warning.push(
-      `Path rewriting needed: ${report.pathRewriting.from} → ${report.pathRewriting.to}`
+      `Path rewriting needed: ${report.pathRewriting.from} → ${report.pathRewriting.to}`,
     );
   }
 
