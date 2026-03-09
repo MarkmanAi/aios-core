@@ -4,7 +4,7 @@
  * Integration test for SYNAPSE pipeline — Story 10.7
  *
  * Verifies: ManifestParser → getActiveDomains → DomainInjector → .aios/active-domains.md
- * Verifies: public API barrel (index.js) exports all 5 required items
+ * Verifies: public API barrel (index.js) exports all required items
  */
 
 const fs = require('fs');
@@ -44,8 +44,16 @@ describe('SYNAPSE public API (index.js)', () => {
     expect(typeof api.createSelfLearner).toBe('function');
   });
 
-  it('exports exactly 5 items', () => {
-    expect(Object.keys(api)).toHaveLength(5);
+  it('exports MemoryWriter', () => {
+    expect(typeof api.MemoryWriter).toBe('function');
+  });
+
+  it('exports createMemoryWriter', () => {
+    expect(typeof api.createMemoryWriter).toBe('function');
+  });
+
+  it('exports exactly 7 items', () => {
+    expect(Object.keys(api)).toHaveLength(7);
   });
 });
 

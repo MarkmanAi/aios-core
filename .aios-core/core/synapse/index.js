@@ -12,4 +12,6 @@ module.exports = {
   SynapseMemoryProvider: require('./memory/synapse-memory-provider').SynapseMemoryProvider,
   createMemoryLoader: require('./memory/memory-loader').createMemoryLoader,
   createSelfLearner: require('./memory/self-learner').createSelfLearner,
+  MemoryWriter: require('./memory/memory-writer').MemoryWriter,
+  createMemoryWriter: require('./memory/memory-writer').createMemoryWriter,
 };
