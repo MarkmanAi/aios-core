@@ -267,7 +267,7 @@ describe('SelfLearner — Heuristic Persistence (Story 16.3)', () => {
       expect(result).toEqual({ persisted: 0 });
       expect(warnSpy).toHaveBeenCalledWith(
         expect.stringContaining('[SelfLearner] MemoryWriter not available for heuristic persistence:'),
-        expect.any(String)
+        expect.any(String),
       );
 
       warnSpy.mockRestore();
