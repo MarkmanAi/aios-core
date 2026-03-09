@@ -26,6 +26,7 @@ const AGENT_SECTOR_PREFERENCES = {
   devops: ['procedural', 'episodic'],   // HOW + HAPPENED
   analyst: ['semantic', 'reflective'],  // WHAT + LEARNED
   'data-engineer': ['procedural', 'semantic'], // HOW + WHAT
+  neo: ['semantic', 'episodic'],               // ORG FACTS + ORG HISTORY
   'ux-design-expert': ['reflective', 'procedural'], // LEARNED + HOW
 };
 
