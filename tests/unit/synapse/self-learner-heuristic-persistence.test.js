@@ -111,19 +111,22 @@ describe('SelfLearner — Heuristic Persistence (Story 16.3)', () => {
 
   describe('AC-1: Heuristic Files Written to Canonical Path', () => {
     it('calls writeHeuristic() for each qualifying heuristic candidate after run()', async () => {
-      stubEvidence(learner, {
-        'pattern:abs-imports': makeHighEvidenceEntry('always use absolute imports'),
-        'pattern:const-pref': makeHighEvidenceEntry('prefer const over let'),
-      });
       stubIO(learner);
+      jest.spyOn(learner, '_persistToMemoryStore').mockResolvedValue({ session: 0, daily: 0 });
+
+      // Use controlled candidates to ensure deterministic call count
+      const heuristics = [
+        makeHeuristic('heur-001', 'always use absolute imports'),
+        makeHeuristic('heur-002', 'prefer const over let'),
+      ];
+      jest.spyOn(learner, '_extractHeuristics').mockReturnValue(heuristics);
+      stubEvidence(learner);
 
       const result = await learner.run();
 
       expect(result.skipped).toBe(false);
-      // _extractHeuristics may produce candidates — verify writeHeuristic was called if
-      // the evidence meets thresholds (confidence formula depends on recency/spread)
-      // At minimum, the method must exist and be callable
-      expect(typeof mockWriteHeuristic).toBe('function');
+      expect(mockWriteHeuristic).toHaveBeenCalledTimes(2);
+      expect(result.stats.heuristics_persisted).toBe(2);
     });
 
     it('calls writeHeuristic() with agentId="shared" (canonical per architecture spec)', async () => {
@@ -223,6 +226,74 @@ describe('SelfLearner — Heuristic Persistence (Story 16.3)', () => {
       await expect(learner.run()).resolves.not.toThrow();
 
       expect(mockWriteHeuristic).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  // ─── AC-6 (cont.): MemoryWriter Module Unavailable ─────────────────────
+  //
+  // The lazy-require try-catch catches errors thrown while resolving MemoryWriter
+  // (e.g., when 16.1 is not deployed). We simulate this by redefining the .MemoryWriter
+  // export as a getter that throws — the access is inside the try block in
+  // _persistHeuristics(), so the catch fires and returns { persisted: 0 }.
+
+  describe('AC-6: MemoryWriter Module Unavailable (lazy-require catch path)', () => {
+    let mockModule;
+    let originalDescriptor;
+
+    beforeEach(() => {
+      mockModule = require('../../../.aios-core/core/synapse/memory/memory-writer');
+      originalDescriptor = Object.getOwnPropertyDescriptor(mockModule, 'MemoryWriter');
+    });
+
+    afterEach(() => {
+      // Restore original MemoryWriter property after each test in this block
+      if (originalDescriptor) {
+        Object.defineProperty(mockModule, 'MemoryWriter', originalDescriptor);
+      }
+    });
+
+    it('logs console.warn and returns { persisted: 0 } when MemoryWriter is unavailable', async () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+      // Redefine .MemoryWriter as a getter that throws — simulates module not deployed
+      Object.defineProperty(mockModule, 'MemoryWriter', {
+        get() { throw new Error("Cannot find module './memory-writer'"); },
+        configurable: true,
+      });
+
+      const heuristics = [makeHeuristic('heur-001', 'test rule')];
+      const result = await learner._persistHeuristics(heuristics, { dryRun: false });
+
+      expect(result).toEqual({ persisted: 0 });
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[SelfLearner] MemoryWriter not available for heuristic persistence:'),
+        expect.any(String)
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    it('run() completes normally with heuristics_persisted=0 when MemoryWriter is unavailable', async () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+      Object.defineProperty(mockModule, 'MemoryWriter', {
+        get() { throw new Error("Cannot find module './memory-writer'"); },
+        configurable: true,
+      });
+
+      stubEvidence(learner);
+      stubIO(learner);
+      jest.spyOn(learner, '_persistToMemoryStore').mockResolvedValue({ session: 0, daily: 0 });
+      jest.spyOn(learner, '_extractHeuristics').mockReturnValue([
+        makeHeuristic('heur-001', 'test rule'),
+      ]);
+
+      const result = await learner.run();
+
+      expect(result.skipped).toBe(false);
+      expect(result.stats.heuristics_persisted).toBe(0);
+
+      warnSpy.mockRestore();
     });
   });
 
