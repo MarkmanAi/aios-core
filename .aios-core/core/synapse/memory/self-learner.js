@@ -92,6 +92,8 @@ class SelfLearner {
       demotions: 0,
       gotchas_created: 0,
       last_run: null,
+      memories_written_session: 0,
+      memories_written_daily: 0,
     };
     this._heuristicCandidates = [];
   }
@@ -136,6 +138,8 @@ class SelfLearner {
       demotions: 0,
       gotchas_created: 0,
       last_run: new Date().toISOString(),
+      memories_written_session: 0,
+      memories_written_daily: 0,
     };
     this._heuristicCandidates = [];
 
@@ -194,6 +198,9 @@ class SelfLearner {
         await this._persistEvidence(evidence);
         await this._persistMemoryUpdates(scoredMemories);
         await this._persistGotchas(gotchas);
+        const memoryCounts = await this._persistToMemoryStore(evidence, { dryRun });
+        this._stats.memories_written_session = memoryCounts.session;
+        this._stats.memories_written_daily = memoryCounts.daily;
       }
 
       const duration = performance.now() - startTime;
@@ -1211,6 +1218,112 @@ class SelfLearner {
     } catch (error) {
       console.error('[SelfLearner] Failed to persist gotchas:', error.message);
     }
+  }
+
+  /**
+   * Persist qualifying evidence entries to SYNAPSE memory stores via MemoryWriter.
+   *
+   * Routes evidence to session (evidence_count >= 2) and daily (evidence_count >= 3,
+   * patterns/axioms only — corrections are session-only per architecture design §9).
+   * Uses lazy require so SelfLearner remains loadable if MemoryWriter is unavailable.
+   *
+   * @param {Object} evidence - Evidence store (same shape as this._evidence)
+   * @param {Object} [options] - Options
+   * @param {boolean} [options.dryRun=false] - If true, skip all writes (AC-4)
+   * @returns {Promise<{session: number, daily: number}>} Count of files written per tier
+   * @private
+   */
+  async _persistToMemoryStore(evidence, options = {}) {
+    const { dryRun = false } = options;
+
+    // AC-4: dryRun guard — MemoryWriter must never be called when dryRun=true
+    if (dryRun) {
+      return { session: 0, daily: 0 };
+    }
+
+    // AC-5: Lazy require wrapping constructor — keeps SelfLearner loadable if 16.1 not deployed
+    let writer;
+    try {
+      const { MemoryWriter } = require('./memory-writer');
+      writer = new MemoryWriter(this.projectDir);
+    } catch (err) {
+      console.warn('[SelfLearner] MemoryWriter not available:', err.message);
+      return { session: 0, daily: 0 };
+    }
+
+    const counts = { session: 0, daily: 0 };
+
+    // evidence.type → memory_type mapping (architecture design doc §11)
+    // gotcha-repeat (errors) are handled by _persistGotchas() — skipped here
+    const EVIDENCE_TYPE_MAP = {
+      'pattern-repeat': 'pattern',
+      'axiom-confirmed': 'axiom',
+      'user-correction': 'correction',
+    };
+
+    // Categories with their daily-tier eligibility
+    // corrections are session-only (never daily) per architecture design §9
+    const categories = [
+      { entries: evidence.patterns || {}, allowDaily: true },
+      { entries: evidence.axioms || {}, allowDaily: true },
+      { entries: evidence.corrections || {}, allowDaily: false },
+    ];
+
+    for (const { entries, allowDaily } of categories) {
+      for (const [, entry] of Object.entries(entries)) {
+        // AC-3: Only evidence_count >= 2 qualifies for any tier
+        if (entry.evidence_count < 2) continue;
+
+        const memoryType = EVIDENCE_TYPE_MAP[entry.type];
+        // Skip types not handled here (e.g., gotcha-repeat)
+        if (!memoryType) continue;
+
+        const evidenceItems = entry.sessions.map(s => `Session: ${s}`);
+
+        // Session tier (evidence_count >= 2): patterns, axioms, corrections
+        try {
+          const result = await writer.write('shared', {
+            type: memoryType,
+            text: entry.text,
+            evidence: evidenceItems,
+            evidence_count: entry.evidence_count,
+            confidence: 0.65,
+          }, 'session');
+
+          // AC-5: filePath: null signals write failure — log warn and continue
+          if (result.filePath === null) {
+            console.warn(`[SelfLearner] MemoryWriter session write returned null: ${(entry.text || '').slice(0, 40)}`);
+          } else {
+            counts.session++;
+          }
+        } catch (err) {
+          console.warn('[SelfLearner] MemoryWriter.write() failed (session):', err.message);
+        }
+
+        // Daily tier (evidence_count >= 3): patterns and axioms only — corrections excluded
+        if (allowDaily && entry.evidence_count >= 3) {
+          try {
+            const result = await writer.write('shared', {
+              type: memoryType,
+              text: entry.text,
+              evidence: evidenceItems,
+              evidence_count: entry.evidence_count,
+              confidence: 0.80,
+            }, 'daily');
+
+            if (result.filePath === null) {
+              console.warn(`[SelfLearner] MemoryWriter daily write returned null: ${(entry.text || '').slice(0, 40)}`);
+            } else {
+              counts.daily++;
+            }
+          } catch (err) {
+            console.warn('[SelfLearner] MemoryWriter.write() failed (daily):', err.message);
+          }
+        }
+      }
+    }
+
+    return counts;
   }
 }
 
