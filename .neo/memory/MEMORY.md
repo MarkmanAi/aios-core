@@ -23,7 +23,13 @@ DELEGATIONS:  [YYYY-MM-DD] TASK: ___ | DELEGATED_TO: ___ | STATUS: pending|compl
 
 ## Decisions
 
+- [2026-03-09] DECISION: P1 formalized for design squad — design-chief validated by @qa | REASON: design-chief (orchestrator) had no named validator. AIOS pattern: maker ≠ validator. @qa (Quinn) validates deliverables (completeness, acceptance criteria, quality gates). @architect (Aria) vetoes technical architecture decisions produced by the design squad. No new agents needed. | ORG IMPACT: squad.yaml design-chief gains validator: "@qa". P1 compliance: design-chief makes → @qa validates ✅.
+
+- [2026-03-09] DECISION: Brad-frost dual presence approved as intentional pattern with invocation rule | REASON: brad-frost exists as Agent (Level 6, .claude/commands/Design/agents/brad-frost.md) AND as Mind (Level 7, squads/mmos-squad/minds/brad_frost/). These are structurally different interaction layers, not a conflict. Rule: tasks → @brad-frost (agent); strategy/philosophy → @emulator brad_frost (mind). | ORG IMPACT: squad.yaml brad-frost gains dual_presence: true + invocation_rule. ORGANOGRAMA Level 6 entry updated with dual presence note. Pattern can serve as precedent for other mind clones that also have agent representations.
+
 - [2026-03-09] DECISION: Position synapse agent (Syn) at Level 5 — Operations | REASON: synapse.md exists as full agent (SYNAPSE Pipeline Operator) since 2026-03-04 but had no ORGANOGRAMA entry. Read .aios-core/development/agents/synapse.md — confirmed unique function: read-only operator for SYNAPSE context injection pipeline. P1 ✅ (@devops validates), P2 ✅ (no-modify veto in core_principles), P3 ✅ (unique: no agent operates SYNAPSE). | ORG IMPACT: agents_core 12→13, total_agents 51→52. GAP-ORG-003 resolved. Compliance 72→77.
+
+- [2026-03-09] DECISION: Formally position squads/design/ as 4th department | REASON: Design System Squad v2.1.0 was imported via commit 781e627 (2026-03-09) with 8 agents, 89 tasks, 11 workflows, 14 checklists. Agents were already at Level 6 in ORGANOGRAMA. Department itself had no board entry (GAP-ORG-002). P3-org-position: formalization, not new creation — agents pre-validated by import QA. | ORG IMPACT: departments 3→4. ORGANOGRAMA DEPARTMENTS section updated. inventory.yaml squads 3→4. GAP-ORG-002 resolved. Compliance 77→82.
 
 - [2026-03-08] DECISION: Position Ralph (Autonomous Loop Orchestrator) in org chart — Level 5 Operations, 3rd department (squads/ralph/) | REASON: Epic 14 requires org chart positioning FIRST per Constitution Article II. Ralph is unique — no existing agent runs autonomous bash loops with fresh Claude sessions per story. P1 ✅ P2 ⚠️ (tasks pending) P3 ✅ | ORG IMPACT: departments 2→3. inventory.yaml updated. ORGANOGRAMA.md updated. v1 skill deprecated to redirect. v2 delegation paths corrected (fictional skill names → real AIOS agents). Story 14.6 complete.
 
@@ -121,6 +127,8 @@ DELEGATIONS:  [YYYY-MM-DD] TASK: ___ | DELEGATED_TO: ___ | STATUS: pending|compl
 
 ## Organizational Evolution
 
+- [2026-03-09] CHANGE: 4th department formally positioned — design squad | BEFORE: 3 departments (mmos-squad, squad-creator, ralph) | AFTER: 4 departments (+ squads/design/) | REASON: Design System Squad v2.1.0 was imported via commit 781e627 but department was never formally registered in ORGANOGRAMA. Neo formal approval and positioning executed. 8 agents (design-chief, brad-frost, dave-malouf, dan-mall, ds-token-architect, ds-foundations-lead, storybook-expert, nano-banana-generator). GAP-ORG-002 resolved. Compliance 77→82.
+
 - [2026-03-08] CHANGE: 3rd department created — ralph squad | BEFORE: 2 departments (mmos-squad, squad-creator) | AFTER: 3 departments (+ squads/ralph/) | REASON: Epic 14 — Ralph Autonomous Loop Full Implementation. Story 14.6 executed. Constitution Article II complied. Delegation paths corrected from fictional skills → real AIOS agent paths.
 
 - [2026-03-01] CHANGE: book-to-intelligence workflow status updated to OPERATIONAL | BEFORE: positioned (2026-02-28), technically uncommitted | AFTER: Python package committed (30 files, commit 983ee3c) — pipeline fully executable. Story 8.2: L3 now produces RAG-ready `chunks/*.md` with YAML frontmatter (P2) + prompt cache for STUFF strategy ~60% cost reduction (P4). QA approved (29/29 tests). @devops pushed to main. | ORG IMPACT: ORGANOGRAMA.md workflow entry updated to OPERATIONAL. First cross-departmental workflow to reach production status.
@@ -143,7 +151,7 @@ DELEGATIONS:  [YYYY-MM-DD] TASK: ___ | DELEGATED_TO: ___ | STATUS: pending|compl
 
 ## Audits
 
-- [2026-03-09] COMPONENT: Full organization | TYPE: health_check | STATUS: warn | FINDINGS: 5 new gaps. Compliance 72/100 (↓ from 87). New: GAP-ORG-002 squads/design/ unpositioned dept (4th dept, 8 agents, 90+ tasks, alta); GAP-ORG-003 synapse.md agent not in ORGANOGRAMA (alta); GAP-INFRA-007 synapse-precompact.js hook (media); GAP-MIND-012 napoleon_hill pipeline files complete but L6-L8 uncertified (media); GAP-MIND-013 adriano_de_marqui PIPELINE-COMPLETE predates Neo (baixa). Positive: ralph structure in place, 8 production minds confirmed, adriano_de_marqui+napoleon_hill likely 9th+10th production. 2/5 principle sample fully compliant.
+- [2026-03-09] COMPONENT: Full organization | TYPE: health_check | STATUS: warn | FINDINGS: 5 new gaps. Compliance 72/100 (↓ from 87). New: GAP-ORG-002 squads/design/ unpositioned dept (4th dept, 8 agents, 90+ tasks, alta); GAP-ORG-003 synapse.md agent not in ORGANOGRAMA (alta); GAP-INFRA-007 synapse-precompact.js hook (media); GAP-MIND-012 napoleon_hill pipeline files complete but L6-L8 uncertified (media); GAP-MIND-013 adriano_de_marqui PIPELINE-COMPLETE predates Neo (baixa). Positive: ralph structure in place, 8 production minds confirmed, adriano_de_marqui+napoleon_hill likely 9th+10th production. 2/5 principle sample fully compliant. UPDATE: GAP-ORG-002 resolved same session → compliance 82/100.
 
 - [2026-02-21] COMPONENT: Full organization (baseline) | TYPE: health_check | STATUS: warn | FINDINGS: 21 gaps identified. Compliance 27/100. Critical: .neo/ meta-layer missing. Council: 11/27 minds with incomplete pipeline. See gaps.yaml.
 

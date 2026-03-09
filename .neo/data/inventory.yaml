@@ -161,11 +161,12 @@ infrastructure:
 # ------------------------------------------------------------
 departments:
 
-  squads: 3
+  squads: 4
   names:
     - mmos-squad        # squads/mmos-squad/
     - squad-creator     # squads/squad-creator/
     - ralph             # squads/ralph/ — autonomous loop orchestrator (Epic 14, 2026-03-08)
+    - design            # squads/design/ — Design System Squad v2.1.0 (import 2026-03-09, formally positioned by Neo 2026-03-09)
 
 # ------------------------------------------------------------
 # NEO META — Neo's own footprint (not counted in org totals)

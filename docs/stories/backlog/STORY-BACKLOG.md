@@ -1,6 +1,6 @@
 # Story Backlog — Tech Debt & Follow-ups
 
-> **Last Updated**: 2026-03-08
+> **Last Updated**: 2026-03-09
 > **Source**: PO Validation + QA Review — Epics 12, 13 (13.2 tech debt added) + QA Review PR #9 Story 13.10
 > **Managed by**: @po (Pax)
 > **Updated**: 2026-03-08 — Epic 13 closed: 12/12 stories Done, all moved to completed/. [13.10-T1], [13.10-T2] remain as LOW tech debt for future sprint.
@@ -11,16 +11,16 @@
 
 | Status | Count |
 |--------|-------|
-| TODO | 2 |
+| TODO | 3 |
 | IN PROGRESS | 0 |
 | DONE | 14 |
-| Total | 16 |
+| Total | 17 |
 
 | Priority | Count |
 |----------|-------|
 | HIGH | 0 |
 | MEDIUM | 0 |
-| LOW | 2 |
+| LOW | 3 |
 
 ---
 
@@ -43,6 +43,15 @@
 - **File**: `src/bob/commands/stop.js:28-34`
 - **Issue**: `force` stop constructs `.aios/locks/bob-orchestration.lock` directly, duplicating `LockManager._getLockPath()`. If the naming convention changes, the path will silently diverge.
 - **Fix**: Expose `lockMgr.getLockFilePath('bob-orchestration')` (or a shared constant) and use it in place of the hardcoded string.
+
+#### [16.1-T1] Fix `_extractBodyText()` correction regex for texts with internal periods
+- **Status**: TODO
+- **Priority**: LOW
+- **Source**: QA Review — Story 16.1 re-review (2026-03-09)
+- **File**: `.aios-core/core/synapse/memory/memory-writer.js` — `_extractBodyText()`
+- **Epic**: 17 (deferred)
+- **Issue**: The `correction` branch uses `/Actually,?\s*(.+?)\./i` — a lazy quantifier that stops at the **first** period in the text. Correction memories containing internal periods (e.g., `"use Node.js APIs"`) are partially captured (`"use Node"` instead of `"use Node.js APIs"`), causing deduplication to silently fail for that entry. A second write of the same correction text would not be recognized as a duplicate.
+- **Fix**: Replace with a greedy-to-end-of-line pattern: `/Actually,?\s*(.+)\.$/im` or strip the trailing sentence period explicitly and compare against the full captured text. Alternatively, store `content.text` directly in frontmatter as a dedicated `text_hash` field for reliable dedup lookup.
 
 #### [13.10-T2] Handle additional resume actions explicitly in `resume.js`
 - **Status**: TODO

@@ -109,7 +109,7 @@
 | **data-chief** | Data & Analytics | `.claude/agents/data-chief.md` |
 | **db-sage** | Database | `.claude/agents/db-sage.md` |
 | **design-chief** | Visual Design Orchestrator | `.claude/agents/design-chief.md` → persona: `.claude/commands/Design/agents/design-chief.md` |
-| **design-system** (brad-frost) | Design System Architect — Atomic Design, tokens, components | `.claude/agents/design-system.md` → persona: `.claude/commands/Design/agents/brad-frost.md` |
+| **design-system** (brad-frost) | Design System Architect — Atomic Design, tokens, components | `.claude/agents/design-system.md` → persona: `.claude/commands/Design/agents/brad-frost.md` → **Agent Mode**. Dual presence: Mind Mode via `@emulator brad_frost` → `squads/mmos-squad/minds/brad_frost/`. Rule: Agent for execution, Mind for strategy. |
 | **dave-malouf** | DesignOps Specialist — processes, scaling, maturity | `.claude/commands/Design/agents/dave-malouf.md` (via design-chief) |
 | **dan-mall** | DS Adoption Specialist — stakeholder buy-in | `.claude/commands/Design/agents/dan-mall.md` (via design-chief) |
 | **ds-token-architect** (Atlas) | Token Architecture — DTCG, Figma variables, normalization | `.claude/commands/Design/agents/ds-token-architect.md` (via design-chief) |
@@ -210,6 +210,7 @@
 | **mmos-squad** | `squads/mmos-squad/` | Mind Mapper | 10 | 27 |
 | **squad-creator** | `squads/squad-creator/` | Squad Chief | 4 | 16 |
 | **ralph** | `squads/ralph/` | Ralph | 1 | 7 |
+| **design** | `squads/design/` | Design Chief | 8 | 89 |
 
 ---
 
@@ -273,9 +274,10 @@
 | Squad-Creator Agents | 4 |
 | **Total Agents** | **52** |
 | Cloned Minds | 27 |
-| Departments | 3 (mmos-squad, squad-creator, ralph) |
+| Departments | 4 (mmos-squad, squad-creator, ralph, design) |
 | Workflows | 15 (1 OPERATIONAL: book-to-intelligence) |
 | Kernel Modules | 19 (18 operational + 1 positioned: synapse) |
 
 *Source: `.neo/data/inventory.yaml` — cross-validated with REPO_PATH_MAP_v2*
 *synapse (Syn) added 2026-03-09 — Level 5 Operations, P1-P3 validated by Neo*
+*design squad formally positioned 2026-03-09 — 4th department, 8 agents, 89 tasks, 11 workflows. GAP-ORG-002 resolved.*

@@ -401,16 +401,16 @@ gaps:
 # ------------------------------------------------------------
 summary:
   total_gaps: 27
-  open: 12
+  open: 11
   in_progress: 1
-  resolved: 14
+  resolved: 15
   wont_fix: 0
   last_updated: "2026-03-09"
 
   by_priority:
-    # OPEN gaps only (2026-03-09 health check):
+    # OPEN gaps only (post GAP-ORG-002 resolution 2026-03-09):
     critical: 0
-    high: 2        # MIND-006 (mitchell_hashimoto) + ORG-002 (design dept) — ORG-003 resolved 2026-03-09
+    high: 1        # MIND-006 (mitchell_hashimoto) — ORG-002 resolved 2026-03-09
     medium: 4      # MIND-008 (don_norman) + MIND-009 (guillermo_rauch) + INFRA-007 (synapse hook) + MIND-012 (napoleon_hill)
     low: 5         # INFRA-005,006 | DOC-002,003 | MIND-013 (adriano_de_marqui record)
 
@@ -434,10 +434,10 @@ summary:
     - GAP-MIND-013   # adriano_de_marqui — PIPELINE-COMPLETE predates Neo, ORGANOGRAMA not updated
 
   # Formula: 100 - (critical*10) - (high*5) - (medium*2) - (low*1)
-  # Open: 2 high + 4 medium + 5 low
-  # = 100 - (2*5) - (4*2) - (5*1) = 100 - 10 - 8 - 5 = 77
-  compliance_score: 77
-  compliance_score_note: "77/100 — GAP-ORG-003 (synapse agent) resolved 2026-03-09. Syn positioned at Level 5 Operations. agents_core 12→13, total 51→52. Open: ORG-002 (design dept, alta), MIND-006 (mitchell, alta), INFRA-007+MIND-012 (media), INFRA-005,006+DOC-002,003+MIND-013 (baixa)."
+  # Open: 1 high + 4 medium + 5 low
+  # = 100 - (1*5) - (4*2) - (5*1) = 100 - 5 - 8 - 5 = 82
+  compliance_score: 82
+  compliance_score_note: "82/100 — GAP-ORG-002 (design dept) resolved 2026-03-09. squads/design/ formally positioned as 4th department. Open: MIND-006 (mitchell, alta), INFRA-007+MIND-012+MIND-008+MIND-009 (media), INFRA-005,006+DOC-002,003+MIND-013 (baixa)."
 
   # === NEW: Found in 2026-03-09 health check ===
 
@@ -462,8 +462,9 @@ summary:
     principle_risk: "P3-org-position (department level, not agent level)"
     identified_by: neo
     identified_on: "2026-03-09"
-    resolved_on: null
-    status: open
+    resolved_on: "2026-03-09"
+    status: resolved
+    note: "Formally positioned by Neo 2026-03-09. ORGANOGRAMA DEPARTMENTS updated (4th dept). inventory.yaml squads: 3→4. MEMORY.md registered. Agents were already at Level 6 — formalization only."
 
   - id: GAP-ORG-003
     type: undocumented_agent
