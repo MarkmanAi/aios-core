@@ -277,6 +277,36 @@ describe('MemoryWriter', () => {
       const fmAfter = parseFrontmatter(await fs.readFile(r1.filePath, 'utf8'));
       expect(fmAfter.evidence_count).toBe(initialCount + 1);
     });
+
+    it('should NOT false-positive dedup when text is a substring of another pattern', async () => {
+      // FP-001 regression: "pattern" must NOT match a file containing "test pattern"
+      const r1 = await writer.write('dev', { type: 'pattern', text: 'test pattern for regression' }, 'session', { skipIndex: true });
+      const r2 = await writer.write('dev', { type: 'pattern', text: 'test' }, 'session', { skipIndex: true });
+
+      // "test" is a substring of r1 text — must NOT be treated as duplicate
+      expect(r2.filePath).not.toBe(r1.filePath);
+      expect(r2.filePath).not.toBeNull();
+    });
+
+    it('should return existing file when session cap (20) is reached', async () => {
+      // Write 20 files for the same agent (unique texts to avoid dedup)
+      for (let i = 0; i < 20; i++) {
+        await writer.write('dev', { type: 'pattern', text: `cap unique pattern ${i}` }, 'session', { skipIndex: true });
+      }
+
+      // 21st write — cap reached, should return existing file without creating a new one
+      const result = await writer.write('dev', { type: 'pattern', text: 'cap overflow pattern' }, 'session', { skipIndex: true });
+
+      expect(result.filePath).not.toBeNull();
+      expect(result.tier).toBe('session');
+
+      // Directory should still contain exactly 20 files for this agent/day
+      const today = new Date().toISOString().split('T')[0];
+      const sessionDir = path.join(tmpDir, '.aios', 'memories', 'shared', 'session');
+      const files = await fs.readdir(sessionDir);
+      const agentFiles = files.filter((f) => f.includes('dev') && f.includes(today));
+      expect(agentFiles.length).toBe(20);
+    });
   });
 
   // ─── AC-7: Error handling ──────────────────────────────────────────────────
@@ -297,6 +327,22 @@ describe('MemoryWriter', () => {
       expect(result).toBeDefined();
       expect(result.filePath).toBeNull();
       expect(result.error).toBeDefined();
+    });
+
+    it('should NOT throw when index patch fails — returns { id, filePath } with filePath set', async () => {
+      // Make the index directory a file to force _patchMasterIndex to fail
+      const indexDir = path.join(tmpDir, '.aios', 'session-digests', 'index');
+      await fs.mkdir(path.dirname(indexDir), { recursive: true });
+      await fs.writeFile(indexDir, 'NOT_A_DIR');
+
+      const badWriter = new MemoryWriter(tmpDir);
+
+      // File write should succeed; index patch should fail gracefully
+      const result = await badWriter.write('dev', { type: 'pattern', text: 'index patch fail test' }, 'session');
+
+      expect(result).toBeDefined();
+      expect(result.filePath).not.toBeNull(); // file was written successfully
+      expect(result.error).toBeUndefined();   // no top-level error (partial success)
     });
   });
 });

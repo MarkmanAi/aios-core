@@ -98,7 +98,7 @@ class MemoryWriter {
     const dir = this._tierToPath(effectiveTier, content.type);
 
     // Deduplication: same normalized text on same day+tier → increment evidence_count
-    const duplicate = await this._findDuplicate(dir, content.text, today);
+    const duplicate = await this._findDuplicate(dir, content.text, content.type, today);
     if (duplicate) {
       await this._incrementEvidenceCount(duplicate);
       const existingId = await this._readId(duplicate);
@@ -426,9 +426,16 @@ class MemoryWriter {
    * Find an existing file for the same day with the same normalized text.
    * Returns absolute filePath or null.
    *
+   * Uses exact text comparison against the specific body section for the given
+   * memoryType — avoids false positives from substring matches on the full file.
+   *
    * @private
+   * @param {string} dir
+   * @param {string} text
+   * @param {string} memoryType - Used to target the correct body section
+   * @param {string} today - YYYY-MM-DD
    */
-  async _findDuplicate(dir, text, today) {
+  async _findDuplicate(dir, text, memoryType, today) {
     if (!text) return null;
     try {
       await fs.mkdir(dir, { recursive: true });
@@ -442,7 +449,8 @@ class MemoryWriter {
         const filePath = path.join(dir, file);
         try {
           const raw = await fs.readFile(filePath, 'utf8');
-          if (this._normalizeText(raw).includes(normalizedText)) {
+          const extracted = this._extractBodyText(raw, memoryType);
+          if (extracted && this._normalizeText(extracted) === normalizedText) {
             return filePath;
           }
         } catch (_) {
@@ -453,6 +461,42 @@ class MemoryWriter {
       // ignore — directory may not exist yet
     }
     return null;
+  }
+
+  /**
+   * Extract the primary text content from a file's body for deduplication.
+   *
+   * Targets the specific body section for each memory_type so that comparison
+   * is exact (not substring-based on the full raw file).
+   *
+   * @private
+   * @param {string} raw - Full file content
+   * @param {string} memoryType
+   * @returns {string} Extracted text or empty string if not found
+   */
+  _extractBodyText(raw, memoryType) {
+    switch (memoryType) {
+      case 'pattern':
+      case 'heuristic':
+      case 'gotcha':
+      case 'general': {
+        // Body format: Pattern: "text"
+        const m = raw.match(/Pattern:\s*"([^"]+)"/);
+        return m ? m[1] : '';
+      }
+      case 'axiom': {
+        // Body format: Axiom: text
+        const m = raw.match(/Axiom:\s*([^\n]+)/);
+        return m ? m[1].trim() : '';
+      }
+      case 'correction': {
+        // Body format: Actually, text.
+        const m = raw.match(/Actually,?\s*(.+?)\./i);
+        return m ? m[1].trim() : '';
+      }
+      default:
+        return '';
+    }
   }
 
   /**
@@ -491,6 +535,11 @@ class MemoryWriter {
 
   /**
    * List all files matching {tier}-{agentId}-{date}-*.yaml in dir.
+   *
+   * Note: uses f.includes(safeAgentId) which could match agent IDs that are
+   * prefixes of others (e.g., 'dev' matches 'dev2'). This is an accepted edge
+   * case for Epic 16 — sanitized IDs in practice do not overlap this way.
+   * Full prefix-safe filtering is deferred to Epic 17.
    *
    * @private
    */
