@@ -66,7 +66,7 @@ function parseYaml(content) {
   };
 
   const outputMatch = content.match(/output: \|\n([\s\S]+)$/);
-  result.output = outputMatch ? outputMatch[1].replace(/^  /gm, '').trim() : null;
+  result.output = outputMatch ? outputMatch[1].replace(/^ {2}/gm, '').trim() : null;
 
   return result;
 }
