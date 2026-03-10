@@ -348,6 +348,10 @@ commands:
     args: '{asset_a} {asset_b}'
     description: 'Fuse two organizational assets into one superior result — A + B → C (new, unique). Governance layer (7 principles + rollback path + board positioning of C) before any execution. Scope v1: squads only.'
     category: governance
+  - name: agent-fusion
+    args: '{agent_a} {agent_b}'
+    description: 'Fuse two agents into one superior result — A + B → C (new, unique persona+capabilities). Governance layer (7 principles + rollback path + org positioning of C) before any execution. Scope v2: agents only.'
+    category: governance
   - name: principles
     description: 'The 7 claws — list the inviolable principles'
     category: governance
@@ -401,6 +405,7 @@ command_types:
     - reorg           # → .neo/tasks/neo-reorg.md
     - import-asset    # → .neo/tasks/neo-import-asset.md (wraps import-asset skill + governance)
     - fusion          # → .neo/tasks/neo-fusion.md (governance layer over wf-squad-fusion.yaml)
+    - agent-fusion    # → .neo/tasks/neo-agent-fusion.md
   inline:
     - matrix          # Read inventory + constitution → territory summary
     - org             # Read ORGANOGRAMA.md → display the board
@@ -429,6 +434,7 @@ dependencies:
     - neo-reorg.md
     - neo-import-asset.md
     - neo-fusion.md
+    - neo-agent-fusion.md
   skills:
     - import-asset  # .claude/skills/import-asset/SKILL.md — technical layer called by neo-import-asset
   templates:
@@ -479,6 +485,7 @@ dependencies:
 - `*validate-new {file}` — Inspect before entry
 - `*import-asset {source_path} {asset_name}` — Import external asset with governance
 - `*fusion {asset_a} {asset_b}` — Fuse two assets into result C (A + B → C, irreversible)
+- `*agent-fusion {agent_a} {agent_b}` — Fuse two agents into Agent C (A + B → C, irreversible)
 - `*principles` — The 7 claws
 - `*gaps` — Blind spots
 

@@ -273,6 +273,7 @@
 |---------|-----------|-------------|-------|
 | `*import-asset` | `.neo/tasks/neo-import-asset.md` | Import external asset with governance — technical diagnostic + 7-principle validation + board positioning before any execution | `import-asset` skill |
 | `*fusion` | `.neo/tasks/neo-fusion.md` | Fuse two organizational assets into result C — A + B → C (irreversible). Governance: 7 principles + rollback path + board positioning of C before execution. Scope v1: squads. | `wf-squad-fusion.yaml` |
+| `*agent-fusion` | `.neo/tasks/neo-agent-fusion.md` | Fuse two agents into Agent C — A + B → C (new, unique persona+capabilities). Governance: 7 principles + rollback path + org positioning of C before execution. Scope v2: agents. | `@dev + @sm (execution protocol)` |
 
 > **Import vs Fusion:** Import = A + B remain (coexistence). Fusion = A + B → C (replacement — A and B cease to exist). Fusion requires rollback path definition before execution begins.
 

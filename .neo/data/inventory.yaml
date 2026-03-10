@@ -14,7 +14,7 @@ meta:
   total_files: 6315          # find . -type f | wc -l (REPO_PATH_MAP_v2 — 2026-02-22)
   constitution: .neo/CONSTITUICAO_MATRIX.md
   organograma: .neo/ORGANOGRAMA.md
-  last_updated: "2026-03-10"
+  last_updated: "2026-03-10"  # Story 18.2 — neo-agent-fusion added
   updated_by: neo
 
 # ------------------------------------------------------------
@@ -86,15 +86,16 @@ procedures:
   tasks_squad_creator: 16
   # Path: squads/squad-creator/tasks/
 
-  tasks_neo: 9
+  tasks_neo: 10
   # Path: .neo/tasks/
   # neo-hire-agent, neo-hire-consultant, neo-create-dept,
   # neo-audit, neo-validate-new, neo-health-check, neo-reorg,
   # neo-import-asset (wraps import-asset skill + governance layer),
-  # neo-fusion (governance layer over wf-squad-fusion.yaml — added 2026-03-10)
+  # neo-fusion (governance layer over wf-squad-fusion.yaml — added 2026-03-10),
+  # neo-agent-fusion (governance layer for agent fusion A+B→C — added 2026-03-10)
 
-  total_tasks: 247
-  # 195 core + 27 mmos + 16 squad_creator + 9 neo = 247
+  total_tasks: 248
+  # 195 core + 27 mmos + 16 squad_creator + 10 neo = 248
   # NOTE: 238 = pre-Neo count (organizational tasks only).
   #       245 = post-Neo count (238 + 7 Neo operational tasks).
   #       Legacy docs cited 236 — off by 2 from pre-Neo count.
@@ -183,7 +184,7 @@ departments:
 # ------------------------------------------------------------
 neo_footprint:
 
-  tasks: 9              # .neo/tasks/ (7 was stale — neo-import-asset wasn't registered; corrected to 9 = 8 existing + neo-fusion 2026-03-10)
+  tasks: 10             # .neo/tasks/ (7 was stale — neo-import-asset wasn't registered; corrected to 9 = 8 existing + neo-fusion 2026-03-10; neo-agent-fusion added 2026-03-10 Story 18.2)
   templates: 3          # .neo/templates/
   data_files: 3         # .neo/data/ (this file + gaps.yaml + principles.md)
   constitution: 1       # .neo/CONSTITUICAO_MATRIX.md
@@ -192,7 +193,7 @@ neo_footprint:
   bridge: 1             # .claude/agents/neo.md
   command: 1            # .claude/commands/neo/neo.md
   public_doc: 1         # docs/architecture/matrix-vision.md
-  note: "Neo exists OUTSIDE the organizational hierarchy. His 9 operational tasks ARE included in total_tasks (as a separate tasks_neo category). His bridge file IS counted in claude_code agents. Neo himself is NOT counted in total_agents. neo-import-asset added 2026-03-10 — wraps import-asset skill with governance layer. neo-fusion added 2026-03-10 — governance layer over wf-squad-fusion.yaml (Story 18.1)."
+  note: "Neo exists OUTSIDE the organizational hierarchy. His 10 operational tasks ARE included in total_tasks (as a separate tasks_neo category). His bridge file IS counted in claude_code agents. Neo himself is NOT counted in total_agents. neo-import-asset added 2026-03-10 — wraps import-asset skill with governance layer. neo-fusion added 2026-03-10 — governance layer over wf-squad-fusion.yaml (Story 18.1). neo-agent-fusion added 2026-03-10 — governance layer for agent fusion A+B→C (Story 18.2)."
 
 # ------------------------------------------------------------
 # DISCREPANCIES vs LEGACY DOCUMENTATION
