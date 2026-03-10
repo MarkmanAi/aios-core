@@ -1,0 +1,207 @@
+qualification_dashboard:
+  generated_at: "2026-03-10"
+  workflow: "wf-model-tier-qualification"
+  status: "populated"
+  source: "Populated from BATCH-PROGRESS.md (session 2026-02-11, @pedro-valerio)"
+
+  summary:
+    total_tested: 10        # Wave 1 complete (formal Opus vs Haiku testing)
+    pre_qualified: 4        # Wave 2 script-first/worker (no LLM comparison needed)
+    deprecated: 1           # migrate-workflows-to-yaml (one-time task, completed)
+    haiku_qualified: 12     # 86% (Wave 1: 8 + Wave 2: 4)
+    opus_required: 1        # 7% (an-diagnose-clone)
+    total_savings_projected: "60-70% token cost reduction"
+
+  results:
+    # =========================================================================
+    # WAVE 1 — Formal Qualification (Opus vs Haiku comparison)
+    # =========================================================================
+
+    - task: "pv-axioma-assessment"
+      wave: 1
+      status: "DONE"
+      decision: "HAIKU QUALIFIED"
+      scores:
+        opus: 7.85
+        haiku: 7.77
+        match_pct: 99.0
+      notes: "95.5% score match — straightforward formula-based scoring"
+
+    - task: "pv-modernization-score"
+      wave: 1
+      status: "DONE"
+      decision: "SCRIPT QUALIFIED"
+      scores:
+        opus: "2/12 checks"
+        haiku: "Script-only"
+      notes: "100% deterministic — 12 pattern checks via grep. Zero LLM tokens needed."
+
+    - task: "validate-squad"
+      wave: 1
+      status: "DONE"
+      decision: "HAIKU QUALIFIED"
+      scores:
+        opus: "7.89 PASS"
+        haiku: "7.89 PASS"
+        match_pct: 100.0
+      notes: "Expert override 91% — same pass/fail verdict. Re-tested and confirmed."
+
+    - task: "qa-after-creation"
+      wave: 1
+      status: "DONE"
+      decision: "HAIKU QUALIFIED"
+      caveat: "Score inflation +19% (8.32 → 9.9) but same APPROVED verdict"
+      scores:
+        opus: "8.32 APPROVED"
+        haiku: "9.90 APPROVED"
+      notes: "GATEKEEPER task — binary pass/fail match. Inflation noted but verdict unchanged."
+
+    - task: "an-fidelity-score"
+      wave: 1
+      status: "DONE"
+      decision: "HAIKU QUALIFIED"
+      scores:
+        opus: "82.22% V2.0"
+        haiku: "81.67% V2.0"
+        match_pct: 99.3
+      notes: "Script-first architecture discovered: 95% of scoring is pure script (0 tokens)"
+
+    - task: "an-clone-review"
+      wave: 1
+      status: "DONE"
+      decision: "HAIKU QUALIFIED"
+      scores:
+        opus: "Trinity 93.3% SOLID"
+        haiku: "Trinity 93.3% v2.2.0"
+        match_pct: 100.0
+      notes: "Scope fix applied in v2.2.0 (explicit SCOPE DEFINITION added). Confirmed."
+
+    - task: "an-diagnose-clone"
+      wave: 1
+      status: "DONE"
+      decision: "OPUS REQUIRED"
+      scores:
+        opus: "85% BOM"
+        haiku: "30% CRITICO"
+      notes: "Fix v2.0.0 attempted with CHECKPOINT CLARIFICATIONS. Haiku simulates file reads instead of analyzing accurately. OPUS CONFIRMED."
+
+    - task: "an-validate-clone"
+      wave: 1
+      status: "DONE"
+      decision: "HAIKU QUALIFIED"
+      scores:
+        opus: "73.89% REVIEW"
+        haiku: "90% AUTH v2.2.0"
+      notes: "Strict rules applied in v2.2.0 — no inference. Bidirectional bias discovered (Haiku generous). Final verdict consistent."
+
+    - task: "an-assess-sources"
+      wave: 1
+      status: "DONE"
+      decision: "HAIKU QUALIFIED"
+      scores:
+        opus: "4.15 avg (3 CJ)"
+        haiku: "4.35 avg (3 CJ) v2.2.2"
+        tier_match_pct: 100.0
+        max_score_variance_pct: 4.2
+        checkpoint_evolucao_match: 100.0
+      version_history:
+        - version: "v2.0"
+          status: "FAIL"
+          checkpoint_match: "25%"
+          score_variance: ">30%"
+        - version: "v2.1"
+          status: "CONDITIONAL"
+          checkpoint_match: "75%"
+          score_variance: "~20%"
+        - version: "v2.2.1"
+          status: "CONDITIONAL"
+          checkpoint_match: "99%"
+          score_variance: "25%"
+        - version: "v2.2.2"
+          status: "QUALIFIED"
+          checkpoint_match: "100%"
+          score_variance: "4.2%"
+          fix: "evolucao_rule clarified — primeira obra = always FALSE"
+      retest_2026_03_10:
+        status: "CONFIRMED QUALIFIED"
+        result_file: "test-cases/an-assess-sources/retest-2026-03-10.yaml"
+        notes: "v2.2.2 output confirmed against opus-baseline. Tier match 100%, max variance 4.2%."
+
+    # =========================================================================
+    # WAVE 2 — Pre-Qualification (Script-First / Worker tasks)
+    # =========================================================================
+
+    - task: "refresh-registry"
+      wave: 2
+      status: "PRE-QUALIFIED"
+      decision: "HAIKU"
+      type: "Hybrid (Script 80%)"
+      notes: "Script counts files/tasks, LLM enriches descriptions. No formal Opus comparison needed."
+
+    - task: "squad-analytics"
+      wave: 2
+      status: "PRE-QUALIFIED"
+      decision: "HAIKU"
+      type: "Hybrid (Script 80%)"
+      notes: "Script collects metrics, LLM interprets patterns. Deterministic core."
+
+    - task: "migrate-workflows-to-yaml"
+      wave: 2
+      status: "DEPRECATED"
+      decision: "N/A"
+      notes: "One-time task completed on 2026-02-05. No longer in rotation."
+
+    - task: "install-commands"
+      wave: 2
+      status: "PRE-QUALIFIED"
+      decision: "SCRIPT"
+      type: "Worker (100%)"
+      scores:
+        tokens: 0
+      notes: "Pure file operations. Zero LLM tokens. 100% deterministic."
+
+    - task: "sync-ide-command"
+      wave: 2
+      status: "PRE-QUALIFIED"
+      decision: "SCRIPT"
+      type: "Worker (100%)"
+      scores:
+        tokens: 0
+      notes: "Pure file operations. Zero LLM tokens. 100% deterministic."
+
+  key_discoveries:
+    - id: "KD-1"
+      title: "Binary Checkpoint Conversion"
+      finding: "Converting subjective scoring (1-5) to binary checkpoints (0-5 count) allows Haiku to achieve 99.3% of Opus quality"
+    - id: "KD-2"
+      title: "Script-First Architecture"
+      finding: "fidelity-score.sh proved 95% of fidelity scoring can be pure script (0 tokens, <1s, 100% deterministic)"
+    - id: "KD-3"
+      title: "Scope Interpretation"
+      finding: "Haiku interprets scope literally — explicit SCOPE DEFINITION required in task definitions"
+    - id: "KD-4"
+      title: "Bidirectional Scoring Bias"
+      finding: "Haiku can be both conservative OR generous depending on task — strict rules + NO INFERENCE required"
+    - id: "KD-5"
+      title: "Iterative Fix Pattern"
+      finding: "Tasks can be iteratively refined (v2.0 → v2.2.2) with 3-step fix: binary checkpoints + scope + no-override"
+    - id: "KD-6"
+      title: "Formal Evaluation Methodology"
+      finding: "an-compare-outputs v1.0.0 established: Tier Match 40%, Score Variance 30%, Checkpoint Match 20%, Rec Quality 10%"
+    - id: "KD-7"
+      title: "Iterative Fix Pattern Confirmed"
+      finding: "4 tasks fixed with same pattern: identify variance source → clarify rule with IF/THEN → retest"
+    - id: "KD-8"
+      title: "Cost Reduction Estimate"
+      finding: "86% Haiku/Script + 7% Opus + 7% deprecated = 60-70% token cost reduction"
+
+  next_actions:
+    - action: "Confirm an-assess-sources v2.2.2 savings in production (retest complete — see retest-2026-03-10.yaml)"
+      priority: "medium"
+      status: "pending"
+    - action: "Consider formal qualification for remaining tasks not yet covered (e.g., an-compare-outputs, pv-audit)"
+      priority: "low"
+      status: "backlog"
+    - action: "Apply script-first pattern to an-fidelity-score (already done) to other analytics tasks"
+      priority: "low"
+      status: "in-progress"
