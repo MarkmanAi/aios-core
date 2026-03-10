@@ -1,6 +1,6 @@
 # Core Heuristics for Squad Creation
 
-> **Source:** AIOS Heuristics Standard
+> **Source:** AIOX Heuristics Standard
 > **Version:** 1.0.0
 > **Updated:** 2026-01-24
 > **Prefix:** SC (Squad-Creator)
@@ -33,7 +33,7 @@ heuristic:
     name: "Strategic Focus Heuristic"
     type: "Decision Heuristic"
     category: "Business Strategy"
-    agent: "@squad-creator:squad-architect"
+    agent: "@squad-creator:squad-chief"
     pattern: "SC-PP-001"
 
   configuration:
@@ -160,7 +160,7 @@ heuristic:
     name: "Coherence Check Heuristic"
     type: "Assessment Heuristic"
     category: "Performance Assessment"
-    agent: "@squad-creator:squad-architect"
+    agent: "@squad-creator:squad-chief"
     pattern: "SC-PP-002"
 
   configuration:
@@ -306,7 +306,7 @@ heuristic:
     name: "Automation Decision Heuristic"
     type: "Process Heuristic"
     category: "Process Management"
-    agent: "@squad-creator:squad-architect"
+    agent: "@squad-creator:squad-chief"
     pattern: "SC-PP-003"
 
   configuration:
@@ -417,7 +417,7 @@ evaluation:
     - Criar checklist de pastas necessarias
     - Documentar ordem de criacao
     - Listar templates a serem copiados
-    - Registrar em squads/squad-creator/data/
+    - Registrar em squads/squad-creator-pro/data/
 
   rationale: "Segunda execucao - documentar processo para proxima repeticao."
 ```
@@ -439,7 +439,7 @@ evaluation:
     guardrails:
       loop_prevention: "Max 1 sync per commit"
       idempotency: "Hash check before copy"
-      audit_trail: "Log to .aios/logs/sync.log"
+      audit_trail: "Log to .aiox/logs/sync.log"
       manual_escape: "--no-sync flag"
       retry_logic: "3 retries, 1s backoff"
 
@@ -507,4 +507,4 @@ decision_log:
 ---
 
 *Squad-Creator Core Heuristics v1.0.0*
-*AIOS Heuristics Standard for squad creation*
+*AIOX Heuristics Standard for squad creation*

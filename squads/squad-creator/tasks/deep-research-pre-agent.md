@@ -1,5 +1,23 @@
 # Deep Research Pre-Agent Task
 
+**Execution Type:** Agent
+**Model:** Opus
+**Haiku Eligible:** NO
+
+## Veto Conditions
+
+| ID | Condition | Check | Result |
+|----|-----------|-------|--------|
+| VETO-DRP-001 | agent_purpose, domain, and activity inputs must be non-empty before generating research prompt | Validate all required input parameters are provided and non-empty strings | VETO - BLOCK. Request missing inputs before proceeding with research generation. |
+| VETO-DRP-002 | Existing research document at target path must be backed up before overwrite | Check if docs/research/{specialist_slug}-{activity}-research.md already exists | VETO - BLOCK. Create backup or rename existing research file before writing new output. |
+| VETO-DRP-003 | Research quality score must meet minimum threshold before accepting output | Validate quality_score >= 60% after Phase 4 evaluation | VETO - BLOCK. Retry research with adjusted queries (max 2 retries) or flag for manual enrichment. |
+
+## Checklist Reference
+
+Before marking this task complete, verify against: `checklists/deep-research-quality.md`
+
+---
+
 ## Purpose
 
 Generate a comprehensive deep research prompt and execute research to establish the knowledge foundation BEFORE creating an agent. This ensures agents are built on REAL methodologies from domain experts, not generic LLM knowledge.
@@ -13,7 +31,7 @@ Generate a comprehensive deep research prompt and execute research to establish 
 
 **Gold Standard Reference:**
 - Research: `docs/research/david-ogilvy-research-engineering-meta-framework.md` (1,179 lines)
-- Task: `squads/{your-squad}/tasks/copysearch.md` (921 lines) - Example from Copy squad
+- Task: `squads/{squad-name}/tasks/{task-name}.md` (921 lines) - Example task
 
 ## Inputs
 
@@ -457,7 +475,7 @@ EXPECTED RESULTS:
 ```
 
 **Output:**
-- `docs/research/gary-halbert-sales-page-research.md` (2,100+ lines)
+- `docs/research/{expert-slug}-{topic}-research.md` (2,100+ lines)  <!-- Example: gary-halbert-sales-page-research.md -->
 - Quality Score: 92%
 
 ---
@@ -540,7 +558,7 @@ EXPECTED RESULTS:
 ## Integration Notes
 
 This task is called by:
-- `workflows/research-then-create-agent.md` (Steps 2-5)
+- `workflows/wf-research-then-create-agent.yaml` (Steps 2-5)
 
 This task calls:
 - WebSearch tool (for external research)
@@ -563,4 +581,4 @@ This task calls:
 
 **Task Version:** 1.0.0
 **Created:** 2026-01-22
-**Part of:** squads/squad-architect
+**Part of:** squads/squad-creator-pro

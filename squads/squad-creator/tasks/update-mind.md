@@ -1,13 +1,18 @@
 ---
 task-id: update-mind
-name: Update Existing Mind DNA (Brownfield)
-version: 1.0.0
+name: Update Existing Agent DNA (Brownfield)
+version: 2.0.0
+execution_type: Hybrid
+model: Sonnet
+haiku_eligible: false
 estimated-time: 1-2 hours
 complexity: medium
+note: "Para atualizar agents em squads criados pelo squad-creator"
 
 inputs:
   required:
-    - mind_slug: "Slug do mind existente (snake_case)"
+    - squad_name: "Nome do squad (ex: copy, legal)"
+    - agent_slug: "Slug do agent existente (snake_case)"
   optional:
     - new_sources_path: "Caminho para novas fontes"
     - focus: "voice|thinking|both (default: both)"
@@ -15,17 +20,29 @@ inputs:
 
 outputs:
   primary:
-    - updated_dna: "mind_dna_complete.yaml atualizado"
-    - diff_report: "Relatorio do que mudou"
+    - updated_agent: "Agent file atualizado com novo DNA"
+    - diff_report: "Relatório do que mudou"
 
 elicit: true
 ---
 
-# Update Existing Mind DNA (Brownfield)
+# Update Existing Agent DNA (Brownfield)
 
-> **Principio:** "Evolucao > Revolucao. Preserve o que funciona, adicione o que falta."
+> **Princípio:** "Evolução > Revolução. Preserve o que funciona, adicione o que falta."
 >
-> **Regra:** NUNCA substituir DNA existente sem validar que o novo e melhor.
+> **Regra:** NUNCA substituir DNA existente sem validar que o novo é melhor.
+>
+> **Escopo:** Agents em `squads/{squad}/agents/` criados pelo squad-creator.
+
+---
+
+## Veto Conditions
+
+| ID | Condition | Check | Result |
+|----|-----------|-------|--------|
+| VETO-UPM-001 | Backup of current mind files must exist before any modification | Verify backup created at squads/{squad_name}/.backup/{agent_slug}.{timestamp}.md | VETO - BLOCK. Create backup snapshot before proceeding with DNA update. |
+| VETO-UPM-002 | Existing agent file must be loadable and parseable before applying deltas | Validate agent file exists at expected path and YAML blocks parse without error | VETO - BLOCK. Fix agent file path or structure before attempting update. |
+| VETO-UPM-003 | Protected sections (primary_framework, identity_statement, veto_heuristics) must not be replaced without explicit human approval | Check merge_rules.protected list against proposed changes | VETO - BLOCK. Route protected section changes through selective mode with human review. |
 
 ---
 
@@ -35,11 +52,9 @@ elicit: true
 
 ```yaml
 existing_files:
-  mind_dna: "outputs/minds/{mind_slug}/mind_dna_complete.yaml"
-  voice_dna: "outputs/minds/{mind_slug}/voice_dna.yaml"
-  thinking_dna: "outputs/minds/{mind_slug}/thinking_dna.yaml"
-  sources_inventory: "outputs/minds/{mind_slug}/sources_inventory.yaml"
-  agent_file: "squads/{squad}/agents/{mind_slug}.md"  # Se ja tem agente
+  agent_file: "squads/{squad_name}/agents/{agent_slug}.md"
+  sources_dir: "squads/{squad_name}/minds/{agent_slug}/sources/"  # Se existir
+  metadata: "squads/{squad_name}/minds/{agent_slug}/metadata.yaml"  # Se existir
 ```
 
 ### 0.2 Snapshot Before
@@ -89,16 +104,16 @@ new_sources_validation:
 gap_analysis:
   voice_gaps_before:
     - "Faltavam anedotas pessoais"
-    - "Tom em situacao X nao documentado"
+    - "Tom em situação X não documentado"
 
   thinking_gaps_before:
-    - "Heuristica de priorizacao incompleta"
-    - "Objection handling nao tinha exemplos"
+    - "Heurística de priorização incompleta"
+    - "Objection handling não tinha exemplos"
 
   gaps_filled_by_new_sources:
     - gap: ""
       source: ""
-      confidence: "alta|media|baixa"
+      confidence: "alta|média|baixa"
 ```
 
 ---
@@ -160,14 +175,14 @@ thinking_delta:
 | Mode | Comportamento |
 |------|---------------|
 | **merge** | Adiciona novos elementos, preserva existentes |
-| **replace** | Substitui secoes onde novo e significativamente melhor |
-| **selective** | Checkpoint por secao, usuario decide |
+| **replace** | Substitui seções onde novo é significativamente melhor |
+| **selective** | Checkpoint por seção, usuário decide |
 
 ### 3.2 Merge Rules
 
 ```yaml
 merge_rules:
-  # SEMPRE adicionar (nao duplicar)
+  # SEMPRE adicionar (não duplicar)
   additive:
     - power_words
     - signature_phrases
@@ -175,7 +190,7 @@ merge_rules:
     - heuristics
     - recognition_patterns
 
-  # NUNCA substituir sem validacao
+  # NUNCA substituir sem validação
   protected:
     - primary_framework  # Core identity
     - identity_statement
@@ -200,14 +215,14 @@ conflicts:
 
   resolution_strategy:
     auto_resolve:
-      - "Novo elemento nao existe no atual -> ADICIONAR"
-      - "Mesmo elemento com mais detalhes -> ENRIQUECER"
-      - "Mesmo elemento com exemplos adicionais -> ADICIONAR EXEMPLOS"
+      - "Novo elemento não existe no atual → ADICIONAR"
+      - "Mesmo elemento com mais detalhes → ENRIQUECER"
+      - "Mesmo elemento com exemplos adicionais → ADICIONAR EXEMPLOS"
 
     require_human:
-      - "Contradicao direta em framework"
-      - "Mudanca em identity_statement"
-      - "Remocao de elemento existente"
+      - "Contradição direta em framework"
+      - "Mudança em identity_statement"
+      - "Remoção de elemento existente"
 ```
 
 ---
@@ -218,20 +233,13 @@ conflicts:
 
 ```yaml
 updated_files:
-  mind_dna_complete:
-    path: "outputs/minds/{mind_slug}/mind_dna_complete.yaml"
-    backup: "outputs/minds/{mind_slug}/backups/mind_dna_{timestamp}.yaml"
-
-  voice_dna:
-    path: "outputs/minds/{mind_slug}/voice_dna.yaml"
+  agent_file:
+    path: "squads/{squad_name}/agents/{agent_slug}.md"
+    backup: "squads/{squad_name}/.backup/{agent_slug}.{timestamp}.md"
     sections_updated: []
 
-  thinking_dna:
-    path: "outputs/minds/{mind_slug}/thinking_dna.yaml"
-    sections_updated: []
-
-  sources_inventory:
-    path: "outputs/minds/{mind_slug}/sources_inventory.yaml"
+  metadata:
+    path: "squads/{squad_name}/minds/{agent_slug}/metadata.yaml"
     new_sources_added: 0
 ```
 
@@ -322,11 +330,11 @@ snapshot_after:
 ## OUTPUT: UPDATE REPORT
 
 ```yaml
-# ============================================================================
+# ═══════════════════════════════════════════════════════════════
 # MIND UPDATE REPORT - {MIND_NAME}
 # Updated: {DATE}
 # Mode: {merge|replace|selective}
-# ============================================================================
+# ═══════════════════════════════════════════════════════════════
 
 update_report:
   metadata:
@@ -336,9 +344,9 @@ update_report:
     mode: ""
     new_sources_processed: 0
 
-  # --------------------------------------------------------------------------
+  # ─────────────────────────────────────────────────────────────
   # CHANGES SUMMARY
-  # --------------------------------------------------------------------------
+  # ─────────────────────────────────────────────────────────────
 
   changes:
     voice_dna:
@@ -351,9 +359,9 @@ update_report:
       updated: []
       unchanged: []
 
-  # --------------------------------------------------------------------------
+  # ─────────────────────────────────────────────────────────────
   # QUALITY IMPACT
-  # --------------------------------------------------------------------------
+  # ─────────────────────────────────────────────────────────────
 
   quality:
     before:
@@ -368,9 +376,9 @@ update_report:
 
     improvement: "+X%"
 
-  # --------------------------------------------------------------------------
+  # ─────────────────────────────────────────────────────────────
   # FILES MODIFIED
-  # --------------------------------------------------------------------------
+  # ─────────────────────────────────────────────────────────────
 
   files:
     updated:
@@ -381,16 +389,16 @@ update_report:
       - original: ""
         backup: ""
 
-  # --------------------------------------------------------------------------
+  # ─────────────────────────────────────────────────────────────
   # NEXT STEPS
-  # --------------------------------------------------------------------------
+  # ─────────────────────────────────────────────────────────────
 
   next_steps:
     - "Regenerar agent.md se qualidade aumentou significativamente"
-    - "Rodar smoke tests para validar mudancas"
-    - "Atualizar squad config se necessario"
+    - "Rodar smoke tests para validar mudanças"
+    - "Atualizar squad config se necessário"
 
-# ============================================================================
+# ═══════════════════════════════════════════════════════════════
 ```
 
 ---
@@ -398,14 +406,14 @@ update_report:
 ## COMMANDS
 
 ```bash
-# Update com novas fontes
-*update-mind gary_halbert --sources /path/to/new/materials
+# Update agent com novas fontes
+*update-mind copy gary_halbert --sources /path/to/new/materials
 
 # Update apenas voice
-*update-mind gary_halbert --focus voice --sources /path/to/interviews
+*update-mind copy gary_halbert --focus voice --sources /path/to/interviews
 
 # Update com merge manual
-*update-mind gary_halbert --mode selective
+*update-mind legal contract_lawyer --mode selective
 ```
 
 ---
@@ -420,9 +428,10 @@ update_report:
 - [ ] Diff report gerado
 - [ ] Quality scores atualizados
 
-**BLOCKING:** Nao modificar arquivos sem backup criado.
+**BLOCKING:** Não modificar arquivos sem backup criado.
 
 ---
 
-**Squad Architect | Update Mind v1.0**
+**Squad Architect | Update Agent DNA v2.0**
+_Last Updated: 2026-02-11_
 *"Evolution beats revolution. Preserve what works, add what's missing."*

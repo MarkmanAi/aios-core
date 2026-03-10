@@ -80,11 +80,12 @@
 | Agent | Role | Path | Notes |
 |-------|------|------|-------|
 | **squad-architect** | Technical squad architect | `squads/squad-creator/agents/squad-architect.md` | — |
-| **oalanicolas** (dept) | DNA operations (squad scope) | `squads/squad-creator/agents/oalanicolas.md` | Homonym of Claude Code agent |
+| **oalanicolas** (dept) | DNA operations (squad scope) | `squads/squad-creator/agents/oalanicolas.md` | Homonym of Claude Code agent — Pro version (B wins, 2026-03-10 fusion) |
 | **sop-extractor** (dept) | SOP operations (squad scope) | `squads/squad-creator/agents/sop-extractor.md` | Homonym of Claude Code agent |
-| **thiago_finch** (dept) | Business Strategy & Marketing — Funnel-First | `squads/squad-creator/agents/thiago_finch.md` | Trio member: Alan (inputs) + Pedro (structure) + Thiago (direction) |
+| **thiago_finch** (dept) | Business Strategy & Marketing — Funnel-First | `squads/squad-creator/agents/thiago_finch.md` | Pro version (B wins, 2026-03-10 fusion) |
+| **pedro-valerio** (dept) | Process Auditor — veto conditions, workflow validation | `squads/squad-creator/agents/pedro-valerio.md` | Absorbed from squad-creator-pro (2026-03-10 fusion) |
 
-*Note: thiago_finch completes the squad-creator trio. Also exists as MMOS mind clone (Level 7).*
+*Note: thiago_finch also exists as MMOS mind clone (Level 7). pedro-valerio absorbed from squad-creator-pro in 2026-03-10 fusion. squad-creator-pro archived → squads/_archived/squad-creator-pro_2026-03-10/*
 
 ---
 
@@ -208,12 +209,11 @@
 | Squad | Path | Leader | Agents | Tasks |
 |-------|------|--------|--------|-------|
 | **mmos-squad** | `squads/mmos-squad/` | Mind Mapper | 10 | 27 |
-| **squad-creator** | `squads/squad-creator/` | Squad Chief | 4 | 16 |
-| **squad-creator-pro** | `squads/squad-creator-pro/` | Squad Chief (pro module) | 3 | 34 |
+| **squad-creator** | `squads/squad-creator/` | Squad Chief | 5 | 48 |
 | **ralph** | `squads/ralph/` | Ralph | 1 | 7 |
 | **design** | `squads/design/` | Design Chief | 8 | 89 |
 
-> **squad-creator-pro** — Pro upgrade module of squad-creator. Positioned 2026-03-10. Auto-detected by squad-creator base orchestrator when present. Remove to degrade cleanly to base-only mode. Adds: mind-cloning pipeline, model routing, axioma quality gates, squad fusion, 15 workflows, 34 tasks, 7 configs, 22 data files. Neo approved: Option A (module, not independent dept). Governed by `squads/squad-creator-pro/config.yaml` v3.1.0.
+> **squad-creator v4.0.0** — Unified squad (2026-03-10 fusion). Absorbed squad-creator-pro capabilities: 5 agents, 48 tasks, 20 workflows, 8 configs, 31 data files, 25 scripts (with tests), minds/ heuristics, benchmarks, assessments. squad-creator-pro archived → `squads/_archived/squad-creator-pro_2026-03-10/`. Stub at `squads/squad-creator-pro/README.md`.
 
 ---
 
@@ -262,8 +262,10 @@
 | utils | `.aios-core/core/utils` | — | operational |
 | docs | `.aios-core/core/docs` | — | operational |
 | **synapse** | `.aios-core/core/synapse` | **@devops** | **positioned — pending story** |
+| **memory-intelligence** | `.aios-core/core/memory-intelligence` | **@devops** | **operational — imported 2026-03-10** |
 
 *19th kernel module. Context injection engine. Design validator: @architect. Positioned by Neo 2026-03-02.*
+*20th kernel module. Memory Intelligence System (MIS): session-digest extraction, progressive retrieval (3 layers), attention scoring, self-learning, rule proposals. Source: mmos-private-NEW. synapse-memory-provider.js deferred — pending SYNAPSE story.*
 
 ---
 
@@ -289,10 +291,9 @@
 | Squad-Creator Agents | 4 |
 | **Total Agents** | **52** |
 | Cloned Minds | 27 |
-| Departments | 4 + 1 module (mmos-squad, squad-creator, ralph, design + squad-creator-pro) |
-| Pro-module context agents | 3 (scoped to squad-creator-pro/ — not standalone deployable) |
+| Departments | 4 (mmos-squad, squad-creator v4.0.0, ralph, design) |
 | Workflows | 15 (1 OPERATIONAL: book-to-intelligence) |
-| Kernel Modules | 19 (18 operational + 1 positioned: synapse) |
+| Kernel Modules | 20 (19 operational + 1 positioned: synapse; memory-intelligence imported 2026-03-10) |
 
 *Source: `.neo/data/inventory.yaml` — cross-validated with REPO_PATH_MAP_v2*
 *synapse (Syn) added 2026-03-09 — Level 5 Operations, P1-P3 validated by Neo*

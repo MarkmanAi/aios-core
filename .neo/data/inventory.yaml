@@ -14,7 +14,7 @@ meta:
   total_files: 6315          # find . -type f | wc -l (REPO_PATH_MAP_v2 — 2026-02-22)
   constitution: .neo/CONSTITUICAO_MATRIX.md
   organograma: .neo/ORGANOGRAMA.md
-  last_updated: "2026-03-10"  # Story 18.2 — neo-agent-fusion added
+  last_updated: "2026-03-10"  # memory-intelligence module imported from mmos-private-NEW
   updated_by: neo
 
 # ------------------------------------------------------------
@@ -43,21 +43,17 @@ headcount:
   # debate, emulator, identity-analyst, mind-mapper, mind-pm,
   # research-specialist, system-prompt-architect
 
-  agents_squad_creator: 4
+  agents_squad_creator: 5
   # Path: squads/squad-creator/agents/
-  # oalanicolas, sop-extractor, squad-architect, thiago_finch
+  # oalanicolas, sop-extractor, squad-architect, thiago_finch,
+  # pedro-valerio (absorbed from squad-creator-pro in 2026-03-10 fusion)
 
-  total_agents: 52
+  total_agents: 53
   # NOTE: Neo is NOT counted here — he exists OUTSIDE the org hierarchy.
   # However, his bridge file (.claude/agents/neo.md) IS counted in the
   # claude_code agent tally above (slot 25).
-  # 13 core + 25 claude_code + 10 mmos + 4 squad_creator = 52
-  #
-  # AUDIT NOTE: The 3 squad_creator agents (oalanicolas,
-  # sop-extractor, squad-architect) overlap in function with
-  # the 2 homonym Claude Code agents (oalanicolas, sop-extractor).
-  # They live in different paths and serve different scopes.
-  total_agents_note: "52 real agents across all paths (13+25+10+4). synapse (Syn) positioned 2026-03-09 at Level 5 Operations — SYNAPSE Pipeline Operator. thiago_finch added to squad-creator 2026-02-23. neo.md bridge counted in claude_code tally."
+  # 13 core + 25 claude_code + 10 mmos + 5 squad_creator = 53
+  total_agents_note: "53 real agents across all paths (13+25+10+5). pedro-valerio absorbed into squad-creator from squad-creator-pro fusion 2026-03-10. squad-creator-pro archived → squads/_archived/squad-creator-pro_2026-03-10/."
 
   minds_cloned: 27
   # Path: squads/mmos-squad/minds/ (directories only, excl. .yaml/.md files)
@@ -127,7 +123,7 @@ processes:
 # ------------------------------------------------------------
 infrastructure:
 
-  kernel_module_dirs: 19
+  kernel_module_dirs: 20
   # Path: .aios-core/core/ (directories only)
   # config, docs, elicitation, events, execution, health-check,
   # ideation, manifest, mcp, memory, migration, orchestration,
@@ -171,13 +167,11 @@ departments:
     - ralph                 # squads/ralph/ — autonomous loop orchestrator (Epic 14, 2026-03-08)
     - design                # squads/design/ — Design System Squad v2.1.0 (import 2026-03-09, formally positioned by Neo 2026-03-09)
 
-  pro_modules: 1
-  pro_module_names:
-    - squad-creator-pro     # squads/squad-creator-pro/ — Pro upgrade module of squad-creator
-                            # v3.1.0, imported 2026-03-10, Option A (module, not dept)
-                            # 218 files: 3 context-agents, 34 tasks, 15 workflows, 7 configs,
-                            # 7 checklists, 22 data files, 20 scripts, 2 minds heuristic pkgs
-                            # Auto-detected by squad-creator base orchestrator when present.
+  pro_modules: 0
+  pro_module_names: []
+  # squad-creator-pro ARCHIVED 2026-03-10 — fused into squad-creator v4.0.0
+  # Archive path: squads/_archived/squad-creator-pro_2026-03-10/
+  # All capabilities now live in squads/squad-creator/ (5 agents, 48 tasks, 20 workflows)
 
 # ------------------------------------------------------------
 # NEO META — Neo's own footprint (not counted in org totals)

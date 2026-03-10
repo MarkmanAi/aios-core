@@ -180,7 +180,7 @@ Parse the user's command and match against the mission router:
 | `*help` | — (list all commands) | — |
 | `*exit` | — (exit mode) | — |
 
-**Path resolution**: All paths relative to `squads/squad-creator/`. Tasks at `tasks/`, data at `data/`.
+**Path resolution**: All paths relative to `squads/squad-creator-pro/`. Tasks at `tasks/`, data at `data/`.
 
 ### Execution:
 1. Read the COMPLETE task/data file (no partial reads)
