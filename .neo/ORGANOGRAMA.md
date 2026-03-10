@@ -1,5 +1,5 @@
 # Living Org Chart — AIOS Organization
-## Last updated: 2026-03-01
+## Last updated: 2026-03-10
 ## Maintained by: Neo — The Matrix Architect
 ## Source: REPO_PATH_MAP_v2 (2026-02-22) + CONSTITUICAO_MATRIX.md
 
@@ -209,8 +209,11 @@
 |-------|------|--------|--------|-------|
 | **mmos-squad** | `squads/mmos-squad/` | Mind Mapper | 10 | 27 |
 | **squad-creator** | `squads/squad-creator/` | Squad Chief | 4 | 16 |
+| **squad-creator-pro** | `squads/squad-creator-pro/` | Squad Chief (pro module) | 3 | 34 |
 | **ralph** | `squads/ralph/` | Ralph | 1 | 7 |
 | **design** | `squads/design/` | Design Chief | 8 | 89 |
+
+> **squad-creator-pro** — Pro upgrade module of squad-creator. Positioned 2026-03-10. Auto-detected by squad-creator base orchestrator when present. Remove to degrade cleanly to base-only mode. Adds: mind-cloning pipeline, model routing, axioma quality gates, squad fusion, 15 workflows, 34 tasks, 7 configs, 22 data files. Neo approved: Option A (module, not independent dept). Governed by `squads/squad-creator-pro/config.yaml` v3.1.0.
 
 ---
 
@@ -264,6 +267,17 @@
 
 ---
 
+## NEO GOVERNANCE COMMANDS
+
+| Command | Task File | Description | Wraps |
+|---------|-----------|-------------|-------|
+| `*import-asset` | `.neo/tasks/neo-import-asset.md` | Import external asset with governance — technical diagnostic + 7-principle validation + board positioning before any execution | `import-asset` skill |
+| `*fusion` | `.neo/tasks/neo-fusion.md` | Fuse two organizational assets into result C — A + B → C (irreversible). Governance: 7 principles + rollback path + board positioning of C before execution. Scope v1: squads. | `wf-squad-fusion.yaml` |
+
+> **Import vs Fusion:** Import = A + B remain (coexistence). Fusion = A + B → C (replacement — A and B cease to exist). Fusion requires rollback path definition before execution begins.
+
+---
+
 ## HEADCOUNT SUMMARY
 
 | Category | Count |
@@ -274,7 +288,8 @@
 | Squad-Creator Agents | 4 |
 | **Total Agents** | **52** |
 | Cloned Minds | 27 |
-| Departments | 4 (mmos-squad, squad-creator, ralph, design) |
+| Departments | 4 + 1 module (mmos-squad, squad-creator, ralph, design + squad-creator-pro) |
+| Pro-module context agents | 3 (scoped to squad-creator-pro/ — not standalone deployable) |
 | Workflows | 15 (1 OPERATIONAL: book-to-intelligence) |
 | Kernel Modules | 19 (18 operational + 1 positioned: synapse) |
 

@@ -14,7 +14,7 @@ meta:
   total_files: 6315          # find . -type f | wc -l (REPO_PATH_MAP_v2 — 2026-02-22)
   constitution: .neo/CONSTITUICAO_MATRIX.md
   organograma: .neo/ORGANOGRAMA.md
-  last_updated: "2026-03-09"
+  last_updated: "2026-03-10"
   updated_by: neo
 
 # ------------------------------------------------------------
@@ -86,13 +86,15 @@ procedures:
   tasks_squad_creator: 16
   # Path: squads/squad-creator/tasks/
 
-  tasks_neo: 7
-  # Path: .neo/tasks/ (to be created)
+  tasks_neo: 9
+  # Path: .neo/tasks/
   # neo-hire-agent, neo-hire-consultant, neo-create-dept,
-  # neo-audit, neo-validate-new, neo-health-check, neo-reorg
+  # neo-audit, neo-validate-new, neo-health-check, neo-reorg,
+  # neo-import-asset (wraps import-asset skill + governance layer),
+  # neo-fusion (governance layer over wf-squad-fusion.yaml — added 2026-03-10)
 
-  total_tasks: 245
-  # 195 core + 27 mmos + 16 squad_creator + 7 neo = 245
+  total_tasks: 247
+  # 195 core + 27 mmos + 16 squad_creator + 9 neo = 247
   # NOTE: 238 = pre-Neo count (organizational tasks only).
   #       245 = post-Neo count (238 + 7 Neo operational tasks).
   #       Legacy docs cited 236 — off by 2 from pre-Neo count.
@@ -163,17 +165,25 @@ departments:
 
   squads: 4
   names:
-    - mmos-squad        # squads/mmos-squad/
-    - squad-creator     # squads/squad-creator/
-    - ralph             # squads/ralph/ — autonomous loop orchestrator (Epic 14, 2026-03-08)
-    - design            # squads/design/ — Design System Squad v2.1.0 (import 2026-03-09, formally positioned by Neo 2026-03-09)
+    - mmos-squad            # squads/mmos-squad/
+    - squad-creator         # squads/squad-creator/
+    - ralph                 # squads/ralph/ — autonomous loop orchestrator (Epic 14, 2026-03-08)
+    - design                # squads/design/ — Design System Squad v2.1.0 (import 2026-03-09, formally positioned by Neo 2026-03-09)
+
+  pro_modules: 1
+  pro_module_names:
+    - squad-creator-pro     # squads/squad-creator-pro/ — Pro upgrade module of squad-creator
+                            # v3.1.0, imported 2026-03-10, Option A (module, not dept)
+                            # 218 files: 3 context-agents, 34 tasks, 15 workflows, 7 configs,
+                            # 7 checklists, 22 data files, 20 scripts, 2 minds heuristic pkgs
+                            # Auto-detected by squad-creator base orchestrator when present.
 
 # ------------------------------------------------------------
 # NEO META — Neo's own footprint (not counted in org totals)
 # ------------------------------------------------------------
 neo_footprint:
 
-  tasks: 7              # .neo/tasks/
+  tasks: 9              # .neo/tasks/ (7 was stale — neo-import-asset wasn't registered; corrected to 9 = 8 existing + neo-fusion 2026-03-10)
   templates: 3          # .neo/templates/
   data_files: 3         # .neo/data/ (this file + gaps.yaml + principles.md)
   constitution: 1       # .neo/CONSTITUICAO_MATRIX.md
@@ -182,7 +192,7 @@ neo_footprint:
   bridge: 1             # .claude/agents/neo.md
   command: 1            # .claude/commands/neo/neo.md
   public_doc: 1         # docs/architecture/matrix-vision.md
-  note: "Neo exists OUTSIDE the organizational hierarchy. His 7 operational tasks ARE included in total_tasks (as a separate tasks_neo category). His bridge file IS counted in claude_code agents. Neo himself is NOT counted in total_agents."
+  note: "Neo exists OUTSIDE the organizational hierarchy. His 9 operational tasks ARE included in total_tasks (as a separate tasks_neo category). His bridge file IS counted in claude_code agents. Neo himself is NOT counted in total_agents. neo-import-asset added 2026-03-10 — wraps import-asset skill with governance layer. neo-fusion added 2026-03-10 — governance layer over wf-squad-fusion.yaml (Story 18.1)."
 
 # ------------------------------------------------------------
 # DISCREPANCIES vs LEGACY DOCUMENTATION

@@ -340,6 +340,14 @@ commands:
     args: '{file}'
     description: 'Validate — inspect new component before it enters the territory'
     category: governance
+  - name: import-asset
+    args: '{source_path} {asset_name}'
+    description: 'Import external asset — technical diagnostic (import-asset skill) + governance layer (7 principles + board positioning) before any execution'
+    category: governance
+  - name: fusion
+    args: '{asset_a} {asset_b}'
+    description: 'Fuse two organizational assets into one superior result — A + B → C (new, unique). Governance layer (7 principles + rollback path + board positioning of C) before any execution. Scope v1: squads only.'
+    category: governance
   - name: principles
     description: 'The 7 claws — list the inviolable principles'
     category: governance
@@ -391,6 +399,8 @@ command_types:
     - validate-new    # → .neo/tasks/neo-validate-new.md
     - health          # → .neo/tasks/neo-health-check.md
     - reorg           # → .neo/tasks/neo-reorg.md
+    - import-asset    # → .neo/tasks/neo-import-asset.md (wraps import-asset skill + governance)
+    - fusion          # → .neo/tasks/neo-fusion.md (governance layer over wf-squad-fusion.yaml)
   inline:
     - matrix          # Read inventory + constitution → territory summary
     - org             # Read ORGANOGRAMA.md → display the board
@@ -417,6 +427,10 @@ dependencies:
     - neo-validate-new.md
     - neo-health-check.md
     - neo-reorg.md
+    - neo-import-asset.md
+    - neo-fusion.md
+  skills:
+    - import-asset  # .claude/skills/import-asset/SKILL.md — technical layer called by neo-import-asset
   templates:
     - new-agent-position.md
     - new-mind-position.md
@@ -463,6 +477,8 @@ dependencies:
 
 - `*audit {component}` — Hunt for fractures
 - `*validate-new {file}` — Inspect before entry
+- `*import-asset {source_path} {asset_name}` — Import external asset with governance
+- `*fusion {asset_a} {asset_b}` — Fuse two assets into result C (A + B → C, irreversible)
 - `*principles` — The 7 claws
 - `*gaps` — Blind spots
 
