@@ -74,7 +74,7 @@ function loadRouting() {
 }
 
 // Calculate score for an output against baseline
-function calculateScore(output, baseline, testCase, rubric) {
+function _calculateScore(output, baseline, testCase, rubric) {
   const scores = {};
   let totalScore = 0;
 
@@ -86,7 +86,7 @@ function calculateScore(output, baseline, testCase, rubric) {
     scores[dimName] = {
       score: dimScore,
       weight: dimConfig.weight,
-      weighted: dimScore * dimConfig.weight
+      weighted: dimScore * dimConfig.weight,
     };
     totalScore += dimScore * dimConfig.weight;
   }
@@ -94,7 +94,7 @@ function calculateScore(output, baseline, testCase, rubric) {
   return {
     total: totalScore,
     dimensions: scores,
-    percentage: (totalScore / 10) * 100
+    percentage: (totalScore / 10) * 100,
   };
 }
 
@@ -124,14 +124,14 @@ function evaluateDimension(dimName, output, baseline, testCase) {
 }
 
 // Determine tier recommendation
-function recommendTier(results, rubric) {
-  const { haiku, sonnet, opus } = results;
+function _recommendTier(results, rubric) {
+  const { haiku, sonnet, _opus } = results;
 
   if (haiku && haiku.percentage >= rubric.thresholds.haiku * 100) {
     return {
       tier: 'haiku',
       reason: `Haiku score (${haiku.percentage.toFixed(1)}%) >= threshold (${rubric.thresholds.haiku * 100}%)`,
-      savings: '93%'
+      savings: '93%',
     };
   }
 
@@ -139,19 +139,19 @@ function recommendTier(results, rubric) {
     return {
       tier: 'sonnet',
       reason: `Sonnet score (${sonnet.percentage.toFixed(1)}%) >= threshold (${rubric.thresholds.sonnet * 100}%)`,
-      savings: '80%'
+      savings: '80%',
     };
   }
 
   return {
     tier: 'opus',
     reason: 'Neither Haiku nor Sonnet met quality threshold',
-    savings: '0%'
+    savings: '0%',
   };
 }
 
 // Generate comparison report
-function generateReport(taskName, results, recommendation) {
+function _generateReport(taskName, results, recommendation) {
   const report = {
     task: taskName,
     timestamp: new Date().toISOString(),
@@ -159,21 +159,21 @@ function generateReport(taskName, results, recommendation) {
       haiku: results.haiku ? {
         score: results.haiku.total.toFixed(2),
         percentage: results.haiku.percentage.toFixed(1) + '%',
-        qualified: results.haiku.percentage >= 90
+        qualified: results.haiku.percentage >= 90,
       } : null,
       sonnet: results.sonnet ? {
         score: results.sonnet.total.toFixed(2),
         percentage: results.sonnet.percentage.toFixed(1) + '%',
-        qualified: results.sonnet.percentage >= 95
+        qualified: results.sonnet.percentage >= 95,
       } : null,
       opus: {
         score: '10.00',
         percentage: '100%',
-        qualified: true
-      }
+        qualified: true,
+      },
     },
     recommendation: recommendation,
-    compensation_needed: recommendation.tier !== 'haiku' && results.haiku && results.haiku.percentage < 90
+    compensation_needed: recommendation.tier !== 'haiku' && results.haiku && results.haiku.percentage < 90,
   };
 
   return report;
@@ -246,7 +246,7 @@ function updateRoutingConfig(taskName, tier, reason) {
 const [,, command, ...args] = process.argv;
 
 switch (command) {
-  case 'validate':
+  case 'validate': {
     const taskName = args[0];
     if (!taskName) {
       console.log('Usage: node model-tier-validator.cjs validate <task-name>');
@@ -285,15 +285,17 @@ switch (command) {
       console.log(`Recommendation: ${testCase.results.recommendation || 'None'}`);
     }
     break;
+  }
 
-  case 'list':
+  case 'list': {
     const tasks = listTestCases();
     console.log('\nAvailable test cases:');
     tasks.forEach(t => console.log(`  - ${t}`));
     console.log(`\nTotal: ${tasks.length} test cases`);
     break;
+  }
 
-  case 'report':
+  case 'report': {
     const allTasks = listTestCases();
     const reports = [];
 
@@ -306,8 +308,8 @@ switch (command) {
           recommendation: {
             tier: tc.results.final_tier,
             savings: tc.results.final_tier === 'haiku' ? '93%' :
-                     tc.results.final_tier === 'sonnet' ? '80%' : '0%'
-          }
+              tc.results.final_tier === 'sonnet' ? '80%' : '0%',
+          },
         });
       }
     }
@@ -319,8 +321,9 @@ switch (command) {
       printComparisonTable(reports);
     }
     break;
+  }
 
-  case 'update-routing':
+  case 'update-routing': {
     const updateTask = args[0];
     const updateTier = args[1];
     const updateReason = args.slice(2).join(' ') || 'Validated via model-tier-validator';
@@ -336,6 +339,7 @@ switch (command) {
       console.log(`❌ Failed to update routing config for ${updateTask}`);
     }
     break;
+  }
 
   default:
     console.log(`
