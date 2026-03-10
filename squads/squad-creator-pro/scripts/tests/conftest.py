@@ -123,7 +123,7 @@ handoff_to:
 '''
     # Add enough content to reach 300+ lines
     agent_content += "\n" * 200
-    (agents_dir / "sample-agent.md").write_text(agent_content)
+    (agents_dir / "sample-agent.md").write_text(agent_content, encoding='utf-8')
 
     # Tasks directory
     tasks_dir = squad_dir / "tasks"

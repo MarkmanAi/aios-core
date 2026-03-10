@@ -7,6 +7,8 @@ set -u
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPT="$SCRIPT_DIR/../validate-clone.sh"
 FIDELITY_SCRIPT="$SCRIPT_DIR/../fidelity-score.sh"
+# Run from scripts/ directory so internal relative-path calls within the script resolve correctly
+cd "$SCRIPT_DIR/.."
 PASS=0
 FAIL=0
 TOTAL=0

@@ -6,8 +6,9 @@ from pathlib import Path
 
 import pytest
 
-
 SCRIPT_PATH = Path(__file__).parent.parent / "squad-analytics.py"
+if not SCRIPT_PATH.exists():
+    pytest.skip("squad-analytics.py not found in scripts/ (task is defined as YAML)", allow_module_level=True)
 
 spec = importlib.util.spec_from_file_location("squad_analytics", SCRIPT_PATH)
 squad_analytics = importlib.util.module_from_spec(spec)

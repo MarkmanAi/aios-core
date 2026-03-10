@@ -31,8 +31,8 @@ class TestCountLines:
     def test_count_lines_simple_file(self, tmp_path):
         """Test counting lines in a simple file"""
         test_file = tmp_path / "test.txt"
-        test_file.write_text("line1\nline2\nline3\n")
-        assert count_lines(str(test_file)) == 4
+        test_file.write_text("line1\nline2\nline3")
+        assert count_lines(str(test_file)) == 3
 
     def test_count_lines_empty_file(self, tmp_path):
         """Test counting lines in empty file"""

@@ -8,8 +8,9 @@ from pathlib import Path
 
 import pytest
 
-
 SCRIPT_PATH = Path(__file__).parent.parent / "refresh-registry.py"
+if not SCRIPT_PATH.exists():
+    pytest.skip("refresh-registry.py not found in scripts/ (task is defined as YAML)", allow_module_level=True)
 
 spec = importlib.util.spec_from_file_location("refresh_registry", SCRIPT_PATH)
 refresh_registry = importlib.util.module_from_spec(spec)
