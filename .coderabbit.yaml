@@ -1,16 +1,16 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 # AIOS CodeRabbit Configuration
-# Story: COLLAB-1 | Updated: 2026-03-02
+# Story: COLLAB-1 | Updated: 2026-03-11
 #
 # CodeRabbit provides AI-powered code review for pull requests
 # Documentation: https://docs.coderabbit.ai/getting-started/yaml-configuration
 
 language: "en-US"
 tone_instructions: "Be professional, constructive, and focused on code quality."
-early_access: false
+early_access: true
 
 reviews:
-  profile: "chill"
+  profile: "balanced"
 
   # Automatic review settings
   auto_review:
@@ -25,7 +25,7 @@ reviews:
   high_level_summary_placeholder: "@coderabbitai summary"
   poem: false
   review_status: true
-  collapse_walkthrough: false
+  collapse_walkthrough: true
   abort_on_close: true
 
   # ---------------------------------------------------------------------------
@@ -43,6 +43,11 @@ reviews:
     - "!**/yarn.lock"
     - "!**/pnpm-lock.yaml"
     - "!**/*.d.ts"
+    - "!**/__pycache__/**"
+    - "!**/*.pyc"
+    - "!knowledge-etl/data/**"
+    - "!knowledge-etl/.pytest_cache/**"
+    - "!outputs/**"
 
   # ---------------------------------------------------------------------------
   # PATH INSTRUCTIONS - Context-specific review rules
@@ -157,6 +162,106 @@ reviews:
         Code examples should be functional and up-to-date.
         Check internal links are valid.
         Do not flag markdown style preferences.
+
+    # ── KNOWLEDGE ETL — Python Pipeline ──────────────────────────────────────
+    - path: "knowledge-etl/**"
+      instructions: |
+        Python ETL pipeline for knowledge extraction and processing.
+        CRITICAL: Check for LLM API key exposure in code or logs.
+        HIGH: Validate checkpoint logic — ensure idempotency on re-runs.
+        HIGH: Verify deduplication logic is correct and consistent.
+        Check ETL layer separation: extract/ → transform/ → load/ must not cross-import.
+        Verify error handling covers API failures, rate limits, and malformed data.
+        Ensure all file paths use pathlib, not raw string concatenation.
+        Check that cost tracking (cost.py) is called for every LLM invocation.
+        Flag any hardcoded model names — should come from config.py.
+
+    # ── KNOWLEDGE ETL — Python Source Code ───────────────────────────────────
+    - path: "**/*.py"
+      instructions: |
+        Python code standards for this project.
+        Use type hints on all function signatures.
+        Prefer pathlib.Path over os.path.
+        Check for bare except clauses — always catch specific exceptions.
+        Verify logging uses the standard logger, not print().
+        No hardcoded API keys or credentials.
+        Ensure async functions are awaited correctly.
+        Flag TODO/FIXME comments that block production readiness.
+
+    # ── APPS — Dashboard (Next.js) ───────────────────────────────────────────
+    - path: "apps/dashboard/**"
+      instructions: |
+        Next.js dashboard — Observability layer (CLI First principle: UI is tertiary).
+        HIGH: Dashboard must never control CLI operations, only observe.
+        Check for proper use of React hooks (no rules-of-hooks violations).
+        Verify server components vs client components separation.
+        Ensure no sensitive data is exposed to the client bundle.
+        Check for proper loading/error states in all data-fetching components.
+        Flag any direct database calls from client components.
+
+    # ── APPS — Monitor Server ─────────────────────────────────────────────────
+    - path: "apps/monitor-server/**"
+      instructions: |
+        Real-time monitoring server for AIOS observability.
+        CRITICAL: Verify no credentials or secrets are logged.
+        Check WebSocket/SSE implementations for proper connection lifecycle.
+        Ensure rate limiting is in place for public endpoints.
+        Verify error responses don't leak internal stack traces.
+
+    # ── CLAUDE COMMANDS (Skills) ──────────────────────────────────────────────
+    - path: ".claude/commands/**"
+      instructions: |
+        Claude Code skills and agent command definitions.
+        Verify skill files have a clear trigger condition and purpose.
+        Check that agent redirects (.md files that redirect to another agent) are valid.
+        Ensure task files follow AIOS task format (elicit, process, validation checklist).
+        Flag any skill that references non-existent agents or tasks.
+        Check that squad command directories follow naming conventions.
+
+    # ── SQUADS — Design ───────────────────────────────────────────────────────
+    - path: "squads/design/**"
+      instructions: |
+        Design squad: Brad Frost Atomic Design, design system, tokens, components.
+        Verify agent files follow AIOS agent YAML structure.
+        Check that design agents reference valid design system patterns.
+        Ensure token definitions follow naming conventions (scale, semantic, component levels).
+
+    # ── SQUADS — Ralph & Others ───────────────────────────────────────────────
+    - path: "squads/ralph/**"
+      instructions: |
+        Verify agent follows AIOS agent YAML structure.
+        Check that commands map to existing task dependencies.
+        Ensure persona_profile is complete.
+
+    # ── BIN — CLI Executables ─────────────────────────────────────────────────
+    - path: "bin/**"
+      instructions: |
+        CLI entrypoints — highest user-facing impact.
+        CRITICAL: Check for command injection vulnerabilities in user input handling.
+        HIGH: Verify all user inputs are validated before use in shell commands.
+        Ensure proper exit codes (0 success, 1 error, 2 misuse).
+        Check that error messages are user-friendly and actionable.
+        Verify --help output is accurate and complete.
+        Flag any use of eval() or exec() with user-controlled data.
+
+    # ── AIOS CORE — Schemas ───────────────────────────────────────────────────
+    - path: ".aios-core/schemas/**"
+      instructions: |
+        Schema definitions for AIOS data structures.
+        Verify schema changes are backward compatible (no removed required fields).
+        Check that new fields have proper defaults or are optional.
+        Ensure schema documentation matches actual field usage.
+        Flag breaking changes with BREAKING CHANGE label.
+
+    # ── AIOS CORE — Core Modules ──────────────────────────────────────────────
+    - path: ".aios-core/core/**"
+      instructions: |
+        Core framework modules — changes here affect ALL agents and workflows.
+        CRITICAL: Any breaking change must be flagged explicitly.
+        HIGH: Verify backward compatibility with existing agent definitions.
+        Check orchestration logic for deadlock conditions.
+        Ensure memory management doesn't cause context bloat.
+        Validate that core modules have no circular dependencies.
 
 # Chat settings
 chat:
