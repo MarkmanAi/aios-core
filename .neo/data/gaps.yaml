@@ -400,17 +400,17 @@ gaps:
 # SUMMARY — Updated by Neo on every *health run
 # ------------------------------------------------------------
 summary:
-  total_gaps: 27
+  total_gaps: 28
   open: 11
-  in_progress: 1
+  in_progress: 2
   resolved: 15
   wont_fix: 0
-  last_updated: "2026-03-09"
+  last_updated: "2026-03-10"
 
   by_priority:
-    # OPEN gaps only (post GAP-ORG-002 resolution 2026-03-09):
+    # OPEN+IN_PROGRESS gaps only:
     critical: 0
-    high: 1        # MIND-006 (mitchell_hashimoto) — ORG-002 resolved 2026-03-09
+    high: 2        # MIND-006 (mitchell_hashimoto) + KB-001 (strategic KB — in_progress)
     medium: 4      # MIND-008 (don_norman) + MIND-009 (guillermo_rauch) + INFRA-007 (synapse hook) + MIND-012 (napoleon_hill)
     low: 5         # INFRA-005,006 | DOC-002,003 | MIND-013 (adriano_de_marqui record)
 
@@ -434,10 +434,10 @@ summary:
     - GAP-MIND-013   # adriano_de_marqui — PIPELINE-COMPLETE predates Neo, ORGANOGRAMA not updated
 
   # Formula: 100 - (critical*10) - (high*5) - (medium*2) - (low*1)
-  # Open: 1 high + 4 medium + 5 low
-  # = 100 - (1*5) - (4*2) - (5*1) = 100 - 5 - 8 - 5 = 82
-  compliance_score: 82
-  compliance_score_note: "82/100 — GAP-ORG-002 (design dept) resolved 2026-03-09. squads/design/ formally positioned as 4th department. Open: MIND-006 (mitchell, alta), INFRA-007+MIND-012+MIND-008+MIND-009 (media), INFRA-005,006+DOC-002,003+MIND-013 (baixa)."
+  # Open+InProgress: 2 high + 4 medium + 5 low
+  # = 100 - (2*5) - (4*2) - (5*1) = 100 - 10 - 8 - 5 = 77
+  compliance_score: 77
+  compliance_score_note: "77/100 — GAP-KB-001 (strategic KB) added 2026-03-10 as high/in_progress (-5). Resolves when 4-book Pareto queue completes. Open: MIND-006 (mitchell, alta), KB-001 (strategic KB, alta/in_progress), INFRA-007+MIND-012+MIND-008+MIND-009 (media), INFRA-005,006+DOC-002,003+MIND-013 (baixa). Score rises to 82 when KB-001 resolves."
 
   # === NEW: Found in 2026-03-09 health check ===
 
@@ -552,6 +552,31 @@ summary:
     status: open
 
   # === END new gaps 2026-03-09 ===
+
+  - id: GAP-KB-001
+    type: missing_component
+    component: "Neo Strategic Knowledge Base"
+    path: ".neo/kb/strategic/ + .neo/data/strategic-principles.md"
+    description: |
+      Neo governed exclusively by intuition + 7 principles with no systematic
+      external framework grounding. Commands *audit, *health, *create-dept, *reorg
+      lacked diagnostic vocabulary: no leverage points framework (Meadows), no
+      cognitive load model (Skelton), no mission command gap analysis (Bungay),
+      no managerial output measurement (Grove). Strategic KB and operational
+      principles file were absent from Neo's territory.
+    priority: high
+    recommended_action: |
+      POSITIONED 2026-03-10. Execution:
+      1. @dev: delete knowledge-etl/data/staging/princípios-milenares/ (test cleanup)
+      2. @dev: run knowledge-etl pipeline — Thinking in Systems (Meadows) first
+      3. After L1+L2+L3 complete: create .neo/data/strategic-principles.md + .neo/kb/strategic/systems-thinking.md
+      4. Repeat for Team Topologies → The Art of Action → High Output Management
+      5. Update inventory.yaml books_processed after each book
+    identified_by: neo
+    identified_on: "2026-03-10"
+    resolved_on: null
+    status: in_progress
+    note: "Pareto Tier 1 queue approved (4 books). P1-P3 validated. ETL pipeline ready. Awaiting execution delegation to @dev."
 
   highest_roi_action: "Resolve mitchell_hashimoto (GAP-MIND-006) — fabricated system prompt violates P3+P7. Must restart from sources."
   quick_wins:

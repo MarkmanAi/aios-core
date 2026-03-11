@@ -1,5 +1,5 @@
 # Living Org Chart — AIOS Organization
-## Last updated: 2026-03-10
+## Last updated: 2026-03-10 (Neo KB upgrade positioned)
 ## Maintained by: Neo — The Matrix Architect
 ## Source: REPO_PATH_MAP_v2 (2026-02-22) + CONSTITUICAO_MATRIX.md
 
@@ -278,6 +278,57 @@
 | `*agent-fusion` | `.neo/tasks/neo-agent-fusion.md` | Fuse two agents into Agent C — A + B → C (new, unique persona+capabilities). Governance: 7 principles + rollback path + org positioning of C before execution. Scope v2: agents. | `@dev + @sm (execution protocol)` |
 
 > **Import vs Fusion:** Import = A + B remain (coexistence). Fusion = A + B → C (replacement — A and B cease to exist). Fusion requires rollback path definition before execution begins.
+
+---
+
+## NEO KNOWLEDGE BASE
+
+> Neo's strategic intelligence layer — built from curated books via `knowledge-etl/` pipeline.
+> **Writer**: `knowledge-etl/` (automated Python pipeline). **Reader**: Neo. **Auditor**: @pedro-valerio (read-only).
+> P1 verified: writer ≠ auditor. Content governed by faithfulness validation (Haiku gate, quote-first extraction).
+> Positioned by Neo 2026-03-10. Approved by: human + Neo 7-principle validation.
+
+### L1 — Operational Principles
+
+| Asset | Path | Format | Status |
+|-------|------|--------|--------|
+| **strategic-principles.md** | `.neo/data/strategic-principles.md` | One principle per entry: principle · action · attribution · source_quote · chapter_ref | POSITIONED — pending first book |
+
+*Neo queries this file during `*audit`, `*health`, `*create-dept`, `*reorg` to ground decisions in verified external frameworks.*
+
+### L2 — Strategic Knowledge Base
+
+| Domain | Path | Books feeding this domain | Status |
+|--------|------|--------------------------|--------|
+| **systems-thinking** | `.neo/kb/strategic/systems-thinking.md` | Thinking in Systems (Meadows), Antifragile (Taleb) | POSITIONED — pending |
+| **org-design** | `.neo/kb/strategic/org-design.md` | Team Topologies (Skelton & Pais), Reinventing Organizations (Laloux) | POSITIONED — pending |
+| **governance** | `.neo/kb/strategic/governance.md` | The Art of Action (Bungay), High Output Management (Grove) | POSITIONED — pending |
+| **multi-agent-systems** | `.neo/kb/strategic/multi-agent-systems.md` | Designing Multi-Agent Systems (Dibia), AI Engineering (Huyen) | POSITIONED — pending |
+
+*Format per file: XML boundaries + Markdown content. Each framework entry includes: name · description · components · when_to_use · source_quote.*
+
+### Acquisition Tools (Knowledge Library CLI)
+
+| Tool | Path | What it does | Destination |
+|------|------|-------------|-------------|
+| **zlib.py** | `tools/zlib.py` | Z-Library CLI — login, search, filter (format/lang), download with progress bar | `books/` (auto-created) |
+| **list_library.py** | `tools/list_library.py` | Local catalog — lists and groups downloaded books by category | reads `books/` |
+
+*Credentials: `ZLIB_EMAIL` + `ZLIB_PASSWORD` in root `.env`. Auth: cookie-based session. Positioned by Neo 2026-03-10.*
+*Workflow: `zlib.py search + download` → `books/{file}` → `knowledge-etl process` → `.neo/kb/strategic/` + `.neo/data/strategic-principles.md`*
+
+### Processing Queue — Pareto Tier 1 (4 books)
+
+| # | Book | Author | L1 | L2 Domain | L3 Clone | Model Strategy |
+|---|------|--------|----|-----------|----|----------------|
+| 1 | **Thinking in Systems** | Donella Meadows | ✅ | systems-thinking | ✅ L3 extracted (donella-h-meadows/) | **DONE** — 2026-03-11 · 96.3% faithfulness |
+| 2 | **Team Topologies** (2nd Ed.) | Skelton & Pais | ✅ | org-design | ❌ | Sonnet L1/L2 |
+| 3 | **The Art of Action** | Stephen Bungay | ✅ | governance | ❌ | Sonnet L1/L2 |
+| 4 | **High Output Management** | Andrew Grove | ✅ | governance | ❌ | Sonnet L1/L2 |
+
+*Sequence approved by Neo 2026-03-10. Pareto logic: 4 books cover systems thinking (foundation), org structure (design tool), governance philosophy (delegation), output measurement (health metric) — ~80% of Neo's governance decision upgrade.*
+*L3 for Meadows: future candidate. Thinking in Systems is primary source. Posthumous clone feasible — requires book + interviews/essays (P3 triangulation).*
+*Princípios-milenares staging: DISCARDED (test run, not in approved queue).*
 
 ---
 
