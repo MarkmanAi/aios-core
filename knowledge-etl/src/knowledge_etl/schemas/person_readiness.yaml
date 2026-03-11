@@ -1,0 +1,29 @@
+# Schema template — Tier Gate
+# Usage: knowledge-etl/src/knowledge_etl/kb/person_readiness.py avalia e escreve instâncias
+current_tier: 0
+
+tiers:
+  - tier: 0
+    name: raw
+    condition: "Ao menos 1 fonte coletada em sources/"
+    passed: false
+
+  - tier: 1
+    name: extracted
+    condition: "ETL rodou em ao menos 1 fonte — extracted.json existe"
+    passed: false
+
+  - tier: 2
+    name: profile_ready
+    condition: "profile/ existe + apex_score_estimated >= threshold por clone_type"
+    threshold:
+      mind_clone: 70
+      governance_advisor: 55
+    passed: false
+
+  - tier: 3
+    name: production_ready
+    condition: "sources_count >= 3 AND tier_2 passed"
+    passed: false
+
+mmos_cleared: false             # True quando current_tier >= 2

@@ -22,6 +22,9 @@ NEO_STRATEGIC_PRINCIPLES = REPO_ROOT / ".neo" / "data" / "strategic-principles.m
 # MMOS territory — L3 DNA sources land here
 MMOS_MINDS = REPO_ROOT / "squads" / "mmos-squad" / "minds"
 
+# PKB territory — Person Knowledge Base (pre-mind knowledge layer)
+PEOPLE_KB = ETL_ROOT / "data" / "people"
+
 # Books input — reference path only; CLI receives explicit book_path argument
 BOOKS_INPUT = REPO_ROOT / "books"
 

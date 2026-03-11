@@ -1,0 +1,25 @@
+# Schema template — Person Knowledge Base Manifest
+# Usage: knowledge-etl/src/knowledge_etl/kb/person_metadata.py cria instâncias deste schema
+slug: ""                        # kebab-case identifier (ex: kent-beck)
+name: ""                        # Full name (ex: Kent Beck)
+clone_type: undecided           # mind_clone | governance_advisor | undecided
+
+sources_count: 0
+sources_types: []               # [book, interview, article, podcast, video]
+sources: []
+# Source object structure:
+# - slug: ""                    # ex: tdd-by-example
+#   type: ""                    # book | interview | article | podcast | video
+#   title: ""
+#   etl_processed: false
+#   processed_at: ""            # ISO date
+
+tier: 0                         # 0=raw | 1=extracted | 2=profile_ready | 3=production_ready
+apex_score_estimated: 0
+etl_processed: false
+agent_enriched: false           # MMOS research-specialist rodou?
+mmos_status: none               # none | in_progress | production
+
+created_at: ""                  # ISO date
+last_updated: ""                # ISO date
+migrated_from_mmos: false

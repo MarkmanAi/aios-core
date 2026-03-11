@@ -1,0 +1,13 @@
+# Schema template — Gap Intelligence
+# Usage: knowledge-etl/src/knowledge_etl/kb/gap_detector.py escreve instâncias
+slug: ""
+gaps: []
+# Gap object structure:
+# - id: "GAP-001"
+#   type: insufficient_sources | missing_source_type | no_contradiction_candidates | single_source_only
+#   description: ""
+#   impact: ""            # ex: BLOCKS_tier_3 | L4 (communication_patterns)
+#   priority: critica | alta | media | baixa
+#   suggestion: ""        # opcional — onde encontrar esta fonte
+
+blocks_tier_progression: false  # True se algum gap tem priority: critica
