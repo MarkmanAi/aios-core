@@ -225,7 +225,7 @@ neo_footprint:
 
   tasks: 10             # .neo/tasks/ (7 was stale — neo-import-asset wasn't registered; corrected to 9 = 8 existing + neo-fusion 2026-03-10; neo-agent-fusion added 2026-03-10 Story 18.2)
   templates: 3          # .neo/templates/
-  data_files: 3         # .neo/data/ (this file + gaps.yaml + principles.md)
+  data_files: 4         # .neo/data/ (this file + gaps.yaml + principles.md + clone-standards.md)
   constitution: 1       # .neo/CONSTITUICAO_MATRIX.md
   organograma: 1        # .neo/ORGANOGRAMA.md
   memory: 1             # .neo/memory/MEMORY.md (single source — no mirror)

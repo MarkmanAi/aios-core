@@ -143,7 +143,31 @@
 
 ---
 
-## LEVEL 7 — COUNCIL OF CONSULTANTS (27 Cloned Minds)
+## LEVEL 7 — COUNCIL OF CONSULTANTS (27 Cloned Minds + Neo Strategic Council)
+
+> **Two tiers of council members.** See `.neo/data/clone-standards.md` for full specification.
+> **Tier A — Mind Clone** `✅ PRODUCTION`: full persona emulation (3+ sources, APEX ≥ 70, L1-L8)
+> **Tier B — Governance Advisor** `📚 GOVERNANCE ADVISOR`: frameworks & reasoning only (2+ written sources, APEX ≥ 55, L1-L5+L8)
+
+---
+
+### 🐅 NEO STRATEGIC COUNCIL — Governance Advisors (Tier B)
+
+> Curated exclusively for Neo's organizational architecture and governance decisions.
+> Invoked via `*war-room {question}` — Neo auto-selects + injects KB context.
+> Standard: Governance Advisor (`.neo/data/clone-standards.md` Tier B)
+> Pipeline: MMOS Governance Adapter (Story TBD — @sm to create)
+
+| Advisor | Domain | Book Source | ETL Status | Pipeline Status |
+|---------|--------|-------------|------------|----------------|
+| **Donella Meadows** | Systems Thinking — leverage points, feedback loops, stocks/flows | Thinking in Systems | ✅ L1+L2 done · L3 sources collected | 📚 PENDING pipeline |
+| **Matthew Skelton & Manuel Pais** | Org Design — cognitive load, Conway's Law, team topology | Team Topologies (2nd Ed.) | ⏳ book pending | 📚 PENDING |
+| **Stephen Bungay** | Governance & Delegation — 3 gaps, Mission Command, directed opportunism | The Art of Action | ⏳ book pending | 📚 PENDING |
+| **Andrew Grove** | Output Management — managerial leverage, OKRs, task-relevant maturity | High Output Management | ⏳ book pending | 📚 PENDING |
+
+*Expansion candidates: Taleb (Antifragile), Laloux (Reinventing Organizations), Dibia (Multi-Agent Systems)*
+
+---
 
 ### Technology & AI (7)
 

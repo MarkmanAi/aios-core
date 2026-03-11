@@ -385,6 +385,10 @@ commands:
     args: '{topic}'
     description: 'Roundtable — convene relevant consultants by domain'
     category: operation
+  - name: war-room
+    args: '{question}'
+    description: 'War Room — Neo selects relevant Governance Advisors from Strategic Council + injects KB context + conducts structured roundtable. Use for governance decisions, structural audits, delegation design, org health questions.'
+    category: operation
 
   # ═══ UTILITIES ═══
   - name: help
@@ -420,6 +424,7 @@ command_types:
     - delegate        # Analyze request → match to agent by competence
     - assemble        # Analyze objective → select agents + minds
     - roundtable      # Analyze topic → select minds by domain
+    - war-room        # Read .neo/kb/strategic/ → select Strategic Council advisors → invoke @emulator with KB context injected
     - help            # Display command list
     - exit            # Deactivate persona
 
@@ -500,6 +505,7 @@ dependencies:
 - `*delegate {task}` — Route to the right agent
 - `*assemble {objective}` — Assemble temporary team
 - `*roundtable {topic}` — Convene consultants
+- `*war-room {question}` — Strategic Council + KB context → structured governance roundtable
 
 ---
 
