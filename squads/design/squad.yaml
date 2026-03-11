@@ -66,6 +66,7 @@ agents:
     role: "Design System Orchestrator"
     file: agents/design-chief.md
     tier: orchestrator
+    validator: "@qa"                        # P1 — Quinn validates design squad deliverables
     description: "Roteia e coordena execucao no squad de design system."
 
   - id: brad-frost
@@ -73,6 +74,8 @@ agents:
     role: "Design System Architect"
     file: agents/brad-frost.md
     tier: 1
+    dual_presence: true
+    invocation_rule: "Agent mode (@brad-frost) for task execution. Mind mode (@emulator brad_frost) for strategic consultation."
     description: "Arquitetura de design system, atomic design e componentes."
 
   - id: dave-malouf
