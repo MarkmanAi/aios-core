@@ -70,6 +70,14 @@ def extract_l1(
 
     all_principles: list[dict] = []
 
+    # Cache check — skip API call if output already exists
+    output_path = l1_dir / "final_principles.json"
+    if output_path.exists():
+        cached = json.loads(output_path.read_text(encoding="utf-8"))
+        all_principles = cached.get("principles", [])
+        console.print(f"[dim]L1 cache hit: {len(all_principles)} principles[/dim]")
+        return all_principles
+
     if strategy == "stuff":
         console.print("[cyan]L1 Strategy:[/cyan] STUFF (full book)")
         all_principles = _extract_stuff(

@@ -83,6 +83,15 @@ def extract_l2(
     l2_dir = STAGING / book_slug / "l2"
     l2_dir.mkdir(parents=True, exist_ok=True)
 
+    # Cache check — skip all API calls if final output already exists
+    l2_dir = STAGING / book_slug / "l2"
+    output_path = l2_dir / "final_frameworks.json"
+    if output_path.exists():
+        cached = json.loads(output_path.read_text(encoding="utf-8"))
+        framework_count = len(cached.get("unified_frameworks", cached.get("core_frameworks", [])))
+        console.print(f"[dim]L2 cache hit: {framework_count} frameworks[/dim]")
+        return cached
+
     checkpoint = Checkpoint(CHECKPOINTS, book_slug, "l2")
 
     prompt_template = (PROMPTS_DIR / "l2_frameworks.xml").read_text(encoding="utf-8")
