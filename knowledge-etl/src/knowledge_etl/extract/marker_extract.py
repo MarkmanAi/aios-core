@@ -186,10 +186,17 @@ def _extract_page_range(chapter_lines: list[str]) -> tuple[int | None, int | Non
     return min(pages), max(pages)
 
 
+_CHAPTER_RE = re.compile(r"^(CHAPTER|PART)\s+\S+\s*$")
+
+
 def _split_chapters(full_text_path: Path, chapters_dir: Path) -> list[Path]:
     """
-    Split full_text.md into chapter files based on H1/H2 headers.
-    Embeds page markers from Marker output.
+    Split full_text.md into chapter files.
+
+    Detects two header styles:
+    1. Markdown headings: lines starting with '# ' or '## '
+    2. Plain-text chapter markers: lines matching 'CHAPTER N' or 'PART N'
+       (common in EPUB extractions that don't preserve heading markup)
     """
     text = full_text_path.read_text(encoding="utf-8")
     lines = text.split("\n")
@@ -199,11 +206,16 @@ def _split_chapters(full_text_path: Path, chapters_dir: Path) -> list[Path]:
     current_lines: list[str] = []
 
     for line in lines:
-        # Detect chapter headers (H1 or H2)
-        if line.startswith("# ") or line.startswith("## "):
+        stripped = line.strip()
+        # Detect chapter headers: Markdown H1/H2 OR plain CHAPTER/PART markers
+        is_header = (
+            line.startswith("# ") or line.startswith("## ")
+            or _CHAPTER_RE.match(stripped)
+        )
+        if is_header:
             if current_lines:
                 chapters.append((current_title, current_lines))
-            current_title = line.lstrip("#").strip()
+            current_title = line.lstrip("#").strip() or stripped
             current_lines = [line]
         else:
             current_lines.append(line)

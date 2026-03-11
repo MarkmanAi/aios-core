@@ -108,12 +108,12 @@ def extract_l3(
     checkpoint._state["prompt_version"] = L3_PROMPT_VERSION
     checkpoint._save()
 
-    # P4 fix: cache book content for STUFF strategy — 60% cost reduction via prompt cache
-    book_content_for_cache: str | None = None
-    if strategy == "stuff":
-        book_content_for_cache = full_text_path.read_text(encoding="utf-8")
-
-    # Phase 1+2: REFINE voice and thinking DNA across chapters
+    # Phase 1+2: REFINE voice and thinking DNA across chapters.
+    # NOTE: book_content is intentionally NOT passed to refine calls.
+    # Each refine call already receives chapter_text + prior_profile in the task_prompt.
+    # Sending the full book cache on top of a growing prior_profile causes context overflow
+    # for books > ~100k tokens (131k book + large prior_profile > 200k limit).
+    # The full book cache is only needed for the contradictions pass (single full-book call).
     console.print(f"[cyan]L3 REFINE:[/cyan] Processing {len(chapter_paths)} chapters (Opus)")
 
     voice_profile = _refine_voice(
@@ -126,7 +126,7 @@ def extract_l3(
         model=model,
         checkpoint=checkpoint,
         l3_dir=l3_dir,
-        book_content=book_content_for_cache,
+        book_content=None,
     )
 
     thinking_profile = _refine_thinking(
@@ -139,7 +139,7 @@ def extract_l3(
         model=model,
         checkpoint=checkpoint,
         l3_dir=l3_dir,
-        book_content=book_content_for_cache,
+        book_content=None,
     )
 
     # Phase 3: Contradictions on full book (Gold Layer)
