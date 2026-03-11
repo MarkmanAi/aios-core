@@ -57,6 +57,7 @@ const ROOT_FILES_TO_COPY = [
 const EXCLUDE_PATTERNS = [
   /node_modules/,
   /\.git/,
+  /__tests__/, // Test directories are not part of the installable framework
   /\.DS_Store/,
   /Thumbs\.db/,
   /\.installed-manifest\.yaml$/, // Don't include installed manifest
