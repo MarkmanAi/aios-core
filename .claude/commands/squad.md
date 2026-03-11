@@ -1,6 +1,6 @@
-# Squad Architect — Squad Creator Pro
+# Squad Architect — Squad Creator v4.0.0
 
-Activates the Squad Architect agent (squad-creator-pro).
+Activates the Squad Architect agent (squad-creator v4.0.0).
 Creates AI agent squads, clones expert minds, validates squads, discovers tools.
 
 ## Activation
@@ -40,17 +40,39 @@ Follow `activation-instructions` in that file exactly.
 *validate-agent {path}                    → Agent quality gate
 *validate-task {path}                     → Task anatomy check
 *validate-workflow {path}                 → Workflow phases/checkpoints
+*qa-after-creation {squad}               → QA post-creation checklist
+*quality-dashboard {name}                → Quality metrics (sources, voice score, fidelity)
 ```
 
 ## Commands — Discovery & Analytics
 
 ```
 *discover-tools {domain}                  → Deep tool discovery (parallel)
+*show-tools                               → Display installed + recommended tools
+*add-tool {name}                          → Add tool to squad deps (delegates to @devops)
+*deep-research {topic}                    → Research before agent creation
 *squad-analytics                          → Full ecosystem dashboard
 *show-registry                            → Display squad registry
 *list-squads                              → List all squads
 *refresh-registry                         → Scan and update registry
 *optimize {squad}                         → Optimize existing squad
+*squad-fusion {a} {b}                     → Fuse two squads into one
+```
+
+## Commands — Specialists
+
+```
+@oalanicolas — Mind Cloning Specialist
+  *extract-dna {name}        → Extract Voice + Thinking DNA
+  *assess-sources {path}     → Evaluate source quality (gold vs bronze)
+  *design-clone {name}       → Design clone architecture
+  *validate-clone {slug}     → Validate clone fidelity
+  *diagnose-clone {slug}     → Diagnose authenticity problems
+
+@pedro-valerio — Process Specialist
+  *audit {workflow}          → Audit workflow/task for fractures
+  *axioma-assessment {squad} → Axiom compliance assessment
+  *modernization-score {sq}  → Modernization scoring
 ```
 
 ## Commands — Utilities
@@ -65,8 +87,8 @@ Follow `activation-instructions` in that file exactly.
 
 ## Knowledge Base
 
-- `squads/squad-creator-pro/docs/COMMANDS.md` — Full command reference
-- `squads/squad-creator-pro/docs/HITL-FLOW.md` — Human-in-the-loop guide
-- `squads/squad-creator-pro/data/best-practices.md` — 18 creation patterns
-- `squads/squad-creator-pro/data/executor-decision-tree.md` — Executor selection
-- `squads/squad-creator-pro/data/squad-registry.yaml` — 30 production squads
+- `squads/squad-creator/docs/COMMANDS.md` — Full command reference
+- `squads/squad-creator/docs/HITL-FLOW.md` — Human-in-the-loop guide
+- `squads/squad-creator/data/best-practices.md` — 18 creation patterns
+- `squads/squad-creator/data/executor-matrix-framework.md` — Executor selection
+- `squads/squad-creator/data/squad-registry.yaml` — Production squads registry
