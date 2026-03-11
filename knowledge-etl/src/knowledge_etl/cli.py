@@ -11,6 +11,7 @@ Usage:
 
 from __future__ import annotations
 
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -141,7 +142,8 @@ def process(
     )
 
     # L2: Frameworks (Sonnet)
-    console.print("\n[bold]L2: Frameworks[/bold]")
+    console.print("\n[bold]L2: Frameworks[/bold] (waiting 200s between phases...)")
+    time.sleep(200)
     l2_results = extract_l2(
         book_slug=slug,
         full_text_path=full_text_path,
@@ -155,7 +157,8 @@ def process(
     # L3: Authorial DNA (Opus) — optional
     l3_results = None
     if clone:
-        console.print("\n[bold]L3: Authorial DNA[/bold]")
+        console.print("\n[bold]L3: Authorial DNA[/bold] (waiting 200s between phases...)")
+        time.sleep(200)
         l3_results = extract_l3(
             book_slug=slug,
             full_text_path=full_text_path,
@@ -180,6 +183,7 @@ def process(
 
     # PHASE 5: LOAD
     console.rule("Phase 5: Load")
+    time.sleep(120)
     committed_paths: list[Path] = []
 
     # L1 -> strategic-principles.md

@@ -1,0 +1,25 @@
+{
+  "completed_chapters": [
+    "voice_01-introduction",
+    "thinking_01-introduction"
+  ],
+  "results": {
+    "voice_01-introduction": {
+      "signature_vocabulary": [],
+      "sentence_pattern": "",
+      "rhetorical_devices": [],
+      "tone": "",
+      "exemplar_quotes": [],
+      "chapter_observations": "This is the full book analyzed as an initial voice profile. The most distinctive voice signature is the scaffolding pedagogy: concept → tangible analogy → generalization → principle extracted in bold. The Slinky opening is paradigmatic of her entire method—she performs the insight physically before naming it conceptually. The book operates on two registers simultaneously: one is a patient, incrementally-building technical primer (stocks, flows, feedback loops introduced with bathtub physics); the other is a gradually escalating philosophical and moral argument that reaches its apex in the final two chapters, where the language shifts from 'here is how systems work' to 'here is how you must live.' The transition from technical to spiritual is managed so gradually that the reader barely notices crossing the threshold—the same voice that explained thermostat dynamics now discusses transcending paradigms and 'dancing with the system.' A signature move throughout is the pairing of technical systems vocabulary with ancient/folk wisdom (Sufi stories, proverbs, biblical quotes) to insist that systems thinking is not new but reclaimed. Self-deprecation functions strategically: admitting her own failures (jogging program, coffee addiction) disarms resistance and models the humility she advocates. The voice is unusually comfortable with paradox and duality—she holds contradictions in suspension rather than resolving them ('the bad news, or the good news, depending on your need to control the world and your willingness to be delighted by its surprises'). The leverage points list in Chapter Six marks a tonal shift toward greater rhetorical urgency and political directness ('Diddling with the details, arranging the deck chairs on the Titanic'), while the final chapter moves into something approaching spiritual testimony without abandoning the analytical frame."
+    },
+    "thinking_01-introduction": {
+      "primary_reasoning_pattern": "",
+      "favorite_argumentative_move": "",
+      "mental_models": [],
+      "epistemic_style": "",
+      "favorite_analogies": [],
+      "exemplar_reasoning_quote": ""
+    }
+  },
+  "total_cost_usd": 6.97387125
+}

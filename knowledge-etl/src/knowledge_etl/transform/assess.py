@@ -6,11 +6,13 @@ MAP-REDUCE = book > 200K tokens → process chapter by chapter.
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from rich.console import Console
 
 from knowledge_etl.config import (
+    CHECKPOINTS,
     DEFAULT_MODEL_L1,
     STUFF_THRESHOLD_TOKENS,
     MODELS,
@@ -32,6 +34,16 @@ def assess(full_text_path: Path, llm: LLMClient) -> dict:
           "estimated_cost_usd": 1.27,
         }
     """
+    # Cache assessment to avoid repeated API calls on re-runs
+    book_slug = full_text_path.parent.name
+    cache_path = CHECKPOINTS / book_slug / "assess.json"
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if cache_path.exists():
+        cached = json.loads(cache_path.read_text(encoding="utf-8"))
+        console.print(f"[dim]Assess cache hit: {cached['token_count']:,} tokens[/dim]")
+        return cached
+
     text = full_text_path.read_text(encoding="utf-8")
 
     console.print("[cyan]Counting tokens...[/cyan]")
@@ -52,8 +64,11 @@ def assess(full_text_path: Path, llm: LLMClient) -> dict:
         "estimated_cost_usd": estimated_cost,
     }
 
+    # Save to cache
+    cache_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
+
     console.print(
-        f"[bold]Tokens:[/bold] {token_count:,} → "
+        f"[bold]Tokens:[/bold] {token_count:,} -> "
         f"[bold]Strategy:[/bold] {strategy.upper()} "
         f"[dim](~${estimated_cost:.2f} estimated)[/dim]"
     )

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from pathlib import Path
 from typing import Literal
 
@@ -126,7 +127,8 @@ def extract_l2(
             chapter_pages=chapter_pages,
         )
 
-        console.print(f"  [cyan]L2:[/cyan] {chapter_key}")
+        console.print(f"  [cyan]L2:[/cyan] {chapter_key} (waiting 65s for rate limit...)")
+        time.sleep(200)
         text, usage = llm.call(
             model=model,
             system_prompt=system,
@@ -186,6 +188,8 @@ def _reduce(
         .replace("{{JSON_ARRAY_OF_CHAPTER_RESULTS}}", chapters_json)
     )
 
+    console.print("[cyan]L2 Reduce:[/cyan] waiting 200s for rate limit...")
+    time.sleep(200)
     text, usage = llm.call(
         model=DEFAULT_MODEL_L2,
         system_prompt=reduce_system,

@@ -75,42 +75,76 @@ def extract(
 
 
 def _run_marker(book_path: Path, output_dir: Path) -> None:
-    """Run Marker CLI to convert PDF/EPUB to Markdown."""
-    if not shutil.which("marker"):
-        console.print("[red]marker not found.[/red] Install with: pip install marker-pdf")
-        sys.exit(1)
-
+    """Convert PDF/EPUB to Markdown. Uses marker for PDF, ebooklib for EPUB."""
     suffix = book_path.suffix.lower()
     if suffix not in (".pdf", ".epub"):
         raise ValueError(f"Unsupported file type: {suffix}. Expected .pdf or .epub")
 
-    # Marker outputs to a directory with the same name as the file
-    marker_output = output_dir / book_path.stem
-    marker_output.mkdir(parents=True, exist_ok=True)
+    target = output_dir / "full_text.md"
 
-    result = subprocess.run(
-        [
-            "marker",
-            str(book_path),
-            "--output_dir", str(output_dir),
-            "--output_format", "markdown",
-        ],
-        capture_output=True,
-        text=True,
-    )
+    if suffix == ".epub":
+        _extract_epub(book_path, target)
+    else:
+        _extract_pdf_marker(book_path, output_dir, target)
+
+
+def _extract_epub(book_path: Path, target: Path) -> None:
+    """Extract EPUB content to Markdown using ebooklib + markdownify."""
+    import ebooklib
+    from ebooklib import epub
+    from markdownify import markdownify as md
+
+    book = epub.read_epub(str(book_path), options={"ignore_ncx": True})
+
+    parts: list[str] = []
+    for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
+        html = item.get_content().decode("utf-8", errors="replace")
+        text = md(html, heading_style="ATX", strip=["script", "style"])
+        text = text.strip()
+        if text:
+            parts.append(text)
+
+    full_text = "\n\n---\n\n".join(parts)
+    target.write_text(full_text, encoding="utf-8")
+    console.print(f"[green]EPUB extracted:[/green] {len(parts)} sections -> {target.name}")
+
+
+def _extract_pdf_marker(book_path: Path, output_dir: Path, target: Path) -> None:
+    """Extract PDF using marker CLI."""
+    import tempfile
+
+    if not shutil.which("marker"):
+        console.print("[red]marker not found.[/red] Install with: pip install marker-pdf")
+        sys.exit(1)
+
+    # marker 1.x expects a directory as input — copy file into a temp dir
+    with tempfile.TemporaryDirectory() as tmp_input:
+        tmp_file = Path(tmp_input) / book_path.name
+        shutil.copy2(str(book_path), str(tmp_file))
+
+        result = subprocess.run(
+            [
+                "marker",
+                tmp_input,
+                "--output_dir", str(output_dir),
+                "--output_format", "markdown",
+            ],
+            capture_output=True,
+            text=True,
+        )
 
     if result.returncode != 0:
         raise RuntimeError(f"Marker failed:\n{result.stderr}")
 
-    # Find the generated markdown file
-    md_files = list(marker_output.glob("*.md"))
+    # Marker outputs to output_dir/{stem}/{stem}.md
+    marker_output = output_dir / book_path.stem
+    md_files = list(marker_output.glob("*.md")) if marker_output.exists() else []
     if not md_files:
-        raise RuntimeError(f"Marker produced no .md files in {marker_output}")
+        md_files = list(output_dir.rglob("*.md"))
+    if not md_files:
+        raise RuntimeError(f"Marker produced no .md files in {output_dir}")
 
-    # Move to canonical location
-    generated_md = md_files[0]
-    target = output_dir / "full_text.md"
-    shutil.move(str(generated_md), str(target))
+    shutil.move(str(md_files[0]), str(target))
 
 
 def _extract_metadata(book_path: Path, staging_dir: Path) -> dict:

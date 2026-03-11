@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from pathlib import Path
 
 from rich.console import Console
@@ -171,6 +172,8 @@ def _verify_batch(
         .replace("{{JSON_OUTPUT}}", items_json)
     )
 
+    console.print(f"  [dim]Validate {label}: waiting 120s for rate limit...[/dim]")
+    time.sleep(120)
     text, usage = llm.call(
         model=model,
         system_prompt=system,
