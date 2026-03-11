@@ -88,9 +88,17 @@ def extract_l2(
     output_path = l2_dir / "final_frameworks.json"
     if output_path.exists():
         cached = json.loads(output_path.read_text(encoding="utf-8"))
-        framework_count = len(cached.get("unified_frameworks", cached.get("core_frameworks", [])))
-        console.print(f"[dim]L2 cache hit: {framework_count} frameworks[/dim]")
-        return cached
+        has_frameworks = (
+            len(cached.get("unified_frameworks", [])) > 0
+            or len(cached.get("core_frameworks", [])) > 0
+        )
+        if not has_frameworks:
+            console.print("[yellow]L2 cache INVALID (0 frameworks) — re-running[/yellow]")
+            output_path.unlink()
+        else:
+            framework_count = len(cached.get("unified_frameworks", cached.get("core_frameworks", [])))
+            console.print(f"[dim]L2 cache hit: {framework_count} frameworks[/dim]")
+            return cached
 
     checkpoint = Checkpoint(CHECKPOINTS, book_slug, "l2")
 
@@ -161,6 +169,7 @@ def extract_l2(
         reduce_template=reduce_template,
         llm=llm,
         cost_tracker=cost_tracker,
+        checkpoint=checkpoint,
     )
 
     output_path = l2_dir / "final_frameworks.json"
@@ -175,6 +184,14 @@ def extract_l2(
     return unified
 
 
+def _is_valid_reduce(result: dict) -> bool:
+    """Return True if the reduce result contains at least one framework."""
+    return (
+        len(result.get("unified_frameworks", [])) > 0
+        or len(result.get("core_frameworks", [])) > 0
+    )
+
+
 def _reduce(
     chapter_results: list[dict],
     book_title: str,
@@ -182,9 +199,16 @@ def _reduce(
     reduce_template: str,
     llm: LLMClient,
     cost_tracker: CostTracker,
+    checkpoint: Checkpoint,
 ) -> dict:
     """Run the Reduce prompt to unify chapter extractions."""
     from knowledge_etl.config import DEFAULT_MODEL_L2, MAX_OUTPUT_REDUCE
+
+    # Checkpoint hit — skip API call if reduce already succeeded
+    cached = checkpoint.get_result("__reduce__")
+    if cached and _is_valid_reduce(cached):
+        console.print("[dim]L2 Reduce: cache hit (checkpoint)[/dim]")
+        return cached
 
     reduce_system = _get_system_prompt(reduce_template)
     chapters_json = json.dumps(chapter_results, indent=2, ensure_ascii=False)
@@ -209,12 +233,15 @@ def _reduce(
 
     json_match = re.search(r"\{.*\}", text, re.DOTALL)
     if not json_match:
-        return {"raw_reduce": text, "chapter_results": chapter_results}
+        result = {"raw_reduce": text, "chapter_results": chapter_results}
+    else:
+        try:
+            result = json.loads(json_match.group())
+        except json.JSONDecodeError:
+            result = {"parse_error": True, "raw": text, "chapter_results": chapter_results}
 
-    try:
-        return json.loads(json_match.group())
-    except json.JSONDecodeError:
-        return {"parse_error": True, "raw": text, "chapter_results": chapter_results}
+    checkpoint.mark_done("__reduce__", result, cost_usd=usage.cost_usd)
+    return result
 
 
 def _fill_template(

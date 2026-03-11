@@ -75,8 +75,12 @@ def extract_l1(
     if output_path.exists():
         cached = json.loads(output_path.read_text(encoding="utf-8"))
         all_principles = cached.get("principles", [])
-        console.print(f"[dim]L1 cache hit: {len(all_principles)} principles[/dim]")
-        return all_principles
+        if len(all_principles) == 0:
+            console.print("[yellow]L1 cache INVALID (0 principles) — re-running[/yellow]")
+            output_path.unlink()
+        else:
+            console.print(f"[dim]L1 cache hit: {len(all_principles)} principles[/dim]")
+            return all_principles
 
     if strategy == "stuff":
         console.print("[cyan]L1 Strategy:[/cyan] STUFF (full book)")
