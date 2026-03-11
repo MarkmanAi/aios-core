@@ -612,6 +612,7 @@ class TimelineManager {
         // Ignore sync errors
       }
     }, this.config.syncIntervalMs);
+    if (this._syncTimer && this._syncTimer.unref) this._syncTimer.unref();
   }
 
   /**

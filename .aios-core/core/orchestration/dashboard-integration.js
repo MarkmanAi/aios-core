@@ -97,6 +97,7 @@ class DashboardIntegration extends EventEmitter {
       this.updateTimer = setInterval(async () => {
         await this.updateStatus();
       }, this.updateInterval);
+      if (this.updateTimer && this.updateTimer.unref) this.updateTimer.unref();
     }
 
     this.emit('started');

@@ -125,6 +125,7 @@ class ObservabilityPanel {
     this.refreshInterval = setInterval(() => {
       this.render();
     }, this.state.refresh_rate);
+    if (this.refreshInterval && this.refreshInterval.unref) this.refreshInterval.unref();
   }
 
   /**

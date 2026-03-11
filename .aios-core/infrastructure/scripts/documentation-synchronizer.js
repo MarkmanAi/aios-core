@@ -1147,6 +1147,7 @@ class DocumentationSynchronizer extends EventEmitter {
         this.emit('error', { phase: 'auto-sync', error });
       }
     }, this.options.syncInterval);
+    if (this.syncInterval && this.syncInterval.unref) this.syncInterval.unref();
   }
 
   async checkForChanges() {
