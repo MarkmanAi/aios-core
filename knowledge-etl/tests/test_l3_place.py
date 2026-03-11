@@ -292,7 +292,7 @@ class TestChunkDnaContent:
 
 
 class TestPlaceL3Integration:
-    def test_creates_json_files_and_chunks_dir(self, tmp_path):
+    def test_creates_extracted_json_and_chunks_dir(self, tmp_path):
         from knowledge_etl.load.l3_place import place_l3
 
         l3_results = {
@@ -327,13 +327,11 @@ class TestPlaceL3Integration:
             "source_file": "test.pdf",
         }
 
-        with patch("knowledge_etl.load.l3_place.MMOS_MINDS", tmp_path):
+        with patch("knowledge_etl.load.l3_place.PEOPLE_KB", tmp_path):
             target = place_l3(l3_results, metadata, "test-book")
 
-        # Original JSON files must exist (compatibility)
-        assert (target / "voice_dna.json").exists()
-        assert (target / "thinking_dna.json").exists()
-        assert (target / "contradictions.json").exists()
+        # Consolidated extracted.json must exist (PKB format)
+        assert (target / "extracted.json").exists()
 
         # chunks/ directory must exist
         assert (target / "chunks").is_dir()
@@ -363,7 +361,7 @@ class TestPlaceL3Integration:
         }
         metadata = {"title": "My Book", "author": "Jane Doe", "source_file": "book.pdf"}
 
-        with patch("knowledge_etl.load.l3_place.MMOS_MINDS", tmp_path):
+        with patch("knowledge_etl.load.l3_place.PEOPLE_KB", tmp_path):
             target = place_l3(l3_results, metadata, "my-book")
 
         chunk_files = list((target / "chunks").glob("*.md"))

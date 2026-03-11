@@ -1,9 +1,9 @@
 # Story Backlog — Tech Debt & Follow-ups
 
 > **Last Updated**: 2026-03-11
-> **Source**: PO Validation + QA Review — Epics 12, 13 (13.2 tech debt added) + QA Review PR #9 Story 13.10 + QA Review Story 20.1
+> **Source**: PO Validation + QA Review — Epics 12, 13 (13.2 tech debt added) + QA Review PR #9 Story 13.10 + QA Review Story 20.1 + QA Review Story 21.2
 > **Managed by**: @po (Pax)
-> **Updated**: 2026-03-11 — [20.1-T1], [20.1-T2] registered by @qa — Story 20.1 follow-ups (LOW tech debt)
+> **Updated**: 2026-03-11 — [21.2-F1], [21.2-F2] registered by @qa — Story 21.2 follow-ups (LOW)
 
 ---
 
@@ -11,16 +11,16 @@
 
 | Status | Count |
 |--------|-------|
-| TODO | 5 |
+| TODO | 7 |
 | IN PROGRESS | 0 |
 | DONE | 14 |
-| Total | 19 |
+| Total | 21 |
 
 | Priority | Count |
 |----------|-------|
 | HIGH | 0 |
 | MEDIUM | 0 |
-| LOW | 5 |
+| LOW | 7 |
 
 ---
 
@@ -68,6 +68,44 @@
 - **File**: `knowledge-etl/tests/test_l3_authorial.py`
 - **Issue**: AC-6 (prompt_version checkpoint invalidation) was verified via integration run log only. No unit test covers the `cached_version != L3_PROMPT_VERSION → checkpoint.reset()` code path.
 - **Fix**: Add a test that mocks a checkpoint with `prompt_version: "1.0"` and asserts `checkpoint.reset()` is called when `extract_l3` runs with version `"2.0"`.
+
+#### [21.2-F1] Adicionar teste de edge case para `author=None` em `place_l3()`
+- **Status**: TODO
+- **Priority**: LOW
+- **Source**: QA Review — Story 21.2 (2026-03-11)
+- **File**: `knowledge-etl/tests/test_l3_place_pkb.py`
+- **Story**: 21.2 — PKB ETL Adapter
+- **Issue**: O fallback `author = metadata.get("author") or "Unknown"` produz `person_slug = "unknown"` via `slugify("Unknown")`. Este caminho nunca foi testado explicitamente. Em produção, um `metadata.yaml` sem campo `author` (ou com `author: null`) criaria a pasta `people/unknown/sources/books/{book_slug}/` sem nenhum aviso ao operador — podendo acumular extrações órfãs sem atribuição correta.
+- **Fix**: Adicionar um teste em `test_l3_place_pkb.py`:
+  ```python
+  def test_unknown_author_fallback(self, tmp_path):
+      metadata = {"title": "Some Book", "author": None, "source_file": "book.pdf"}
+      with patch("knowledge_etl.load.l3_place.PEOPLE_KB", tmp_path):
+          result = place_l3(_L3_RESULTS, metadata, "some-book")
+      assert "unknown" in str(result)
+      data = json.loads((result / "extracted.json").read_text())
+      assert data["author"] == "Unknown"
+  ```
+  Considerar também logar um `console.print("[yellow]L3 Load:[/yellow] author not found in metadata — using 'Unknown'")` em `place_l3()` para alertar o operador.
+- **Esforço estimado**: 30 min
+
+#### [21.2-F2] Implementar limpeza de backup files acumulados no Epic 22
+- **Status**: TODO
+- **Priority**: LOW
+- **Source**: QA Review — Story 21.2 (2026-03-11)
+- **File**: `knowledge-etl/src/knowledge_etl/load/l3_place.py`
+- **Story**: 21.2 — PKB ETL Adapter (endereçar no Epic 22 ou Story de manutenção PKB)
+- **Issue**: Cada re-execução do ETL para o mesmo livro cria um novo `extracted.{ts}.backup.json`. Em pipelines de re-processamento frequente (ex: atualização de prompts, mudança de modelo), esses backups acumulam indefinidamente em `knowledge-etl/data/people/{slug}/sources/books/{book_slug}/`. Não existe mecanismo de limpeza automática ou limite de retenção.
+- **Fix**: No Epic 22 (ou em uma story de manutenção PKB), implementar um dos dois approaches:
+  1. **Retenção limitada**: manter apenas os N backups mais recentes (sugestão: N=3). Exemplo:
+     ```python
+     backups = sorted(pkb_dir.glob("extracted.*.backup.json"))
+     for old_backup in backups[:-2]:  # keep last 2 before adding new
+         old_backup.unlink()
+     ```
+  2. **Backups em subdiretório**: mover backups para `pkb_dir / ".backups" / f"extracted.{ts}.json"` para não poluir o diretório principal.
+  Qualquer approach deve ser acompanhado de teste unitário que valide o limite de retenção.
+- **Esforço estimado**: 2 horas
 
 #### [13.10-T2] Handle additional resume actions explicitly in `resume.js`
 - **Status**: TODO
@@ -154,3 +192,4 @@
 *Updated: 2026-03-08 — [13.10-T1], [13.10-T2] registered by @qa — CodeRabbit nitpicks from PR #9 (Story 13.10)*
 *Updated: 2026-03-08 — Epic 13 CLOSED: 12/12 stories Done. All 13.x stories archived to docs/stories/completed/ by @po*
 *Updated: 2026-03-11 — [20.1-T1], [20.1-T2] registered by @qa — Story 20.1 follow-ups (LOW)*
+*Updated: 2026-03-11 — [21.2-F1], [21.2-F2] registered by @qa — Story 21.2 follow-ups (LOW): edge case author=None + limpeza de backups*

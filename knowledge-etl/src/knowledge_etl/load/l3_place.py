@@ -1,12 +1,12 @@
 """
-Load L3: Place authorial DNA files into the MMOS minds directory.
-Output: squads/mmos-squad/minds/{author_slug}/sources/books/{book_slug}/
+Load L3: Place authorial DNA files into the Person Knowledge Base (PKB).
+Output: knowledge-etl/data/people/{person_slug}/sources/books/{book_slug}/
 """
 
 from __future__ import annotations
 
 import json
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 import yaml
@@ -14,7 +14,7 @@ from rich.console import Console
 
 from knowledge_etl.config import (
     CHUNK_OVERLAP_TOKENS,
-    MMOS_MINDS,
+    PEOPLE_KB,
     OUTPUT_CHUNK_MAX_TOKENS,
     OUTPUT_CHUNK_MIN_TOKENS,
 )
@@ -29,15 +29,13 @@ def place_l3(
     book_slug: str,
 ) -> Path:
     """
-    Place L3 DNA files into the MMOS minds directory structure.
+    Place L3 DNA files into the Person Knowledge Base (PKB) directory structure.
 
     Creates:
-      squads/mmos-squad/minds/{author_slug}/sources/books/{book_slug}/
-        voice_dna.json          (compatibility — always generated)
-        thinking_dna.json       (compatibility — always generated)
-        contradictions.json     (compatibility — always generated)
-        metadata.yaml           (updated with chunks info)
-        chunks/                 (NEW — RAG-ready Markdown chunks)
+      knowledge-etl/data/people/{person_slug}/sources/books/{book_slug}/
+        extracted.json          (consolidated voice_dna + thinking_dna + contradictions)
+        metadata.yaml           (book info + chunks info)
+        chunks/                 (RAG-ready Markdown chunks)
           voice_001.md
           thinking_001.md
           contradictions_001.md
@@ -49,37 +47,44 @@ def place_l3(
         book_slug: Slug identifier for the book.
 
     Returns:
-        Path to the book directory in the minds tree.
+        Path to the book directory in the PKB tree.
     """
     author = metadata.get("author") or "Unknown"
-    author_slug = slugify(author)
+    person_slug = slugify(author)
 
-    target_dir = MMOS_MINDS / author_slug / "sources" / "books" / book_slug
-    target_dir.mkdir(parents=True, exist_ok=True)
+    pkb_dir = PEOPLE_KB / person_slug / "sources" / "books" / book_slug
+    pkb_dir.mkdir(parents=True, exist_ok=True)
 
-    # Write voice DNA (compatibility)
-    voice_path = target_dir / "voice_dna.json"
-    voice_path.write_text(
-        json.dumps(l3_results.get("voice_dna", {}), indent=2, ensure_ascii=False),
+    # Write consolidated extracted.json (PKB format)
+    extracted = {
+        "source_slug": book_slug,
+        "source_type": "book",
+        "source_title": metadata.get("title", ""),
+        "author": author,
+        "processed_at": date.today().isoformat(),
+        "voice_dna": l3_results.get("voice_dna", {}),
+        "thinking_dna": l3_results.get("thinking_dna", {}),
+        "contradictions": l3_results.get("contradictions", []),
+    }
+    extracted_path = pkb_dir / "extracted.json"
+
+    # VETO: backup existing extracted.json before overwriting
+    if extracted_path.exists():
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        backup_path = pkb_dir / f"extracted.{ts}.backup.json"
+        extracted_path.rename(backup_path)
+        console.print(
+            f"[yellow]L3 Load:[/yellow] extracted.json already exists — "
+            f"backup created: {backup_path.name}"
+        )
+
+    extracted_path.write_text(
+        json.dumps(extracted, indent=2, ensure_ascii=False),
         encoding="utf-8",
     )
 
-    # Write thinking DNA (compatibility)
-    thinking_path = target_dir / "thinking_dna.json"
-    thinking_path.write_text(
-        json.dumps(l3_results.get("thinking_dna", {}), indent=2, ensure_ascii=False),
-        encoding="utf-8",
-    )
-
-    # Write contradictions (compatibility)
-    contradictions_path = target_dir / "contradictions.json"
-    contradictions_path.write_text(
-        json.dumps(l3_results.get("contradictions", {}), indent=2, ensure_ascii=False),
-        encoding="utf-8",
-    )
-
-    # P2: Generate RAG-ready chunks
-    chunk_dir = target_dir / "chunks"
+    # Generate RAG-ready chunks in PKB
+    chunk_dir = pkb_dir / "chunks"
     chunk_dir.mkdir(exist_ok=True)
 
     chunk_metadata = {
@@ -108,16 +113,12 @@ def place_l3(
         "source_file": metadata.get("source_file", ""),
         "book_slug": book_slug,
         "pipeline": "knowledge-etl",
-        "extracted_files": [
-            "voice_dna.json",
-            "thinking_dna.json",
-            "contradictions.json",
-        ],
+        "extracted_files": ["extracted.json"],
         "chunks_dir": "chunks/",
         "total_chunks": total_chunks,
         "chunk_size_range": f"{OUTPUT_CHUNK_MIN_TOKENS}-{OUTPUT_CHUNK_MAX_TOKENS} tokens",
     }
-    metadata_path = target_dir / "metadata.yaml"
+    metadata_path = pkb_dir / "metadata.yaml"
     metadata_path.write_text(
         yaml.dump(meta, allow_unicode=True, default_flow_style=False),
         encoding="utf-8",
@@ -125,11 +126,11 @@ def place_l3(
 
     console.print(
         f"[green]L3 Load:[/green] DNA placed at "
-        f"minds/{author_slug}/sources/books/{book_slug}/ "
+        f"people/{person_slug}/sources/books/{book_slug}/ "
         f"({total_chunks} chunks)"
     )
 
-    return target_dir
+    return pkb_dir
 
 
 # ─── Chunking helpers ────────────────────────────────────────────────────────
