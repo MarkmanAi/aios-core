@@ -43,6 +43,32 @@ class TestCountTokensApprox:
 
 class TestJsonToMarkdown:
     def test_voice_dna_contains_sections(self):
+        # Schema v2.0 fields
+        dna = {
+            "voice_dna": {
+                "writing_style_patterns": ["opens with diagnostic claim", "alternates abstract/concrete"],
+                "signature_vocabulary": ["collision", "friction"],
+                "sentence_structure": "Medium declaratives with short punchy closers",
+                "rhetorical_devices": ["contrast: X vs Y"],
+                "pedagogical_approach": "concept then physical example",
+                "exemplar_quotes": ["Quote one here."],
+            },
+            "chapter_observations": "More combative than usual.",
+        }
+        md = _json_to_markdown(dna, "voice_dna")
+        assert "# Voice DNA" in md
+        assert "## Writing Style Patterns" in md
+        assert "## Signature Vocabulary" in md
+        assert "- collision" in md
+        assert "## Sentence Structure" in md
+        assert "## Rhetorical Devices" in md
+        assert "## Pedagogical Approach" in md
+        assert "## Exemplar Quotes" in md
+        assert "> Quote one here." in md
+        assert "## Chapter Observations" in md
+
+    def test_voice_dna_backward_compat_v1_fields(self):
+        # Schema v1.0 fields still render correctly (sentence_pattern, tone)
         dna = {
             "voice_dna": {
                 "signature_vocabulary": ["collision", "friction"],
@@ -56,13 +82,9 @@ class TestJsonToMarkdown:
         md = _json_to_markdown(dna, "voice_dna")
         assert "# Voice DNA" in md
         assert "## Signature Vocabulary" in md
-        assert "- collision" in md
-        assert "## Sentence Pattern" in md
-        assert "## Rhetorical Devices" in md
+        assert "## Sentence Structure" in md  # sentence_pattern falls back to this heading
         assert "## Tone" in md
         assert "## Exemplar Quotes" in md
-        assert "> Quote one here." in md
-        assert "## Chapter Observations" in md
 
     def test_thinking_dna_contains_sections(self):
         dna = {

@@ -58,7 +58,7 @@ def process(
     book_path: str = typer.Argument(..., help="Path to the PDF or EPUB file"),
     author: Optional[str] = typer.Option(None, "--author", "-a", help="Author name (overrides detected)"),
     domain: str = typer.Option("general", "--domain", "-d", help="Knowledge domain (e.g., software-engineering)"),
-    clone: bool = typer.Option(False, "--clone", help="Also run L3 DNA extraction for mind cloning"),
+    advisor: bool = typer.Option(False, "--advisor", help="Extract L3 DNA sources for Governance Advisor pipeline (writing style + reasoning + contradictions)"),
     book_slug_override: Optional[str] = typer.Option(None, "--slug", help="Override auto-generated book slug"),
 ) -> None:
     """
@@ -91,7 +91,7 @@ def process(
     slug = book_slug_override or slugify(book_title)
 
     console.print(f"\n[bold]Pipeline Start:[/bold] {book_title}")
-    console.print(f"[dim]Slug: {slug} | Domain: {domain} | Clone: {clone}[/dim]\n")
+    console.print(f"[dim]Slug: {slug} | Domain: {domain} | Advisor: {advisor}[/dim]\n")
 
     llm = LLMClient()
     cost_tracker = CostTracker()
@@ -154,9 +154,9 @@ def process(
         cost_tracker=cost_tracker,
     )
 
-    # L3: Authorial DNA (Opus) — optional
+    # L3: Authorial DNA (Opus) — optional, only with --advisor flag
     l3_results = None
-    if clone:
+    if advisor:
         console.print("\n[bold]L3: Authorial DNA[/bold] (waiting 200s between phases...)")
         time.sleep(200)
         l3_results = extract_l3(

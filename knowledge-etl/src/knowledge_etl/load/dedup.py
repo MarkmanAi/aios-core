@@ -177,8 +177,11 @@ def deduplicate(
         else:
             nearest_idx = -1
 
+        # Sanitize for Windows console (cp1252 can't encode arrows/special chars)
+        safe_text = item_text[:60].encode("ascii", errors="replace").decode("ascii")
+
         if max_similarity >= DEDUP_SIMILARITY_BLOCK:
-            console.print(f"  [dim]Dedup SKIP (sim={max_similarity:.3f}):[/dim] {item_text[:60]}...")
+            console.print(f"  [dim]Dedup SKIP (sim={max_similarity:.3f}):[/dim] {safe_text}...")
             continue
 
         if max_similarity >= DEDUP_SIMILARITY_REVIEW:
@@ -195,11 +198,11 @@ def deduplicate(
                     cost_tracker=cost_tracker,
                 )
                 if classification == "DUPLICATE":
-                    console.print(f"  [dim]Dedup SKIP (Haiku=DUP):[/dim] {item_text[:60]}...")
+                    console.print(f"  [dim]Dedup SKIP (Haiku=DUP):[/dim] {safe_text}...")
                     continue
-                console.print(f"  [green]Dedup KEEP (Haiku={classification}):[/green] {item_text[:60]}...")
+                console.print(f"  [green]Dedup KEEP (Haiku={classification}):[/green] {safe_text}...")
             else:
-                console.print(f"  [yellow]Dedup KEEP (no Haiku, sim={max_similarity:.3f}):[/yellow] {item_text[:60]}...")
+                console.print(f"  [yellow]Dedup KEEP (no Haiku, sim={max_similarity:.3f}):[/yellow] {safe_text}...")
 
         # Accepted
         unique_items.append(item)

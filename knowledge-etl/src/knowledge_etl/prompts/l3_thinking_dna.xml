@@ -1,7 +1,12 @@
 <system_prompt>
-You are a cognitive scientist specializing in authorial fingerprinting.
-This pass focuses on Thinking DNA: the cognitive signature — HOW the
-author reasons, not what they conclude.
+You are a cognitive scientist specializing in reasoning pattern extraction from non-fiction books.
+Your task is to identify HOW an author thinks — their reasoning architecture, mental models,
+argumentative moves, and decision heuristics — as revealed through their WRITING.
+
+CRITICAL CONSTRAINT: Extract from the provided TEXT only.
+- DO extract: reasoning patterns, mental models named or implied, argument structure, how they handle uncertainty, decision heuristics in WHEN/DO/BECAUSE form
+- DO NOT infer personality traits, speaking style, or anything not directly evidenced in the text
+- Every field MUST be supported by at least one verbatim quote
 </system_prompt>
 
 <user_prompt>
@@ -21,70 +26,74 @@ author reasons, not what they conclude.
 </prior_thinking_profile>
 
 <instructions>
-You are mapping cognitive patterns, not content. Do NOT summarize.
+STEP 1 — Evidence First (in <evidence> tags):
+Extract 5-8 verbatim quotes that reveal HOW the author reasons — not what they conclude.
+Focus on: sentences that show their reasoning process, how they structure an argument,
+how they reach a conclusion, how they handle a counter-argument.
 
-Step 1 — Thinking DNA Analysis (in <thinking_analysis> tags):
-- Reasoning pattern: inductive? deductive? dialectical? abductive?
-- Favorite argumentative move: reframe? historicize? quantify? analogize?
-- Mental models the author implicitly uses (name them even if unnamed)
-- Epistemic style: how they handle uncertainty (hedge? assert? qualify?)
-- Domains from which they draw analogies
+STEP 2 — Pattern Analysis (in <analysis> tags):
+From the evidence collected, identify:
+- What is the dominant reasoning pattern? (inductive from examples? deductive from principles? dialectical?)
+- What is the author's favorite argumentative move? (reframe the question? expose the structural flaw? show the pattern beneath the surface?)
+- What mental models does the author rely on implicitly? (give them names even if unnamed in the text)
+- How does the author handle uncertainty? (assert strongly? qualify carefully? present multiple framings?)
+- What domains does the author draw analogies from? (physics? biology? military? history?)
+- Can you identify any WHEN X → DO Y → BECAUSE Z decision heuristics embedded in the text?
 
-Step 2 — Profile Update (in <profile_update> tags):
-If prior_thinking_profile exists, REFINE it additively.
-Strengthen recurring patterns, add new ones observed here.
+STEP 3 — Profile Update (in <profile_update> tags):
+If prior_thinking_profile exists, refine it ADDITIVELY.
+Add new patterns observed, strengthen recurring ones with new evidence.
 </instructions>
 
 <examples>
   <example type="gold">
     <input_text>
-Most advice about creativity is wrong. Not slightly wrong — fundamentally, structurally wrong — because it focuses on the output when the problem lives entirely in the input.
+Systems surprise us because our models of them are too simple. They are made of stocks and flows, and of feedback loops that operate on delays. These elements are not complicated individually — a stock is just an accumulation, a flow is just a rate of change — but in combination they produce behaviors that violate our intuitions spectacularly.
 
-We romanticize the blank page. We celebrate the solitary artist, staring into the void, conjuring something from nothing. But that is not where creativity happens. Creativity happens in the collision between what you have absorbed and what you refuse to accept. You cannot collide without material. And material comes only from relentless, promiscuous attention.
+The classic example is the bathtub. You know the water level rises when inflow exceeds outflow, falls when outflow exceeds inflow. Simple. Obvious. But now tell me: if I slowly turn up the faucet by 10% while simultaneously opening the drain by 8%, what happens to the water level? Most people get this wrong. Not because they cannot do arithmetic, but because they have trained themselves to ignore the rates of change and focus only on the level.
 
-The best creators I have studied were, without exception, obsessive consumers of work outside their domain. The architect reading neuroscience. The novelist studying supply chain logistics. The composer who could explain the history of Ottoman military strategy. They did not do this for inspiration — a word I find nearly useless. They did it because they had learned, often by accident, that genuine novelty emerges from the friction between domains, not from deeper excavation of a single one.
-
-Here is what that means practically. If you want to make something original, stop trying to be original. Start being genuinely curious about things you cannot immediately monetize. Read widely, without agenda. Let the connections form on their own schedule, not yours. The creative act is less a lightning bolt and more a slow accumulation — a pressure building behind a wall you did not know you were building, until it breaks.
-
-Cross-domain collision is not a technique. It is a posture.
+There is a concept from ecology — carrying capacity — that illustrates why delays matter. A deer population in a forest will not begin to decline the moment food becomes scarce. There is a lag: the deer keep reproducing while the vegetation is already collapsing. By the time reproduction slows, the herd is already far beyond what the forest can sustain, and the crash, when it comes, is far worse than it needed to be. The overshoot was baked in by the delay. This pattern — overshoot driven by delayed feedback — appears in economics, in fisheries, in organizational management, and in personal habits. The names change. The structure does not.
     </input_text>
     <correct_output>
 {
-  "thinking_dna": {
-    "primary_reasoning_pattern": "Dialectical inversion — author identifies a common belief, exposes its structural flaw at the level of mechanism, then rebuilds from the inversion. Pattern: [received wisdom] — [why it is wrong at root] — [corrected model with practical implication]",
-    "favorite_argumentative_move": "Shift the level of analysis to expose a hidden assumption; here, shifts from output to input as the relevant unit: 'it focuses on the output when the problem lives entirely in the input'",
-    "mental_models": [
-      "Collision model: creativity as friction between accumulated cross-domain material — novelty emerges from contact between domains, not from depth within a single one",
-      "Hydraulic pressure model: knowledge accumulates invisibly like pressure behind a wall until it breaks — the creative act is release, not generation ex nihilo"
-    ],
-    "epistemic_style": "Assertive with empirical grounding — strong declarative claims paired with observational evidence ('The best creators I have studied were, without exception...'); hedges on mechanism ('often by accident') but not on conclusion",
-    "favorite_analogies": ["physics and pressure systems", "cross-domain crafts (architecture, composition, logistics, military history)"],
-    "exemplar_reasoning_quote": "You cannot collide without material. And material comes only from relentless, promiscuous attention."
-  },
-  "chapter_observations": "This chapter shows the dialectical inversion pattern at its most explicit — each paragraph dismantles a myth before offering a materialist corrective. Reasoning is more polemical than observational here, with fewer qualifications and more direct assertion than analytical sections."
+  "primary_reasoning_pattern": "Structural induction — author identifies a surprising behavior, traces it to an underlying structural mechanism (stocks/flows/feedback/delays), then dissolves the specific example into a universal pattern. Pattern: [surprising behavior] → [structural mechanism] → [universal application]",
+  "favorite_argumentative_move": "Expose the cognitive habit that causes the wrong answer, not just the wrong answer itself. In the bathtub example: 'Most people get this wrong. Not because they cannot do arithmetic, but because they have trained themselves to ignore the rates of change and focus only on the level.' The move is always: your intuition fails here because of a specific cognitive error, not ignorance.",
+  "mental_models": [
+    "Stock-and-flow model: all accumulations are stocks, all rates are flows, and behavior emerges from their interaction — 'in combination they produce behaviors that violate our intuitions spectacularly'",
+    "Delayed feedback overshoot: when feedback loops operate with delays, systems overshoot their targets before correcting — 'The overshoot was baked in by the delay'",
+    "Structure-behavior equivalence: the same structure produces the same behavior regardless of domain — 'The names change. The structure does not.'"
+  ],
+  "epistemic_style": "Assertive on structure, humble about prediction. Strong declarative claims about system mechanisms; uses 'illustrates' and 'appears in' rather than 'proves' when moving from example to generalization.",
+  "favorite_analogies": ["physical hydraulics (bathtub)", "ecology and population dynamics (deer/carrying capacity)", "cross-domain pattern transfer (economics, fisheries, management, habits)"],
+  "decision_heuristics": [
+    "WHEN a system produces surprising behavior → DO trace it to the stock-flow-feedback structure BECAUSE behavior emerges from structure, not from external forces or random events",
+    "WHEN a stock is large relative to its flows → DO expect slow response to interventions and extend your time horizon BECAUSE stocks change only as fast as their flows allow"
+  ],
+  "exemplar_reasoning_quote": "Most people get this wrong. Not because they cannot do arithmetic, but because they have trained themselves to ignore the rates of change and focus only on the level. Systems thinking is largely the discipline of unlearning that habit."
 }
     </correct_output>
-    <reasoning>All thinking_dna fields are populated. primary_reasoning_pattern names the pattern and describes its three-step structure. mental_models includes 2 distinct models with how each manifests in the text. favorite_analogies lists 2+ domains. exemplar_reasoning_quote is verbatim from input_text. chapter_observations contrasts with a prior baseline.</reasoning>
+    <reasoning>All 7 fields populated. primary_reasoning_pattern names and describes the three-step structure. favorite_argumentative_move quotes the exact passage showing the move. mental_models has 3 entries, each named and supported by a verbatim quote. decision_heuristics uses WHEN/DO/BECAUSE format extractable from the text. exemplar_reasoning_quote is verbatim.</reasoning>
   </example>
 </examples>
 
 <output_format>
 {
-  "thinking_dna": {
-    "primary_reasoning_pattern": "Pattern name + description",
-    "favorite_argumentative_move": "Description with example quote",
-    "mental_models": ["model name: how it manifests in this text"],
-    "epistemic_style": "How author handles uncertainty",
-    "favorite_analogies": ["domain 1", "domain 2"],
-    "exemplar_reasoning_quote": "Quote that best shows their thinking style"
-  },
-  "chapter_observations": "Unique thinking patterns in this chapter vs prior"
+  "primary_reasoning_pattern": "Pattern name + description of its structure with example from text",
+  "favorite_argumentative_move": "Description + verbatim quote showing the move in action",
+  "mental_models": ["model name: how it manifests in the text (with brief quote)", "model name: ...", "model name: ..."],
+  "epistemic_style": "How the author handles uncertainty and limits of knowledge — assertive? qualified? multi-framed?",
+  "favorite_analogies": ["domain 1", "domain 2"],
+  "decision_heuristics": ["WHEN [condition from text] -> DO [action] BECAUSE [reason from text]", "WHEN ..."],
+  "exemplar_reasoning_quote": "Verbatim quote that best shows the author's reasoning style"
 }
+Minimum requirements: mental_models >= 3, decision_heuristics >= 2, exemplar_reasoning_quote is verbatim.
 </output_format>
 
 <guardrails>
-- Base ALL observations on the provided text only
-- Every claim MUST have a supporting quote or passage reference
-- Never supplement with external knowledge of the author
+- Base ALL observations on the provided text only — no external knowledge of the author
+- exemplar_reasoning_quote MUST be verbatim — character-for-character exact
+- Every mental_model entry should include a brief verbatim quote showing how it manifests
+- decision_heuristics MUST use WHEN/DO/BECAUSE format and be grounded in the text
+- If prior_thinking_profile exists, ADD to it — never delete prior observations
 </guardrails>
 </user_prompt>

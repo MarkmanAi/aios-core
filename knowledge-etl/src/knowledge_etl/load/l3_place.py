@@ -156,6 +156,14 @@ def _voice_dna_to_markdown(dna_dict: dict) -> str:
     inner = dna_dict.get("voice_dna", dna_dict)
     lines: list[str] = ["# Voice DNA\n"]
 
+    # Schema v2.0 fields (new)
+    writing_patterns = inner.get("writing_style_patterns", [])
+    if writing_patterns:
+        lines.append("## Writing Style Patterns")
+        for p in writing_patterns:
+            lines.append(f"- {p}")
+        lines.append("")
+
     vocab = inner.get("signature_vocabulary", [])
     if vocab:
         lines.append("## Signature Vocabulary")
@@ -163,10 +171,11 @@ def _voice_dna_to_markdown(dna_dict: dict) -> str:
             lines.append(f"- {word}")
         lines.append("")
 
-    pattern = inner.get("sentence_pattern", "")
-    if pattern:
-        lines.append("## Sentence Pattern")
-        lines.append(pattern)
+    # v2.0: sentence_structure; v1.0 fallback: sentence_pattern
+    structure = inner.get("sentence_structure", "") or inner.get("sentence_pattern", "")
+    if structure:
+        lines.append("## Sentence Structure")
+        lines.append(structure)
         lines.append("")
 
     devices = inner.get("rhetorical_devices", [])
@@ -176,6 +185,13 @@ def _voice_dna_to_markdown(dna_dict: dict) -> str:
             lines.append(f"- {d}")
         lines.append("")
 
+    pedagogy = inner.get("pedagogical_approach", "")
+    if pedagogy:
+        lines.append("## Pedagogical Approach")
+        lines.append(pedagogy)
+        lines.append("")
+
+    # v1.0 only: tone (kept for backward compat)
     tone = inner.get("tone", "")
     if tone:
         lines.append("## Tone")
@@ -232,6 +248,14 @@ def _thinking_dna_to_markdown(dna_dict: dict) -> str:
         lines.append("## Favorite Analogies")
         for a in analogies:
             lines.append(f"- {a}")
+        lines.append("")
+
+    # v2.0: decision_heuristics (WHEN/DO/BECAUSE format)
+    heuristics = inner.get("decision_heuristics", [])
+    if heuristics:
+        lines.append("## Decision Heuristics")
+        for h in heuristics:
+            lines.append(f"- {h}")
         lines.append("")
 
     quote = inner.get("exemplar_reasoning_quote", "")

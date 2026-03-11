@@ -30,20 +30,24 @@ console = Console()
 
 
 class VoiceDNA(BaseModel):
+    # Schema v2.0 — text-extractable fields only (no conversational/speaking style)
+    writing_style_patterns: list[str] = []
     signature_vocabulary: list[str] = []
-    sentence_pattern: str = ""
+    sentence_structure: str = ""
     rhetorical_devices: list[str] = []
-    tone: str = ""
+    pedagogical_approach: str = ""
     exemplar_quotes: list[str] = []
     chapter_observations: str = ""
 
 
 class ThinkingDNA(BaseModel):
+    # Schema v2.0 — reasoning patterns extractable from written text
     primary_reasoning_pattern: str = ""
     favorite_argumentative_move: str = ""
     mental_models: list[str] = []
     epistemic_style: str = ""
     favorite_analogies: list[str] = []
+    decision_heuristics: list[str] = []
     exemplar_reasoning_quote: str = ""
 
 
@@ -87,13 +91,22 @@ def extract_l3(
     book_title = metadata.get("title") or book_slug
     author = metadata.get("author") or "Unknown"
 
+    # Prompt version — increment when prompts change to invalidate cached extractions
+    L3_PROMPT_VERSION = "2.0"
+
     # Load prompt templates
     voice_template = (PROMPTS_DIR / "l3_voice_dna.xml").read_text(encoding="utf-8")
     thinking_template = (PROMPTS_DIR / "l3_thinking_dna.xml").read_text(encoding="utf-8")
     contradictions_template = (PROMPTS_DIR / "l3_contradictions.xml").read_text(encoding="utf-8")
 
-    # Checkpoint for resume support
+    # Checkpoint for resume support — invalidate if prompt version changed
     checkpoint = Checkpoint(CHECKPOINTS, book_slug, "l3")
+    cached_version = checkpoint._state.get("prompt_version", "1.0")
+    if cached_version != L3_PROMPT_VERSION:
+        console.print(f"[yellow]L3 prompt version changed ({cached_version} -> {L3_PROMPT_VERSION}) — resetting checkpoint[/yellow]")
+        checkpoint.reset()
+    checkpoint._state["prompt_version"] = L3_PROMPT_VERSION
+    checkpoint._save()
 
     # P4 fix: cache book content for STUFF strategy — 60% cost reduction via prompt cache
     book_content_for_cache: str | None = None

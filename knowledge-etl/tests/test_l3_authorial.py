@@ -17,9 +17,10 @@ from knowledge_etl.transform.l3_authorial import _refine_thinking, _refine_voice
 def mock_llm():
     llm = MagicMock()
     llm.call.return_value = (
-        '{"voice_dna": {"signature_vocabulary": ["test"], "sentence_pattern": "short", '
-        '"rhetorical_devices": [], "tone": "direct", "exemplar_quotes": []}, '
-        '"chapter_observations": "first chapter"}',
+        '{"voice_dna": {"writing_style_patterns": ["pattern1"], '
+        '"signature_vocabulary": ["test"], "sentence_structure": "short declarative", '
+        '"rhetorical_devices": [], "pedagogical_approach": "example-first", '
+        '"exemplar_quotes": []}, "chapter_observations": "first chapter"}',
         MagicMock(cost_usd=0.01),
     )
     return llm

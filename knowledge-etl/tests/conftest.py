@@ -3,8 +3,16 @@
 from __future__ import annotations
 
 import sys
+from unittest.mock import patch
 
 import pytest
+
+
+@pytest.fixture(autouse=True)
+def mock_sleep():
+    """Mock time.sleep globally to prevent rate-limit sleeps from blocking tests."""
+    with patch("time.sleep"):
+        yield
 
 
 @pytest.fixture(autouse=True)
