@@ -1,0 +1,12 @@
+author: Donella H. Meadows
+book_slug: thinking-in-systems
+book_title: Thinking in Systems
+chunk_size_range: 2000-4000 tokens
+chunks_dir: chunks/
+extracted_files:
+- voice_dna.json
+- thinking_dna.json
+- contradictions.json
+pipeline: knowledge-etl
+source_file: Thinking in Systems (Donella H. Meadows) (z-library.sk, 1lib.sk, z-lib.sk).epub
+total_chunks: 3

@@ -1,0 +1,43 @@
+schema: 1
+story: "20.1"
+story_title: "ETL --advisor flag + L3 prompt fixes for Governance Advisor sources"
+gate: PASS
+status_reason: "All 7 ACs verified. 45/45 tests pass. Schema v2.0 implemented correctly with Pydantic enforcement. Meadows L3 output confirmed complete at destination. No CRITICAL or HIGH issues found."
+reviewer: "Quinn (Test Architect)"
+updated: "2026-03-11T00:00:00Z"
+
+top_issues: []
+waiver:
+  active: false
+
+quality_score: 90
+expires: "2026-03-25T00:00:00Z"
+
+evidence:
+  tests_reviewed: 45
+  risks_identified: 2
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7]
+    ac_gaps: []
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: "Local ETL pipeline. No user-facing inputs. No credentials in code."
+  performance:
+    status: PASS
+    notes: "mock_sleep autouse — test suite runs in 2.94s. Production rate limits preserved."
+  reliability:
+    status: PASS
+    notes: "Checkpoint version invalidation (AC-6) ensures re-extraction on prompt changes. Pydantic validation prevents silent empty-field output."
+  maintainability:
+    status: PASS
+    notes: "Schema clearly documented in Pydantic models. XML prompts self-documenting with gold examples. Backward compatibility maintained in l3_place.py for v1.0 schema."
+
+recommendations:
+  immediate: []
+  future:
+    - action: "Fix cosmetic log message in _refine_voice/_refine_thinking: 'waiting 65s' should say 'waiting 200s'"
+      refs: ["knowledge-etl/src/knowledge_etl/transform/l3_authorial.py"]
+    - action: "Add unit test for checkpoint version invalidation logic (AC-6 coverage via code path, not just integration log)"
+      refs: ["knowledge-etl/tests/test_l3_authorial.py"]

@@ -1,9 +1,9 @@
 # Story Backlog — Tech Debt & Follow-ups
 
-> **Last Updated**: 2026-03-09
-> **Source**: PO Validation + QA Review — Epics 12, 13 (13.2 tech debt added) + QA Review PR #9 Story 13.10
+> **Last Updated**: 2026-03-11
+> **Source**: PO Validation + QA Review — Epics 12, 13 (13.2 tech debt added) + QA Review PR #9 Story 13.10 + QA Review Story 20.1
 > **Managed by**: @po (Pax)
-> **Updated**: 2026-03-08 — Epic 13 closed: 12/12 stories Done, all moved to completed/. [13.10-T1], [13.10-T2] remain as LOW tech debt for future sprint.
+> **Updated**: 2026-03-11 — [20.1-T1], [20.1-T2] registered by @qa — Story 20.1 follow-ups (LOW tech debt)
 
 ---
 
@@ -11,16 +11,16 @@
 
 | Status | Count |
 |--------|-------|
-| TODO | 3 |
+| TODO | 5 |
 | IN PROGRESS | 0 |
 | DONE | 14 |
-| Total | 17 |
+| Total | 19 |
 
 | Priority | Count |
 |----------|-------|
 | HIGH | 0 |
 | MEDIUM | 0 |
-| LOW | 3 |
+| LOW | 5 |
 
 ---
 
@@ -52,6 +52,22 @@
 - **Epic**: 17 (deferred)
 - **Issue**: The `correction` branch uses `/Actually,?\s*(.+?)\./i` — a lazy quantifier that stops at the **first** period in the text. Correction memories containing internal periods (e.g., `"use Node.js APIs"`) are partially captured (`"use Node"` instead of `"use Node.js APIs"`), causing deduplication to silently fail for that entry. A second write of the same correction text would not be recognized as a duplicate.
 - **Fix**: Replace with a greedy-to-end-of-line pattern: `/Actually,?\s*(.+)\.$/im` or strip the trailing sentence period explicitly and compare against the full captured text. Alternatively, store `content.text` directly in frontmatter as a dedicated `text_hash` field for reliable dedup lookup.
+
+#### [20.1-T1] Fix cosmetic log message in `_refine_voice` / `_refine_thinking`
+- **Status**: TODO
+- **Priority**: LOW
+- **Source**: QA Review — Story 20.1 (2026-03-11)
+- **File**: `knowledge-etl/src/knowledge_etl/transform/l3_authorial.py`
+- **Issue**: Console prints "waiting 65s for rate limit..." but `time.sleep(200)` is called. Message is misleading during pipeline execution.
+- **Fix**: Update log strings to say "waiting 200s for rate limit..." to match actual sleep duration.
+
+#### [20.1-T2] Add unit test for L3 checkpoint version invalidation logic
+- **Status**: TODO
+- **Priority**: LOW
+- **Source**: QA Review — Story 20.1 (2026-03-11)
+- **File**: `knowledge-etl/tests/test_l3_authorial.py`
+- **Issue**: AC-6 (prompt_version checkpoint invalidation) was verified via integration run log only. No unit test covers the `cached_version != L3_PROMPT_VERSION → checkpoint.reset()` code path.
+- **Fix**: Add a test that mocks a checkpoint with `prompt_version: "1.0"` and asserts `checkpoint.reset()` is called when `extract_l3` runs with version `"2.0"`.
 
 #### [13.10-T2] Handle additional resume actions explicitly in `resume.js`
 - **Status**: TODO
@@ -136,4 +152,5 @@
 *Updated: 2026-03-07 — [12.3-T3], [12.2-QA-L1], [12.2-QA-L2], [12.2-QA-L3] DONE: implemented by @dev, 41/41 tests pass*
 *Updated: 2026-03-07 — [12.1-QA-L1] DONE: _parse_json unwrapping fix by @architect + @dev, 14/14 tests pass*
 *Updated: 2026-03-08 — [13.10-T1], [13.10-T2] registered by @qa — CodeRabbit nitpicks from PR #9 (Story 13.10)*
-*Updated: 2026-03-08 — Epic 13 CLOSED: 12/12 stories Done. All 13.x stories archived to docs/stories/completed/ by @po**
+*Updated: 2026-03-08 — Epic 13 CLOSED: 12/12 stories Done. All 13.x stories archived to docs/stories/completed/ by @po*
+*Updated: 2026-03-11 — [20.1-T1], [20.1-T2] registered by @qa — Story 20.1 follow-ups (LOW)*
