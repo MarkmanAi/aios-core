@@ -359,16 +359,15 @@ def _patched_extract_l1(l1_env: dict, llm: MagicMock, book_slug: str = "test-boo
 
 class TestL1CacheValidation:
     def test_invalid_cache_file_deleted(self, l1_env):
-        """Zero-principle cache file must be deleted and pipeline re-executed."""
+        """Zero-principle cache file must be deleted (unlink called) on invalid cache."""
         _make_l1_cache(l1_env, "test-book", [])
 
-        # Patch _extract_map_reduce to verify it was invoked (proves cache miss path ran)
-        with patch(
+        with patch("pathlib.Path.unlink") as mock_unlink, patch(
             "knowledge_etl.transform.l1_principles._extract_map_reduce", return_value=[]
-        ) as mock_mr:
+        ):
             _patched_extract_l1(l1_env, MagicMock())
 
-        mock_mr.assert_called_once()
+        mock_unlink.assert_called_once()
 
     def test_invalid_cache_triggers_rerun(self, l1_env):
         """Zero-principle cache must trigger _extract_map_reduce (not silent cache hit)."""
