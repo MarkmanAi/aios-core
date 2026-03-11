@@ -72,13 +72,8 @@ def merge_l1(
         console.print("[yellow]L1 Load:[/yellow] No new unique principles to add")
         return target
 
-    # Build section
-    section_lines = [
-        f"\n## {author} -- {title}",
-        f"*Source: {book_slug} | Extracted: {today}*",
-        "",
-    ]
-
+    # Build principle lines
+    new_lines = []
     for p in unique_principles:
         principle_text = p.get("principle", "")
         action_text = p.get("action", "")
@@ -91,23 +86,47 @@ def merge_l1(
         if chapter_ref:
             line += f" (_{chapter_ref}_)"
 
-        section_lines.append(line)
+        new_lines.append(line)
 
-    section_lines.append("")
+    # Check if a section for this book_slug already exists → append inside it
+    section_header = f"## {author} -- {title}"
+    if existing_content and f"*Source: {book_slug} |" in existing_content:
+        # Find the existing section and append new principles inside it
+        lines = existing_content.split("\n")
+        insert_idx = None
+        in_section = False
+        for i, line in enumerate(lines):
+            if section_header in line:
+                in_section = True
+            elif in_section and line.startswith("## "):
+                # Next section — insert before it
+                insert_idx = i
+                break
+        if insert_idx is None and in_section:
+            insert_idx = len(lines)  # End of file
 
-    # Append to file
-    new_section = "\n".join(section_lines)
-    if existing_content:
-        updated_content = existing_content.rstrip() + "\n" + new_section
+        if insert_idx is not None:
+            lines[insert_idx:insert_idx] = new_lines
+            updated_content = "\n".join(lines)
+        else:
+            # Fallback: append new section
+            section_lines = [f"\n{section_header}", f"*Source: {book_slug} | Extracted: {today}*", ""] + new_lines + [""]
+            updated_content = existing_content.rstrip() + "\n" + "\n".join(section_lines)
     else:
-        # Initialize file with header
-        updated_content = (
-            "# Strategic Principles\n"
-            "\n"
-            "Operational principles extracted from books by the knowledge-etl pipeline.\n"
-            "Each principle is attributed to its author and source.\n"
-            + new_section
-        )
+        # New section for this book
+        section_lines = [f"\n{section_header}", f"*Source: {book_slug} | Extracted: {today}*", ""] + new_lines + [""]
+        new_section = "\n".join(section_lines)
+        if existing_content:
+            updated_content = existing_content.rstrip() + "\n" + new_section
+        else:
+            # Initialize file with header
+            updated_content = (
+                "# Strategic Principles\n"
+                "\n"
+                "Operational principles extracted from books by the knowledge-etl pipeline.\n"
+                "Each principle is attributed to its author and source.\n"
+                + new_section
+            )
 
     target.write_text(updated_content, encoding="utf-8")
     console.print(f"[green]L1 Load:[/green] {len(unique_principles)} principles merged into {target.name}")
