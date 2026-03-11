@@ -43,13 +43,69 @@ core_principles:
 
 commands:
   - '*help' - Show available commands
-  - '*compile-generalista' - Compile general-purpose system prompt
+  - '*compile-generalista' - Compile general-purpose system prompt (Tier A)
+  - '*compile-governance-advisor' - Compile Governance Advisor system prompt (Tier B) with mandatory disclaimer + KB injection
   - '*create-specialist' - Create domain-specific specialist
   - '*test-fidelity' - Run blind fidelity testing
   - '*optimize-prompt' - Optimize prompt for tokens/performance
   - '*validate-security' - Validate prompt security
   - '*chat-mode' - Conversational prompt engineering guidance
   - '*exit' - Deactivate
+
+governance_advisor_output_mode:
+  description: >
+    Tier B output mode. Generates a framework-scoped system prompt for Governance Advisors.
+    NOT a full personality clone — scope is limited to reasoning patterns, mental models,
+    and decision frameworks extractable from written sources.
+    Triggered by *map {name} --tier governance-advisor from @mind-mapper.
+    Reference: .neo/data/clone-standards.md (Tier B specification).
+  output_file: "minds/{slug}/system_prompts/governance-advisor-v1.0.md"
+  mandatory_disclaimer: |
+    [GOVERNANCE ADVISOR MODE]
+    This is a framework-based advisor, not a full personality clone.
+    Emulation scope: reasoning patterns, mental models, decision frameworks.
+    L6-L7 (personal values, biography) inferred from written work only.
+    Confidence: HIGH for frameworks | MEDIUM for values | LOW for conversational style.
+  disclaimer_rule: >
+    The system prompt MUST begin with the mandatory_disclaimer verbatim.
+    No deviation. @emulator uses exact string "[GOVERNANCE ADVISOR MODE]" for detection.
+  content_scope:
+    include:
+      - "Reasoning patterns extracted from L1-L5 analysis"
+      - "Mental models and frameworks from the work"
+      - "Decision heuristics (WHEN/DO/BECAUSE format from ETL thinking_dna.json)"
+      - "Writing style patterns and vocabulary (from ETL voice_dna.json)"
+      - "Gold Layer contradictions from ETL contradictions.json or L8 analysis"
+      - "Governance frameworks from .neo/kb/strategic/{domain}.md (injected inline)"
+    exclude:
+      - "Conversational tone or informal speech patterns"
+      - "Personality quirks not grounded in written sources"
+      - "How the person would respond in informal settings"
+      - "Biographical claims not present in the sources"
+  kb_injection:
+    description: >
+      Inject the relevant L2 governance frameworks from .neo/kb/strategic/ directly
+      into the system prompt inside a <governance_frameworks> XML block.
+      This ensures @emulator has the frameworks in-context without a separate KB lookup.
+    format: |
+      <governance_frameworks source=".neo/kb/strategic/{domain}.md">
+        {full content of .neo/kb/strategic/{domain}.md}
+      </governance_frameworks>
+    domain_mapping:
+      "donella_meadows": "systems-thinking"
+      "matthew_skelton": "org-design"
+      "manuel_pais": "org-design"
+      "stephen_bungay": "governance"
+      "andrew_grove": "governance"
+    note: >
+      Read the domain file at compile time and embed inline.
+      If domain file does not exist yet, note it as [PENDING] and continue.
+  fidelity_note: >
+    Tier B prompts are not tested for persona fidelity (no blind test).
+    Human checkpoint validates framework accuracy before output is finalized.
+  regression_note: >
+    *compile-generalista and *create-specialist (Tier A) are UNCHANGED.
+    governance_advisor_output_mode only activates when --tier governance-advisor flag is set.
 
 security:
   code_generation:

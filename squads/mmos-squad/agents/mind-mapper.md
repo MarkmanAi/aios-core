@@ -62,7 +62,8 @@ core_principles:
   - FIDELITY OR NOTHING: 94% is the target - anything less requires iteration
 
 commands:
-  - '*map {name}' - Ultra-simple command: Auto-detects everything and creates/updates cognitive clone
+  - '*map {name}' - Ultra-simple command: Auto-detects everything and creates/updates cognitive clone (Tier A — default)
+  - '*map {name} --tier governance-advisor' - Run Tier B pipeline for book-first/posthumous authors (APEX >= 55, 2+ written sources)
   - '*help' - Show available commands and capabilities
   - '*viability {name}' - Quick viability check (APEX + ICP scoring)
   - '*status {name}' - Show current progress and next steps for a mind
@@ -70,6 +71,50 @@ commands:
   - '*phase {phase} {name}' - Execute specific phase (viability, research, analysis, synthesis, implementation, testing)
   - '*chat-mode' - Conversational mode for mind mapping guidance
   - '*exit' - Deactivate and return to base mode
+
+tier_b_governance_advisor:
+  description: >
+    Tier B pipeline for book-first or posthumous authors who are primarily accessible
+    through written works. Produces a Governance Advisor — a framework-scoped advisor
+    that responds using the author's reasoning patterns and mental models, NOT a full
+    personality clone. Reference: .neo/data/clone-standards.md (Tier B specification).
+  trigger: "*map {name} --tier governance-advisor"
+  pipeline_adaptations:
+    apex_threshold: 55          # Tier A requires >= 70
+    minimum_sources: 2          # Written sources (books, papers, long-form articles). Tier A requires 3+ of any type.
+    l1_l5: "Standard extraction from written text — no changes"
+    l6_l7: >
+      TEXT INFERENCE MODE (not standard collection).
+      Identity Analyst reads book sources and extracts L6/L7 from:
+      prefaces, dedications, moral conclusions, autobiographical passages, stated principles.
+      Each inference MUST carry a confidence level: HIGH | MEDIUM | LOW.
+      No biographical data fabricated beyond what exists in sources.
+    l8_input: >
+      PRIMARY: ETL contradictions.json from minds/{slug}/sources/books/{book-slug}/contradictions.json
+      if available (produced by knowledge-etl --advisor flag, Story 20.1).
+      FALLBACK: Standard MMOS L8 extraction from sources (no change).
+    system_prompt_scope: "Frameworks & reasoning only — NOT full persona. Output: governance-advisor-v1.0.md"
+    human_checkpoint: >
+      Occurs at L6-L8 as usual, but validator reviews FRAMEWORK ACCURACY, not persona fidelity.
+      Checkpoint prompt: "Validate that the extracted frameworks and reasoning patterns accurately
+      represent the author's work. This is NOT a personality fidelity test."
+  apex_scoring:
+    tier_b_range: "55-69 — acceptable for Governance Advisor, log as [GOVERNANCE ADVISOR: APEX {score}]"
+    tier_b_minimum: 55
+    tier_a_minimum: 70
+    note: >
+      APEX formula is unchanged. Only the acceptance threshold differs.
+      Scores < 55 → NO-GO even for Tier B.
+      Scores >= 70 → eligible for Tier A upgrade if sources warrant.
+  output:
+    system_prompt_file: "minds/{slug}/system_prompts/governance-advisor-v1.0.md"
+    marker: "[GOVERNANCE ADVISOR MODE]"
+    emulator_detection: >
+      @emulator detects [GOVERNANCE ADVISOR MODE] marker and switches to
+      framework invocation style (not personality emulation).
+  regression_note: >
+    Standard *map {name} (no --tier flag) runs existing Tier A pipeline UNCHANGED.
+    No behavioral changes to *roundtable, *duo, or existing Tier A minds.
 
 security:
   code_generation:

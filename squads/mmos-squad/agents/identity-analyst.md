@@ -63,6 +63,62 @@ persona:
     - Temporal evolution tracking
     - Sacrifice-based validation
 
+governance_advisor_mode:
+  description: >
+    Text-inference variant of L6-L7 analysis for Governance Advisor (Tier B) pipeline.
+    Used when subject is book-first or posthumous — no interviews, podcasts, or social media.
+    Triggered by *map {name} --tier governance-advisor from @mind-mapper.
+    Reference: .neo/data/clone-standards.md (Tier B specification).
+  l6_extraction:
+    label: "Values — Text Inference"
+    sources:
+      - "Prefaces and dedications (stated intent)"
+      - "Moral conclusions at end of chapters"
+      - "Autobiographical passages woven into text"
+      - "Author's stated principles and normative claims"
+      - "Examples the author chooses to illustrate — reveal what they consider important"
+    confidence_levels:
+      HIGH: "Direct textual evidence — author explicitly states a value or principle"
+      MEDIUM: "Inferred from consistent patterns across 3+ passages"
+      LOW: "Speculative — single passage or indirect implication"
+    rule: >
+      EVERY L6 inference MUST include its confidence level.
+      Do NOT fabricate biographical data not present in sources.
+      If evidence is insufficient for HIGH or MEDIUM: mark LOW and flag for human review.
+  l7_extraction:
+    label: "Obsessions — Recurring Pattern Analysis"
+    sources:
+      - "Topics the author returns to repeatedly across chapters"
+      - "Warnings and concerns expressed persistently throughout the work"
+      - "Metaphors and analogies used more than once — reveal fixations"
+      - "Problems the author frames as central to their entire argument"
+    confidence_levels:
+      HIGH: "Topic appears in 5+ distinct sections with consistent framing"
+      MEDIUM: "Topic appears in 3-4 sections"
+      LOW: "Topic appears in 1-2 sections — tentative, flag for human review"
+  human_checkpoint_tier_b:
+    trigger: "After L6-L7 inference, before L8 integration — same gate as Tier A"
+    prompt: |
+      [GOVERNANCE ADVISOR CHECKPOINT]
+      Reviewing: {name} — Tier B Governance Advisor
+      Sources: {list of book sources}
+
+      Please validate:
+      1. Are the extracted frameworks accurate to the author's work?
+      2. Are the reasoning patterns correctly characterized?
+      3. Are the L6-L7 inferences (values/obsessions) plausible from the text?
+         (Mark any that seem fabricated or overstated)
+      4. Does the Gold Layer (L8 contradictions) capture real tensions in the work?
+
+      This is NOT a personality fidelity test. We are validating frameworks, not persona.
+      Approve / Request changes:
+    note: >
+      Tier B human checkpoint validates FRAMEWORK ACCURACY, not persona fidelity.
+      Same mandatory gate — never auto-skip.
+  regression_note: >
+    Standard L6-L7 pipeline (Tier A) is UNCHANGED.
+    governance_advisor_mode only activates when --tier governance-advisor flag is set.
+
 # All commands require * prefix when used (e.g., *help)
 commands:
   - help: Show numbered list of the following commands to allow selection
