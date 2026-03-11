@@ -182,6 +182,103 @@ class LLMClient:
         )
         return text, usage
 
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=4, max=30),
+        reraise=True,
+    )
+    def call_structured(
+        self,
+        model: str,
+        system_prompt: str,
+        task_prompt: str,
+        output_schema: dict,
+        tool_name: str,
+        book_content: str | None = None,
+        max_tokens: int = 4096,
+    ) -> tuple[dict, UsageStats]:
+        """
+        Calls Claude with forced tool_use — returns structured dict, never raises json.JSONDecodeError.
+        Uses tool_choice={"type": "tool", "name": tool_name} to force structured response.
+
+        Args:
+            model: Key from MODELS dict ('opus', 'sonnet', 'haiku')
+            system_prompt: System instructions
+            task_prompt: The specific extraction task for this call
+            output_schema: JSON Schema dict (from a Pydantic model's .model_json_schema())
+            tool_name: Tool name (e.g. "extract_principles")
+            book_content: Full book text — cached across passes with cache_control
+            max_tokens: Max output tokens
+
+        Returns:
+            (result_dict, usage_stats) — result_dict is already parsed, no json.loads needed
+        """
+        model_id = MODELS[model]
+
+        system: list[dict[str, Any]] = [
+            {
+                "type": "text",
+                "text": system_prompt,
+                "cache_control": {"type": "ephemeral"},
+            }
+        ]
+
+        user_content: list[dict[str, Any]] = []
+        if book_content:
+            user_content.append(
+                {
+                    "type": "text",
+                    "text": f"<book>\n{book_content}\n</book>",
+                    "cache_control": {"type": "ephemeral"},
+                }
+            )
+        user_content.append({"type": "text", "text": task_prompt})
+
+        messages: list[dict[str, Any]] = [{"role": "user", "content": user_content}]
+
+        response = self.client.messages.create(
+            model=model_id,
+            max_tokens=max_tokens,
+            system=system,
+            tools=[
+                {
+                    "name": tool_name,
+                    "description": "Extract structured data from the provided content.",
+                    "input_schema": output_schema,
+                }
+            ],
+            tool_choice={"type": "tool", "name": tool_name},
+            messages=messages,
+        )
+
+        tool_block = next((b for b in response.content if b.type == "tool_use"), None)
+        if tool_block is None:
+            raise ValueError(
+                f"call_structured: expected tool_use block in response, "
+                f"got: {[b.type for b in response.content]}"
+            )
+
+        result: dict = tool_block.input
+
+        required_keys = output_schema.get("required", [])
+        missing = [k for k in required_keys if k not in result]
+        if missing:
+            raise ValueError(
+                f"call_structured: tool response missing required keys {missing}. "
+                f"Got keys: {list(result.keys())}"
+            )
+
+        usage = UsageStats(
+            model_id=model_id,
+            input_tokens=response.usage.input_tokens,
+            output_tokens=response.usage.output_tokens,
+            cache_creation_tokens=getattr(
+                response.usage, "cache_creation_input_tokens", 0
+            ),
+            cache_read_tokens=getattr(response.usage, "cache_read_input_tokens", 0),
+        )
+        return result, usage
+
     def count_tokens(
         self,
         model: str,

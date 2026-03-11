@@ -142,16 +142,22 @@ def _extract_stuff(
     )
 
     system = _get_system_prompt(prompt_template)
-    text, usage = llm.call(
+    result, usage = llm.call_structured(
         model=model,
         system_prompt=system,
         task_prompt=task_prompt,
+        output_schema=L1Result.model_json_schema(),
+        tool_name="extract_principles",
         book_content=book_content,
         max_tokens=MAX_OUTPUT_L1,
     )
     cost_tracker.record("l1_stuff", usage)
 
-    return _parse_principles(text, l1_dir / "stuff_extraction.json")
+    principles = result.get("principles", [])
+    (l1_dir / "stuff_extraction.json").write_text(
+        json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+    return principles
 
 
 def _extract_map_reduce(
@@ -195,15 +201,20 @@ def _extract_map_reduce(
         )
 
         console.print(f"  [cyan]L1:[/cyan] {chapter_key}")
-        text, usage = llm.call(
+        result, usage = llm.call_structured(
             model=model,
             system_prompt=system,
             task_prompt=task_prompt,
+            output_schema=L1Result.model_json_schema(),
+            tool_name="extract_principles",
             max_tokens=MAX_OUTPUT_L1,
         )
         cost_tracker.record("l1_map", usage, chapter=chapter_key)
 
-        principles = _parse_principles(text, l1_dir / f"{chapter_key}.json")
+        principles = result.get("principles", [])
+        (l1_dir / f"{chapter_key}.json").write_text(
+            json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
         checkpoint.mark_done(chapter_key, principles, usage.cost_usd)
         chapter_results.extend(principles)
 
@@ -244,25 +255,17 @@ def _reduce_l1(
         .replace("{{JSON_ARRAY_OF_CANDIDATES}}", candidates_json)
     )
 
-    text, usage = llm.call(
+    result, usage = llm.call_structured(
         model=DEFAULT_MODEL_L1,
         system_prompt=reduce_system,
         task_prompt=task_prompt,
+        output_schema=L1Result.model_json_schema(),
+        tool_name="reduce_principles",
         max_tokens=MAX_OUTPUT_REDUCE,
     )
     cost_tracker.record("l1_reduce", usage)
 
-    json_match = re.search(r"\{.*\}", text, re.DOTALL)
-    if not json_match:
-        console.print("[yellow]L1 Reduce warning:[/yellow] LLM returned unparseable response — returning raw chapter results")
-        return chapter_results
-
-    try:
-        data = json.loads(json_match.group())
-        return data.get("principles", chapter_results)
-    except json.JSONDecodeError:
-        console.print("[yellow]L1 Reduce warning:[/yellow] JSON decode failed — returning raw chapter results")
-        return chapter_results
+    return result.get("principles", chapter_results)
 
 
 def _fill_template(
@@ -291,6 +294,7 @@ def _get_system_prompt(template: str) -> str:
     return match.group(1).strip() if match else "You are an expert knowledge extractor."
 
 
+# DEPRECATED (Story 22.2): replaced by call_structured() — kept for reference only.
 def _parse_principles(text: str, output_path: Path) -> list[dict]:
     """Parse JSON from LLM response, save to file, return list."""
     # Extract JSON from response (LLM might wrap in markdown code blocks)

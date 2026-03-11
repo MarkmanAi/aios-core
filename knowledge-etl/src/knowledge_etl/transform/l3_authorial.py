@@ -10,7 +10,7 @@ import json
 import re
 import time
 from pathlib import Path
-from typing import Any, Type
+from typing import Type
 
 from pydantic import BaseModel, ValidationError
 from rich.console import Console
@@ -210,20 +210,20 @@ def _refine_voice(
 
         console.print(f"  [cyan]L3 Voice:[/cyan] {chapter_key} (waiting 65s for rate limit...)")
         time.sleep(200)
-        text, usage = llm.call(
+        result, usage = llm.call_structured(
             model=model,
             system_prompt=system,
             task_prompt=task_prompt,
+            output_schema=VoiceDNA.model_json_schema(),
+            tool_name="extract_voice_dna",
             book_content=book_content,
             max_tokens=MAX_OUTPUT_L3,
         )
         cost_tracker.record("l3_voice", usage, chapter=chapter_key)
 
-        parsed = _parse_json(text, VoiceDNA)
-        if parsed:
-            latest_voice = parsed
-            prior_profile = json.dumps(parsed, ensure_ascii=False)
-            checkpoint.mark_done(ckpt_key, parsed, usage.cost_usd)
+        latest_voice = result
+        prior_profile = json.dumps(result, ensure_ascii=False)
+        checkpoint.mark_done(ckpt_key, result, usage.cost_usd)
 
     # Save final voice DNA
     output_path = l3_dir / "voice_dna.json"
@@ -279,20 +279,20 @@ def _refine_thinking(
 
         console.print(f"  [cyan]L3 Thinking:[/cyan] {chapter_key} (waiting 65s for rate limit...)")
         time.sleep(200)
-        text, usage = llm.call(
+        result, usage = llm.call_structured(
             model=model,
             system_prompt=system,
             task_prompt=task_prompt,
+            output_schema=ThinkingDNA.model_json_schema(),
+            tool_name="extract_thinking_dna",
             book_content=book_content,
             max_tokens=MAX_OUTPUT_L3,
         )
         cost_tracker.record("l3_thinking", usage, chapter=chapter_key)
 
-        parsed = _parse_json(text, ThinkingDNA)
-        if parsed:
-            latest_thinking = parsed
-            prior_profile = json.dumps(parsed, ensure_ascii=False)
-            checkpoint.mark_done(ckpt_key, parsed, usage.cost_usd)
+        latest_thinking = result
+        prior_profile = json.dumps(result, ensure_ascii=False)
+        checkpoint.mark_done(ckpt_key, result, usage.cost_usd)
 
     # Save final thinking DNA
     output_path = l3_dir / "thinking_dna.json"
@@ -328,17 +328,16 @@ def _extract_contradictions(
 
     console.print("  [cyan]L3 Contradictions:[/cyan] full book (waiting 300s for rate limit...)")
     time.sleep(300)
-    text, usage = llm.call(
+    result, usage = llm.call_structured(
         model=model,
         system_prompt=system,
         task_prompt=task_prompt,
+        output_schema=ContradictionsResult.model_json_schema(),
+        tool_name="extract_contradictions",
         book_content=book_content,
         max_tokens=MAX_OUTPUT_L3,
     )
     cost_tracker.record("l3_contradictions", usage)
-
-    parsed = _parse_json(text, ContradictionsResult)
-    result = parsed if parsed else {"productive_contradictions": [], "raw": text}
 
     output_path = l3_dir / "contradictions.json"
     output_path.write_text(
@@ -375,6 +374,7 @@ def _get_system_prompt(template: str) -> str:
     return match.group(1).strip() if match else "You are an expert authorial analyst."
 
 
+# DEPRECATED (Story 22.2): replaced by call_structured() — kept for reference only.
 def _parse_json(text: str, pydantic_model: Type[BaseModel] | None = None) -> dict | None:
     """Parse JSON from LLM response, handling markdown code blocks.
 

@@ -9,7 +9,7 @@ import json
 import re
 import time
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ValidationError
 from rich.console import Console
@@ -61,6 +61,14 @@ class L2Result(BaseModel):
     trigger_questions: list[TriggerQuestion] = []
 
 
+class L2ReduceResult(BaseModel):
+    """Expected shape of the cross-chapter synthesis (reduce_synthesis.xml output)."""
+    unified_frameworks: list[dict[str, Any]] = []
+    unified_heuristics: list[dict[str, Any]] = []
+    unified_anti_patterns: list[dict[str, Any]] = []
+    unified_trigger_questions: list[dict[str, Any]] = []
+
+
 def extract_l2(
     book_slug: str,
     full_text_path: Path,
@@ -84,7 +92,6 @@ def extract_l2(
     l2_dir.mkdir(parents=True, exist_ok=True)
 
     # Cache check — skip all API calls if final output already exists
-    l2_dir = STAGING / book_slug / "l2"
     output_path = l2_dir / "final_frameworks.json"
     if output_path.exists():
         cached = json.loads(output_path.read_text(encoding="utf-8"))
@@ -146,19 +153,22 @@ def extract_l2(
 
         console.print(f"  [cyan]L2:[/cyan] {chapter_key} (waiting 65s for rate limit...)")
         time.sleep(200)
-        text, usage = llm.call(
+        result, usage = llm.call_structured(
             model=model,
             system_prompt=system,
             task_prompt=task_prompt,
+            output_schema=L2Result.model_json_schema(),
+            tool_name="extract_frameworks",
             book_content=book_content,  # None for map-reduce (no cache reuse)
             max_tokens=MAX_OUTPUT_L2,
         )
         cost_tracker.record("l2_map", usage, chapter=chapter_key)
 
-        result = _parse_l2(text, l2_dir / f"{chapter_key}.json")
-        if result:
-            chapter_results.append(result)
-            checkpoint.mark_done(chapter_key, result, usage.cost_usd)
+        (l2_dir / f"{chapter_key}.json").write_text(
+            json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
+        chapter_results.append(result)
+        checkpoint.mark_done(chapter_key, result, usage.cost_usd)
 
     # REDUCE: Synthesize across chapters
     console.print("[cyan]L2 Reduce:[/cyan] Cross-chapter synthesis")
@@ -223,22 +233,15 @@ def _reduce(
 
     console.print("[cyan]L2 Reduce:[/cyan] waiting 200s for rate limit...")
     time.sleep(200)
-    text, usage = llm.call(
+    result, usage = llm.call_structured(
         model=DEFAULT_MODEL_L2,
         system_prompt=reduce_system,
         task_prompt=task_prompt,
+        output_schema=L2ReduceResult.model_json_schema(),
+        tool_name="synthesize_frameworks",
         max_tokens=MAX_OUTPUT_REDUCE,
     )
     cost_tracker.record("l2_reduce", usage)
-
-    json_match = re.search(r"\{.*\}", text, re.DOTALL)
-    if not json_match:
-        result = {"raw_reduce": text, "chapter_results": chapter_results}
-    else:
-        try:
-            result = json.loads(json_match.group())
-        except json.JSONDecodeError:
-            result = {"parse_error": True, "raw": text, "chapter_results": chapter_results}
 
     checkpoint.mark_done("__reduce__", result, cost_usd=usage.cost_usd)
     return result
@@ -269,6 +272,7 @@ def _get_system_prompt(template: str) -> str:
     return match.group(1).strip() if match else "You are a knowledge architect."
 
 
+# DEPRECATED (Story 22.2): replaced by call_structured() — kept for reference only.
 def _parse_l2(text: str, output_path: Path) -> dict | None:
     json_match = re.search(r"\{.*\}", text, re.DOTALL)
     if not json_match:
