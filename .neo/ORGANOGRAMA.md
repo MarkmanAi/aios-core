@@ -160,7 +160,7 @@
 
 | Advisor | Domain | Book Source | ETL Status | Pipeline Status |
 |---------|--------|-------------|------------|----------------|
-| **Donella Meadows** | Systems Thinking — leverage points, feedback loops, stocks/flows | Thinking in Systems | ✅ L1+L2 done · L3 sources collected | 📚 PENDING pipeline |
+| **Donella Meadows** | Systems Thinking — leverage points, feedback loops, stocks/flows | Thinking in Systems | ✅ L1+L2+L3 done (Story 20.1+20.2) | 📚 GOVERNANCE ADVISOR ✅ APEX 68 · `governance-advisor-v1.0.md` · checkpoint approved 2026-03-11 |
 | **Matthew Skelton & Manuel Pais** | Org Design — cognitive load, Conway's Law, team topology | Team Topologies (2nd Ed.) | ⏳ book pending | 📚 PENDING |
 | **Stephen Bungay** | Governance & Delegation — 3 gaps, Mission Command, directed opportunism | The Art of Action | ⏳ book pending | 📚 PENDING |
 | **Andrew Grove** | Output Management — managerial leverage, OKRs, task-relevant maturity | High Output Management | ⏳ book pending | 📚 PENDING |
