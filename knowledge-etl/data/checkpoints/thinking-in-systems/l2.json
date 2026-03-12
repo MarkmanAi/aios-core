@@ -1,6 +1,8 @@
 {
   "completed_chapters": [
-    "01-introduction"
+    "01-introduction",
+    "__reduce_a__",
+    "__reduce_b__"
   ],
   "results": {
     "01-introduction": {
@@ -174,7 +176,403 @@
           "source_quote": "You'll stop looking for who's to blame; instead you'll start asking, 'What's the system?' The concept of feedback opens up the idea that a system can cause its own behavior."
         }
       ]
+    },
+    "__reduce_a__": {
+      "unified_frameworks": [
+        {
+          "name": "Elements-Interconnections-Purpose (EIP) System Definition",
+          "type": "explicit",
+          "description": "A system must consist of exactly three components: elements (the visible, tangible parts), interconnections (the relationships and information flows holding elements together), and a function or purpose (the goal the system serves). The three interact, but purpose is typically the least obvious and most determinative of behavior.",
+          "components": [
+            "Elements: visible, tangible, countable parts of the system",
+            "Interconnections: information flows and relationships linking elements",
+            "Function/Purpose: the goal or behavior the system produces — deduced from observation, not stated intent"
+          ],
+          "when_to_use": "When encountering any complex situation and needing to determine whether it constitutes a system and where behavioral leverage lies",
+          "source_quote": "a system must consist of three kinds of things: elements, interconnections, and a function or purpose.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "sub_frameworks": [
+            "Purpose-Primacy Hierarchy"
+          ],
+          "cross_references": [
+            "Purpose-Primacy Hierarchy",
+            "Structure-Before-Blame Diagnostic"
+          ]
+        },
+        {
+          "name": "Stock-and-Flow Dynamics Model",
+          "type": "explicit",
+          "description": "Systems are understood through stocks (accumulated quantities measurable at any moment) and flows (rates of change that fill or drain stocks over time). The level of a stock at any moment is the memory of all historical flows, and behavior over time is determined by the relationship between inflows and outflows.",
+          "components": [
+            "Stock: an accumulation (physical or informational) measurable at a given time",
+            "Inflow: a rate that increases the stock",
+            "Outflow: a rate that decreases the stock",
+            "Dynamic equilibrium: the state when inflows equal outflows"
+          ],
+          "when_to_use": "When analyzing why a system resists change, moves slowly, or oscillates — stocks provide the memory and momentum that govern pace of change",
+          "source_quote": "A stock is the foundation of any system... A stock is the memory of the history of changing flows within the system.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "sub_frameworks": [
+            "Inflow-Outflow Symmetry Principle"
+          ],
+          "cross_references": [
+            "Inflow-Outflow Symmetry Principle",
+            "Balancing Feedback Loop",
+            "Reinforcing Feedback Loop"
+          ]
+        },
+        {
+          "name": "Balancing Feedback Loop (Goal-Seeking Structure)",
+          "type": "explicit",
+          "description": "A feedback loop in which a stock's deviation from a goal triggers corrective action to restore the stock toward that goal. It is self-correcting and stability-seeking, opposing whatever direction of change is imposed on the system. It is both a source of stability and a source of resistance to change.",
+          "components": [
+            "Goal: the desired state for the stock",
+            "Monitoring/signal: detection of discrepancy between actual and desired state",
+            "Corrective action: adjustment of inflow or outflow to close the discrepancy"
+          ],
+          "when_to_use": "When a system appears to resist policy changes or return to prior conditions despite intervention — a balancing loop is maintaining the existing state",
+          "source_quote": "This kind of stabilizing, goal-seeking, regulating loop is called a balancing feedback loop... A balancing feedback loop opposes whatever direction of change is imposed on the system.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "parent_framework": "Feedback Loop Typology",
+          "cross_references": [
+            "Reinforcing Feedback Loop",
+            "Stock-and-Flow Dynamics Model"
+          ]
+        },
+        {
+          "name": "Reinforcing Feedback Loop (Self-Multiplying Structure)",
+          "type": "explicit",
+          "description": "A feedback loop in which a stock's growth (or decline) generates conditions that accelerate further growth (or decline) in the same direction. It produces exponential behavior — virtuous cycles or vicious circles — and will ultimately destroy itself unless constrained by a balancing loop.",
+          "components": [
+            "Stock with capacity to reproduce or grow as a fraction of itself",
+            "Gain rate: the fraction by which the stock amplifies each cycle",
+            "Runaway direction: growth (virtuous circle) or collapse (vicious circle)"
+          ],
+          "when_to_use": "When observing accelerating growth or accelerating decline — a reinforcing loop is driving the exponential trajectory",
+          "source_quote": "The second kind of feedback loop is amplifying, reinforcing, self-multiplying, snowballing—a vicious or virtuous circle that can cause healthy growth or runaway destruction. It is called a reinforcing feedback loop... It generates more input to a stock the more that is already there.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "parent_framework": "Feedback Loop Typology",
+          "cross_references": [
+            "Balancing Feedback Loop",
+            "Stock-and-Flow Dynamics Model"
+          ]
+        },
+        {
+          "name": "[IMPLICIT] Structure-Before-Blame Diagnostic",
+          "type": "implicit",
+          "description": "A two-step reframing protocol that consistently redirects causal attribution from external actors or events to internal system structure. (1) Identify the behavior pattern; (2) locate its structural source within the system rather than outside it. Meadows applies this throughout as the foundational epistemic move of systems thinking.",
+          "components": [
+            "Step 1 — Resist external attribution: resist naming a person, event, or outside force as the cause",
+            "Step 2 — Locate structural source: identify which stock, flow, or feedback loop within the system generates the behavior"
+          ],
+          "when_to_use": "When a persistent, recurrent problem has resisted repeated interventions or policy fixes — the structural source has not yet been identified",
+          "source_quote": "The system, to a large extent, causes its own behavior! An outside event may unleash that behavior, but the same outside event applied to a different system is likely to produce a different result.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "cross_references": [
+            "EIP System Definition",
+            "Purpose-Primacy Hierarchy"
+          ]
+        },
+        {
+          "name": "[IMPLICIT] Purpose-Primacy Hierarchy",
+          "type": "implicit",
+          "description": "A leverage-prioritization framework that ranks the three EIP system components in reverse order of their impact on system behavior. Elements are most visible but least determinative; purpose is least visible but most determinative. When intervening in a system, look last at elements and first at purpose.",
+          "components": [
+            "Lowest leverage: elements (most visible, most often changed, least impactful unless they alter relationships or purpose)",
+            "Medium leverage: interconnections (information flows, rules, relationships)",
+            "Highest leverage: purpose/function (least visible, most determinative of all downstream behavior)"
+          ],
+          "when_to_use": "When deciding where to intervene in a system — guides attention away from swapping out personnel or components and toward examining goals and information flows",
+          "source_quote": "The least obvious part of the system, its function or purpose, is often the most crucial determinant of the system's behavior... The elements, the parts of systems we are most likely to notice, are often (not always) least important in defining the unique characteristics of the system.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "parent_framework": "Elements-Interconnections-Purpose (EIP) System Definition",
+          "cross_references": [
+            "EIP System Definition",
+            "Structure-Before-Blame Diagnostic"
+          ]
+        },
+        {
+          "name": "[IMPLICIT] Inflow-Outflow Symmetry Principle",
+          "type": "implicit",
+          "description": "The same change in stock level can be achieved by manipulating either inflows OR outflows, yet human cognition systematically neglects outflows. Functions as a corrective decision framework: before defaulting to increasing inputs to solve a stock-level problem, always evaluate whether reducing outflows achieves the same result more cheaply or efficiently.",
+          "components": [
+            "Inflow lever: increasing the rate of input to raise stock level",
+            "Outflow lever: decreasing the rate of drain to raise stock level (systematically overlooked)"
+          ],
+          "when_to_use": "Whenever the instinctive solution to a shortage is to add more inputs — prompt evaluation of outflow reduction as an equivalent or superior alternative",
+          "source_quote": "A stock can be increased by decreasing its outflow rate as well as by increasing its inflow rate. There's more than one way to fill a bathtub!... Everyone understands that you can prolong the life of an oil-based economy by discovering new oil deposits. It seems to be harder to understand that the same result can be achieved by burning less oil.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "parent_framework": "Stock-and-Flow Dynamics Model",
+          "cross_references": [
+            "Stock-and-Flow Dynamics Model"
+          ]
+        },
+        {
+          "name": "[META] Feedback Loop Typology",
+          "type": "explicit",
+          "description": "An overarching classification of all feedback mechanisms into two fundamental types — balancing (goal-seeking, stabilizing) and reinforcing (self-amplifying, destabilizing) — from which all complex system behaviors ultimately derive. Real systems typically contain interlocking combinations of both types.",
+          "components": [
+            "Balancing Feedback Loop: opposes change, seeks goal state, produces stability or resistance",
+            "Reinforcing Feedback Loop: amplifies change, accelerates growth or collapse, produces exponential trajectories"
+          ],
+          "when_to_use": "As the master classification lens when diagnosing any system behavior — determine which loop type is currently dominant",
+          "source_quote": "if you see a behavior that persists over time, there is likely a mechanism creating that consistent behavior. That mechanism operates through a feedback loop.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "sub_frameworks": [
+            "Balancing Feedback Loop (Goal-Seeking Structure)",
+            "Reinforcing Feedback Loop (Self-Multiplying Structure)"
+          ],
+          "cross_references": [
+            "Stock-and-Flow Dynamics Model",
+            "Structure-Before-Blame Diagnostic"
+          ]
+        }
+      ],
+      "unified_heuristics": [
+        {
+          "rule": "WHEN observing a persistent behavior pattern over time → DO search for a feedback loop generating that consistent pattern BECAUSE if a behavior persists, there is likely a mechanism — a feedback loop — creating it",
+          "source_quote": "if you see a behavior that persists over time, there is likely a mechanism creating that consistent behavior. That mechanism operates through a feedback loop.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "cross_references": [
+            "Feedback Loop Typology",
+            "Structure-Before-Blame Diagnostic"
+          ],
+          "priority": 1
+        },
+        {
+          "rule": "WHEN trying to determine a system's purpose → DO observe its behavior over time rather than reading its stated mission BECAUSE purposes are deduced from behavior, not from rhetoric or stated goals",
+          "source_quote": "The best way to deduce the system's purpose is to watch for a while to see how the system behaves... Purposes are deduced from behavior, not from rhetoric or stated goals.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "cross_references": [
+            "Purpose-Primacy Hierarchy",
+            "EIP System Definition"
+          ],
+          "priority": 2
+        },
+        {
+          "rule": "WHEN a stock is large relative to its flows → DO expect slow response to any intervention BECAUSE stocks take time to change, acting as delays, lags, buffers, and sources of momentum",
+          "source_quote": "A stock takes time to change, because flows take time to flow. That's a vital point, a key to understanding why systems behave as they do. Stocks usually change slowly.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "cross_references": [
+            "Stock-and-Flow Dynamics Model"
+          ],
+          "priority": 3
+        },
+        {
+          "rule": "WHEN a reinforcing loop is dominant → DO use the doubling-time shortcut (70 ÷ growth rate %) to anticipate how quickly the system will reach critical scale BECAUSE exponential growth is routinely underestimated",
+          "source_quote": "The time it takes for an exponentially growing stock to double in size, the 'doubling time,' equals approximately 70 divided by the growth rate (expressed as a percentage).",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "cross_references": [
+            "Reinforcing Feedback Loop"
+          ],
+          "priority": 4
+        },
+        {
+          "rule": "WHEN a stock-maintaining balancing loop is failing to reach its target → DO check whether compensating flows (drain or fill processes) are being ignored in the goal-setting BECAUSE a balancing loop must set its goal high enough to compensate for simultaneous draining processes",
+          "source_quote": "A stock-maintaining balancing feedback loop must have its goal set appropriately to compensate for draining or inflowing processes that affect that stock. Otherwise, the feedback process will fall short of or exceed the target for the stock.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "cross_references": [
+            "Balancing Feedback Loop",
+            "Stock-and-Flow Dynamics Model"
+          ],
+          "priority": 5
+        },
+        {
+          "rule": "WHEN a feedback loop delivers information about a stock → DO recognize that this information can only affect future behavior, not correct the current state BECAUSE information delivered by a feedback loop can only affect future behavior; it can't deliver a signal fast enough to correct behavior that drove the current feedback",
+          "source_quote": "The information delivered by a feedback loop—even nonphysical feedback—can only affect future behavior; it can't deliver a signal fast enough to correct behavior that drove the current feedback.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "cross_references": [
+            "Balancing Feedback Loop",
+            "Reinforcing Feedback Loop"
+          ],
+          "priority": 6
+        }
+      ]
+    },
+    "__reduce_b__": {
+      "unified_anti_patterns": [
+        {
+          "mistake": "Focusing only on inflows when trying to increase a stock, ignoring the equivalent power of reducing outflows",
+          "why_wrong": "The human mind systematically underweights outflows; this leads to expensive input-based solutions when cheaper outflow-reduction alternatives exist and produce identical results",
+          "source_quote": "The human mind seems to focus more easily on stocks than on flows. On top of that, when we do focus on flows, we tend to focus on inflows more easily than on outflows. Therefore, we sometimes miss seeing that we can fill a bathtub not only by increasing the inflow rate, but also by decreasing the outflow rate.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "related_frameworks": [
+            "Inflow-Outflow Symmetry Principle",
+            "Stock-and-Flow Dynamics Model"
+          ],
+          "severity": "High — leads to systematically suboptimal resource allocation decisions",
+          "canonical": true
+        },
+        {
+          "mistake": "Underestimating the momentum of large stocks and expecting rapid change from interventions",
+          "why_wrong": "Stocks change only as fast as their flows allow; large stocks with slow flows will resist even large interventions for extended periods, making impatience counterproductive",
+          "source_quote": "People often underestimate the inherent momentum of a stock. It takes a long time for populations to grow or stop growing, for wood to accumulate in a forest, for a reservoir to fill up, for a mine to be depleted.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "related_frameworks": [
+            "Stock-and-Flow Dynamics Model"
+          ],
+          "severity": "High — produces premature abandonment of correct interventions and thrashing between policies",
+          "canonical": true
+        },
+        {
+          "mistake": "Attributing system behavior to external actors, events, or forces rather than to the system's internal structure",
+          "why_wrong": "The same external event applied to a different system produces different results; therefore the system's structure — not the event — is the true source of behavior, and blaming external causes prevents structural diagnosis",
+          "source_quote": "Political leaders don't cause recessions or economic booms. Ups and downs are inherent in the structure of the market economy... The system, to a large extent, causes its own behavior!",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "related_frameworks": [
+            "Structure-Before-Blame Diagnostic"
+          ],
+          "severity": "Critical — forecloses structural diagnosis entirely; no leverage can be found until this mistake is corrected",
+          "canonical": true
+        },
+        {
+          "mistake": "Changing the elements (people, components) of a system while leaving interconnections and purpose intact, and expecting significant behavioral change",
+          "why_wrong": "Elements are the least impactful lever in a system; a system generally goes on being itself even with complete substitution of elements as long as interconnections and purposes remain intact",
+          "source_quote": "A system generally goes on being itself, changing only slowly if at all, even with complete substitutions of its elements—as long as its interconnections and purposes remain intact.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "related_frameworks": [
+            "Purpose-Primacy Hierarchy",
+            "Elements-Interconnections-Purpose (EIP) System Definition"
+          ],
+          "severity": "High — produces the illusion of reform while leaving the structural source of behavior untouched",
+          "canonical": true
+        },
+        {
+          "mistake": "Reading stated goals or missions to determine what a system is trying to achieve, rather than observing actual behavior",
+          "why_wrong": "A government that proclaims environmental protection but allocates little money toward it is not, in fact, pursuing environmental protection; only behavior reveals actual purpose",
+          "source_quote": "If a government proclaims its interest in protecting the environment but allocates little money or effort toward that goal, environmental protection is not, in fact, the government's purpose. Purposes are deduced from behavior, not from rhetoric or stated goals.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "related_frameworks": [
+            "Elements-Interconnections-Purpose (EIP) System Definition",
+            "Purpose-Primacy Hierarchy"
+          ],
+          "severity": "High — misdirects analysis toward declared intent rather than structural reality",
+          "canonical": true
+        },
+        {
+          "mistake": "Looking for a single external 'fix' (technical solution, new person, policy lever) for persistent systemic problems",
+          "why_wrong": "Problems rooted in internal system structure — hunger, poverty, drug addiction, war — will persist regardless of external fixes because the structural source continues to generate the behavior",
+          "source_quote": "Hunger, poverty, environmental degradation, economic instability, unemployment, chronic disease, drug addiction, and war, for example, persist in spite of the analytical ability and technical brilliance that have been directed toward eradicating them... That is because they are intrinsically systems problems—undesirable behaviors characteristic of the system structures that produce them.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "related_frameworks": [
+            "Structure-Before-Blame Diagnostic"
+          ],
+          "severity": "Critical — produces repeated policy failure and wasted resources without addressing root cause",
+          "canonical": true
+        }
+      ],
+      "unified_trigger_questions": [
+        {
+          "question": "Am I looking at a system or just a bunch of stuff? Can I identify parts? Do the parts affect each other? Do the parts together produce an effect different from each part alone? Does this behavior persist across varying circumstances?",
+          "purpose": "Determines whether a situation warrants systems analysis; confirms the presence of genuine systemic interdependence before applying system tools",
+          "source_quote": "How to know whether you are looking at a system or just a bunch of stuff: A) Can you identify parts? . . . and B) Do the parts affect each other? . . . and C) Do the parts together produce an effect that is different from the effect of each part on its own? . . . and perhaps D) Does the effect, the behavior over time, persist in a variety of circumstances?",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "related_frameworks": [
+            "Elements-Interconnections-Purpose (EIP) System Definition"
+          ],
+          "when_to_ask": "Entry point — ask before applying any systems tool; gates the entire analytical process",
+          "canonical": true
+        },
+        {
+          "question": "If A causes B, is it possible that B also causes A?",
+          "purpose": "Reveals hidden feedback loops; shifts thinking from linear cause-effect chains to circular causality, which is the foundational move of systems analysis",
+          "source_quote": "If A causes B, is it possible that B also causes A?",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "related_frameworks": [
+            "Balancing Feedback Loop",
+            "Reinforcing Feedback Loop"
+          ],
+          "when_to_ask": "Whenever a linear causal narrative is offered for a complex phenomenon",
+          "canonical": true
+        },
+        {
+          "question": "What is the actual behavior of this system over time — and what does that behavior (not the stated mission) reveal about its true purpose?",
+          "purpose": "Strips away rhetoric and stated goals to expose the purpose actually being served by the system's structure, which is the highest-leverage point for intervention",
+          "source_quote": "The best way to deduce the system's purpose is to watch for a while to see how the system behaves... Purposes are deduced from behavior, not from rhetoric or stated goals.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "related_frameworks": [
+            "Purpose-Primacy Hierarchy",
+            "Elements-Interconnections-Purpose (EIP) System Definition"
+          ],
+          "when_to_ask": "When diagnosing why a system persistently produces undesirable outcomes despite stated good intentions",
+          "canonical": true
+        },
+        {
+          "question": "Can I think of any human decision that is made without any feedback about the level of the stock it influences?",
+          "purpose": "Trains the practitioner to see feedback loops everywhere — used pedagogically to make the ubiquity of feedback visible and to reveal how thoroughly decisions are embedded in system structure",
+          "source_quote": "I often challenge my students to try to think of any human decision that occurs without a feedback loop—that is, a decision that is made without regard to any information about the level of the stock it influences.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "related_frameworks": [
+            "Balancing Feedback Loop",
+            "Reinforcing Feedback Loop",
+            "Stock-and-Flow Dynamics Model"
+          ],
+          "when_to_ask": "When introducing systems thinking to new practitioners or when a decision-maker believes they are acting independently of system feedback",
+          "canonical": true
+        },
+        {
+          "question": "Instead of asking who is to blame, ask: What is the system?",
+          "purpose": "Redirects causal analysis from individual actors to structural sources of behavior; the foundational reframe that makes systems thinking actionable",
+          "source_quote": "You'll stop looking for who's to blame; instead you'll start asking, 'What's the system?' The concept of feedback opens up the idea that a system can cause its own behavior.",
+          "chapter_refs": [
+            "Chapter 1: The Basics"
+          ],
+          "related_frameworks": [
+            "Structure-Before-Blame Diagnostic"
+          ],
+          "when_to_ask": "Any time blame, credit, or hero/villain narratives are being applied to a complex recurring problem",
+          "canonical": true
+        }
+      ]
     }
   },
-  "total_cost_usd": 0.465594
+  "total_cost_usd": 0.585
 }
