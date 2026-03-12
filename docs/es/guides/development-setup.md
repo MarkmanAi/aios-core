@@ -158,7 +158,7 @@ NODE_ENV=development
 AIOS_DEBUG=false
 
 # Opcional: Configuracion MCP
-SYNKRA_API_TOKEN=your-synkra-token
+MARKMANAI_API_TOKEN=your-markmanai-token
 ```
 
 ### Paso 3: Verificar Instalacion

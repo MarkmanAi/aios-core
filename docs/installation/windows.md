@@ -430,7 +430,7 @@ Remove-Item -Recurse -Force .aios-core
 Remove-Item -Recurse -Force .claude\commands\AIOS
 
 # Remove global npm packages
-npm uninstall -g @synkra/aios
+npm uninstall -g @markmanai/aios
 ```
 
 ---

@@ -330,7 +330,7 @@
 | `squad-creator-migrate.md` |
 | `squad-creator-publish.md` |
 | `squad-creator-sync-ide-command.md` |
-| `squad-creator-sync-synkra.md` |
+| `squad-creator-sync-markmanai.md` |
 | `squad-creator-validate.md` |
 | `story-checkpoint.md` |
 | `sync-documentation.md` |

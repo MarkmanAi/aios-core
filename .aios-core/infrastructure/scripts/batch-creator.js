@@ -1,5 +1,5 @@
 /**
- * Batch Component Creator for Synkra AIOS
+ * Batch Component Creator for MarkmanAi AIOS
  * Creates multiple related components in a single operation
  * @module batch-creator
  */

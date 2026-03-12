@@ -15,7 +15,7 @@ if defined AIOS_HOME (
 set "TRACKER_SCRIPT=%USERPROFILE%\aios-core\.aios-core\infrastructure\scripts\llm-routing\usage-tracker\index.js"
 if exist "%TRACKER_SCRIPT%" goto :found
 
-set "TRACKER_SCRIPT=%USERPROFILE%\Workspaces\AIOS\SynkraAI\aios-core\.aios-core\infrastructure\scripts\llm-routing\usage-tracker\index.js"
+set "TRACKER_SCRIPT=%USERPROFILE%\Workspaces\AIOS\MarkmanAi\aios-core\.aios-core\infrastructure\scripts\llm-routing\usage-tracker\index.js"
 if exist "%TRACKER_SCRIPT%" goto :found
 
 set "TRACKER_SCRIPT=%~dp0..\usage-tracker\index.js"

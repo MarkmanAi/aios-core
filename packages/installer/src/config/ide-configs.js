@@ -25,7 +25,7 @@ const path = require('path');
 /**
  * IDE Configuration Metadata
  *
- * Synkra AIOS v2.1 supports 5 main IDEs:
+ * MarkmanAi AIOS v2.1 supports 5 main IDEs:
  * - Claude Code (Anthropic's official CLI) - Recommended
  * - Cursor (AI-first code editor)
  * - Windsurf (AI-powered development)

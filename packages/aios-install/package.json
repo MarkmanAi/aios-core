@@ -1,5 +1,5 @@
 {
-  "name": "@synkra/aios-install",
+  "name": "@markmanai/aios-install",
   "version": "1.0.0",
   "description": "NPX installer for AIOS - AI-Orchestrated System for Full Stack Development",
   "main": "src/installer.js",

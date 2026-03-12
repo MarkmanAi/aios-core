@@ -1,5 +1,5 @@
 ---
-task: Sync Squad to Synkra
+task: Sync Squad to MarkmanAi
 responsavel: "@squad-creator"
 responsavel_type: agent
 atomic_layer: task
@@ -21,13 +21,13 @@ Checklist:
   - "[x] Validar squad localmente"
   - "[x] Obter token de autenticação"
   - "[x] Calcular checksum"
-  - "[x] Enviar para Synkra API"
+  - "[x] Enviar para MarkmanAi API"
   - "[x] Exibir URL do marketplace"
 ---
 
-# *sync-squad-synkra
+# *sync-squad-markmanai
 
-Sincroniza um squad local para o Synkra API marketplace.
+Sincroniza um squad local para o MarkmanAi API marketplace.
 
 ## Uso
 
@@ -35,35 +35,35 @@ Sincroniza um squad local para o Synkra API marketplace.
 @squad-creator
 
 # Sync privado (apenas workspace)
-*sync-squad-synkra ./squads/meu-squad
+*sync-squad-markmanai ./squads/meu-squad
 
 # Sync público (visível para todos)
-*sync-squad-synkra ./squads/meu-squad --public
+*sync-squad-markmanai ./squads/meu-squad --public
 
 # Preview sem sincronizar
-*sync-squad-synkra ./squads/meu-squad --dry-run
+*sync-squad-markmanai ./squads/meu-squad --dry-run
 
 # Sync com verbosidade
-*sync-squad-synkra ./squads/meu-squad --verbose
+*sync-squad-markmanai ./squads/meu-squad --verbose
 ```
 
 ## Autenticação
 
-Requer autenticação com Synkra API:
+Requer autenticação com MarkmanAi API:
 
 ```bash
-export SYNKRA_API_TOKEN="seu-token"
+export MARKMANAI_API_TOKEN="seu-token"
 ```
 
 Ou configure em `.env`:
 
 ```env
-SYNKRA_API_URL=https://api.synkra.dev/api
-SYNKRA_API_TOKEN=seu-token
+MARKMANAI_API_URL=https://api.markmanai.com/api
+MARKMANAI_API_TOKEN=seu-token
 ```
 
 Para obter um token:
-1. Acesse https://synkra.dev/settings/api-keys
+1. Acesse https://markmanai.com/settings/api-keys
 2. Crie uma nova API key com permissões de sync
 3. Configure a variável de ambiente
 
@@ -71,7 +71,7 @@ Para obter um token:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- *sync-squad-synkra
+ *sync-squad-markmanai
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📦 Squad: ./squads/meu-squad/
@@ -85,11 +85,11 @@ Step 1: Local Validation
 Step 2: Calculate Checksum
   ✓ Checksum: a1b2c3d4e5f6...
 
-Step 3: Sync to Synkra API
+Step 3: Sync to MarkmanAi API
   ✓ Visibility: private
-  ✓ API URL: https://api.synkra.dev/api
+  ✓ API URL: https://api.markmanai.com/api
 
-Syncing to Synkra API...
+Syncing to MarkmanAi API...
 
 ✅ Squad synced successfully!
 
@@ -99,7 +99,7 @@ Syncing to Synkra API...
 
 Next steps:
   - View squad: *describe-squad meu-squad
-  - Make public: *sync-squad-synkra ./squads/meu-squad --public
+  - Make public: *sync-squad-markmanai ./squads/meu-squad --public
 ```
 
 ## Flags
@@ -117,7 +117,7 @@ Next steps:
 
 ```
 ┌──────────────────────────────────────────────────┐
-│              *sync-squad-synkra                   │
+│              *sync-squad-markmanai                   │
 ├──────────────────────────────────────────────────┤
 │                                                   │
 │  1. Parse Arguments                               │
@@ -128,7 +128,7 @@ Next steps:
 │     ↓ (fail → abort)                              │
 │  4. Calculate SHA-256 checksum                    │
 │     ↓                                             │
-│  5. Check SYNKRA_API_TOKEN                        │
+│  5. Check MARKMANAI_API_TOKEN                        │
 │     ↓ (missing → abort)                           │
 │  6. If --dry-run: show preview and exit           │
 │     ↓                                             │
@@ -144,8 +144,8 @@ Next steps:
 ### Request
 
 ```javascript
-POST ${SYNKRA_API_URL}/squads/sync
-Authorization: Bearer ${SYNKRA_API_TOKEN}
+POST ${MARKMANAI_API_URL}/squads/sync
+Authorization: Bearer ${MARKMANAI_API_TOKEN}
 Content-Type: application/json
 
 {
@@ -227,11 +227,11 @@ const checksum = crypto.createHash('sha256')
   .digest('hex');
 
 // 6. Check authentication
-const apiToken = process.env.SYNKRA_API_TOKEN;
-const apiUrl = process.env.SYNKRA_API_URL || 'https://api.synkra.dev/api';
+const apiToken = process.env.MARKMANAI_API_TOKEN;
+const apiUrl = process.env.MARKMANAI_API_URL || 'https://api.markmanai.com/api';
 
 if (!apiToken) {
-  error('SYNKRA_API_TOKEN not set. See task docs for authentication.');
+  error('MARKMANAI_API_TOKEN not set. See task docs for authentication.');
   return;
 }
 
@@ -247,7 +247,7 @@ DRY RUN - Would sync:
   return;
 }
 
-// 8. Call Synkra API
+// 8. Call MarkmanAi API
 const response = await fetch(`${apiUrl}/squads/sync`, {
   method: 'POST',
   headers: {
@@ -278,7 +278,7 @@ if (result.success) {
   `);
 
   if (flags.public) {
-    output(`  URL: https://synkra.dev/squads/${result.data.squad_id}`);
+    output(`  URL: https://markmanai.com/squads/${result.data.squad_id}`);
   }
 } else {
   error(`Sync failed: ${result.error}`);
@@ -291,8 +291,8 @@ if (result.success) {
 |-------|-------|---------|
 | `squad.yaml not found` | Caminho inválido | Verifique o path do squad |
 | `Validation failed` | Squad não passa na validação | Execute `*validate-squad` primeiro |
-| `SYNKRA_API_TOKEN not set` | Token não configurado | Configure a variável de ambiente |
-| `401 Unauthorized` | Token inválido ou expirado | Gere novo token em synkra.dev |
+| `MARKMANAI_API_TOKEN not set` | Token não configurado | Configure a variável de ambiente |
+| `401 Unauthorized` | Token inválido ou expirado | Gere novo token em markmanai.com |
 | `403 Forbidden` | Sem permissão para operação | Verifique permissões da API key |
 | `Squad not found or not owned` | Tentando atualizar squad de outro workspace | Verifique ownership |
 
@@ -305,7 +305,7 @@ if (result.success) {
 
 ## Related Story
 
-- **SQS-5:** SquadSyncService for Synkra API (Sprint 8)
+- **SQS-5:** SquadSyncService for MarkmanAi API (Sprint 8)
 
 ## Changelog
 

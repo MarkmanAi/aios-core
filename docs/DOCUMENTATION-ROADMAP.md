@@ -125,7 +125,7 @@ These documents are **obsolete or redundant** and should NOT be created:
 | `tools-system-schema-refinement.md`                  | Refinement completed                                   |
 | `analysis/scripts-consolidation-analysis.md`         | Scripts already consolidated                           |
 | `analysis/repository-strategy-analysis.md`           | Strategy defined in ARCHITECTURE-INDEX                 |
-| `SYNKRA-REBRANDING-SPECIFICATION.md`                 | Rebranding completed                                   |
+| `MARKMANAI-REBRANDING-SPECIFICATION.md`                 | Rebranding completed                                   |
 | `multi-repo-strategy-pt.md`                          | Use `docs/pt-BR/` structure instead                    |
 
 ---

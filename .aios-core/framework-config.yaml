@@ -12,7 +12,7 @@
 
 # --- Metadata (framework portion) ---
 metadata:
-  name: "Synkra AIOS"
+  name: "MarkmanAi AIOS"
   framework_version: "3.12.0"
 
 markdownExploder: true

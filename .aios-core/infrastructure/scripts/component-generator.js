@@ -1,5 +1,5 @@
 /**
- * Component Generator for Synkra AIOS
+ * Component Generator for MarkmanAi AIOS
  * Generates agents, tasks, and workflows using templates
  * @module component-generator
  */
@@ -411,7 +411,7 @@ class ComponentGenerator {
         }
         
         // Notes
-        variables.EACH_NOTES = ['Generated using Synkra AIOS template system'];
+        variables.EACH_NOTES = ['Generated using MarkmanAi AIOS template system'];
         break;
         
       case 'workflow':
@@ -422,7 +422,7 @@ class ComponentGenerator {
         variables.WORKFLOW_TYPE = answers.workflowType;
         
         // Metadata
-        variables.AUTHOR = process.env.USER || 'Synkra AIOS';
+        variables.AUTHOR = process.env.USER || 'MarkmanAi AIOS';
         variables.CREATED_DATE = new Date().toISOString();
         variables.LAST_MODIFIED = new Date().toISOString();
         variables.EACH_TAGS = ['generated', componentType];

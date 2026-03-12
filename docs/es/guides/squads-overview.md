@@ -183,7 +183,7 @@ tags:
 ├─────────────────────────────────────────────────────────────┤
 │  Nivel 1: LOCAL        --> ./squads/           (Privado)    │
 │  Nivel 2: AIOS-SQUADS  --> github.com/MarkmanAi (Publico)    │
-│  Nivel 3: SYNKRA API   --> api.synkra.dev      (Marketplace)│
+│  Nivel 3: MARKMANAI API   --> api.markmanai.com      (Marketplace)│
 └─────────────────────────────────────────────────────────────┘
 ```
 

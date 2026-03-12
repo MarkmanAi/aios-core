@@ -59,16 +59,16 @@ AIOS-FullStack v${packageJson.version}
 AI-Orchestrated System for Full Stack Development
 
 USAGE:
-  npx @synkra/aios-core@latest              # Run installation wizard
-  npx @synkra/aios-core@latest install      # Install in current project
-  npx @synkra/aios-core@latest init <name>  # Create new project
-  npx @synkra/aios-core@latest update       # Update to latest version
-  npx @synkra/aios-core@latest validate     # Validate installation integrity
-  npx @synkra/aios-core@latest info         # Show system info
-  npx @synkra/aios-core@latest doctor       # Run diagnostics
-  npx @synkra/aios-core@latest --version    # Show version
-  npx @synkra/aios-core@latest --version -d # Show detailed version info
-  npx @synkra/aios-core@latest --help       # Show this help
+  npx @markmanai/aios-core@latest              # Run installation wizard
+  npx @markmanai/aios-core@latest install      # Install in current project
+  npx @markmanai/aios-core@latest init <name>  # Create new project
+  npx @markmanai/aios-core@latest update       # Update to latest version
+  npx @markmanai/aios-core@latest validate     # Validate installation integrity
+  npx @markmanai/aios-core@latest info         # Show system info
+  npx @markmanai/aios-core@latest doctor       # Run diagnostics
+  npx @markmanai/aios-core@latest --version    # Show version
+  npx @markmanai/aios-core@latest --version -d # Show detailed version info
+  npx @markmanai/aios-core@latest --help       # Show this help
 
 UPDATE:
   aios update                    # Update to latest version
@@ -91,18 +91,18 @@ SERVICE DISCOVERY:
 
 EXAMPLES:
   # Install in current directory
-  npx @synkra/aios-core@latest
+  npx @markmanai/aios-core@latest
 
   # Install with minimal mode (only expansion-creator)
-  npx @synkra/aios-core-minimal@latest
+  npx @markmanai/aios-core-minimal@latest
 
   # Create new project
-  npx @synkra/aios-core@latest init my-project
+  npx @markmanai/aios-core@latest init my-project
 
   # Search for workers
   aios workers search "json csv"
 
-For more information, visit: https://github.com/SynkraAI/aios-core
+For more information, visit: https://github.com/MarkmanAi/aios-core
 `);
 }
 
@@ -118,7 +118,7 @@ async function showVersion() {
 
   // Detailed version output (Story 7.2: Version Tracking)
   console.log(`AIOS-FullStack v${packageJson.version}`);
-  console.log('Package: @synkra/aios-core');
+  console.log('Package: @markmanai/aios-core');
 
   // Check for local installation
   const localVersionPath = path.join(process.cwd(), '.aios-core', 'version.json');
@@ -403,7 +403,7 @@ Examples:
   // Check 4: AIOS installation
   const aiosCoreDir = path.join(__dirname, '..', '.aios-core');
   if (fs.existsSync(aiosCoreDir)) {
-    console.log(`✔ Synkra AIOS: v${packageJson.version}`);
+    console.log(`✔ MarkmanAi AIOS: v${packageJson.version}`);
 
     // Check for corruption using validate (if available)
     try {
@@ -447,7 +447,7 @@ Examples:
     });
     hasErrors = true;
     console.log('✗ AIOS Core not installed');
-    console.log('  Run: npx @synkra/aios-core@latest');
+    console.log('  Run: npx @markmanai/aios-core@latest');
   }
 
   // Apply fixes if --fix

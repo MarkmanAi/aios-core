@@ -24,7 +24,7 @@ const SAFE_NAME_PATTERN = /^[a-zA-Z0-9._-]+$/;
  * Repository for aios-squads
  * @constant {string}
  */
-const AIOS_SQUADS_REPO = 'SynkraAI/aios-squads';
+const AIOS_SQUADS_REPO = 'MarkmanAi/aios-squads';
 
 /**
  * Error codes for SquadPublisherError
@@ -114,7 +114,7 @@ class SquadPublisher {
    * @param {Object} [options={}] - Configuration options
    * @param {boolean} [options.verbose=false] - Enable verbose logging
    * @param {boolean} [options.dryRun=false] - Simulate without creating PR
-   * @param {string} [options.repo] - Target repository (default: SynkraAI/aios-squads)
+   * @param {string} [options.repo] - Target repository (default: MarkmanAi/aios-squads)
    */
   constructor(options = {}) {
     this.verbose = options.verbose || false;

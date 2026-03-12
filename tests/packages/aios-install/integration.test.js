@@ -23,7 +23,7 @@ describe('Integration - Task 8.3: Local NPX Execution', () => {
       const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
 
       // Then
-      expect(pkgJson.name).toBe('@synkra/aios-install');
+      expect(pkgJson.name).toBe('@markmanai/aios-install');
       expect(pkgJson.bin).toBeDefined();
       expect(pkgJson.bin['aios-install']).toBe('./bin/aios-install.js');
       expect(pkgJson.bin['edmcp']).toBe('./bin/edmcp.js');

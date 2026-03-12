@@ -227,7 +227,7 @@ function statusAction() {
   if (!cache) {
     console.log('\n  No license activated.');
     console.log('  Activate: aios pro activate --key PRO-XXXX-XXXX-XXXX-XXXX');
-    console.log('  Purchase: https://synkra.ai/pro');
+    console.log('  Purchase: https://markmanai.com/pro');
     console.log('');
     return;
   }
@@ -653,7 +653,7 @@ async function setupAction(options) {
   console.log('To activate your license:');
   console.log('  aios pro activate --key PRO-XXXX-XXXX-XXXX-XXXX');
   console.log('');
-  console.log('Documentation: https://synkra.ai/pro/docs');
+  console.log('Documentation: https://markmanai.com/pro/docs');
   console.log('');
 }
 

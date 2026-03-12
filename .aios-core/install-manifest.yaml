@@ -2056,7 +2056,7 @@ files:
     hash: sha256:1fe5d5a713a0f1c582f6218a0418a78312f868e692bf67c01fd3e298b9b749bf
     type: task
     size: 12402
-  - path: development/tasks/squad-creator-sync-synkra.md
+  - path: development/tasks/squad-creator-sync-markmanai.md
     hash: sha256:10824bf23e81ea0a75bd064ce6d8df085a3b9eb966c24fb2ed422ec8a813a94b
     type: task
     size: 8635

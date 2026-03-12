@@ -8,7 +8,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/synkra/aios-core"
+    "url": "https://github.com/MarkmanAi/aios-core"
   },
   "engines": {
     "gemini-cli": ">=0.26.0"

@@ -36,11 +36,11 @@ function detectRepositoryContext() {
 
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
-  // Detect if we're in @synkra/aios-core repo itself
+  // Detect if we're in @markmanai/aios-core repo itself
   const isFrameworkRepo =
     packageJson.name === '@aios/fullstack' ||
-    packageJson.name === '@synkra/aios-core' ||
-    remoteUrl.includes('@synkra/aios-core');
+    packageJson.name === '@markmanai/aios-core' ||
+    remoteUrl.includes('@markmanai/aios-core');
 
   // Load installation config if exists
   let installConfig = null;

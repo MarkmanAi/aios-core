@@ -1,5 +1,5 @@
 /**
- * Dependency Analyzer for Synkra AIOS
+ * Dependency Analyzer for MarkmanAi AIOS
  * Analyzes and resolves dependencies between components
  * @module dependency-analyzer
  */

@@ -4,7 +4,7 @@
  * Story 1.4: IDE Selection
  * Tests IDE configuration metadata structure
  *
- * Synkra AIOS v2.1 supports 5 IDEs:
+ * MarkmanAi AIOS v2.1 supports 5 IDEs:
  * - Claude Code, Cursor, Windsurf, GitHub Copilot, AntiGravity
  */
 

@@ -11,7 +11,7 @@ const path = require('path');
 function requireAiosInstalled() {
   const aiosCoreDir = path.join(process.cwd(), '.aios-core');
   if (!fs.existsSync(aiosCoreDir)) {
-    console.error('Bob requires AIOS to be installed. Run: npx @synkra/aios-install');
+    console.error('Bob requires AIOS to be installed. Run: npx @markmanai/aios-install');
     process.exit(1);
   }
 }

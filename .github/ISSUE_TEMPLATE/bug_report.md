@@ -12,12 +12,12 @@ A clear and concise description of what the bug is.
 
 ## 📦 Package Information
 Which AIOS-FullStack package is affected?
-- [ ] @synkra/aios-core/workspace
-- [ ] @synkra/aios-core/core
-- [ ] @synkra/aios-core/memory
-- [ ] @synkra/aios-core/security
-- [ ] @synkra/aios-core/performance
-- [ ] @synkra/aios-core/telemetry
+- [ ] @markmanai/aios-core/workspace
+- [ ] @markmanai/aios-core/core
+- [ ] @markmanai/aios-core/memory
+- [ ] @markmanai/aios-core/security
+- [ ] @markmanai/aios-core/performance
+- [ ] @markmanai/aios-core/telemetry
 
 **Version:** (e.g., 4.31.0)
 
@@ -37,7 +37,7 @@ A clear and concise description of what actually happened.
 ## 📋 Code Example
 ```javascript
 // Minimal code example that reproduces the issue
-const { AIOS } = require('@synkra/aios-core/workspace');
+const { AIOS } = require('@markmanai/aios-core/workspace');
 
 const aios = new AIOS();
 // ... rest of your code

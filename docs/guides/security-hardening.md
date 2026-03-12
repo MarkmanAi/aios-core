@@ -1288,7 +1288,7 @@ If you discover a security vulnerability in MarkmanAi AIOS, please follow respon
 ### Reporting Process
 
 1. **DO NOT** create a public GitHub issue for security vulnerabilities
-2. Email security concerns to: **security@synkra.ai**
+2. Email security concerns to: **security@markmanai.com**
 3. Include the following in your report:
    - Description of the vulnerability
    - Steps to reproduce

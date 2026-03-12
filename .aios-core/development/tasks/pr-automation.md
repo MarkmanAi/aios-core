@@ -16,9 +16,9 @@ checklists:
 
 ## Purpose
 
-To help users contribute to the AIOS open-source project (`@synkra/aios-core`) by automating the PR creation process, ensuring contributions follow project standards, pass quality checks, and have proper formatting before submission.
+To help users contribute to the AIOS open-source project (`@markmanai/aios-core`) by automating the PR creation process, ensuring contributions follow project standards, pass quality checks, and have proper formatting before submission.
 
-**Target Repository**: `@synkra/aios-core` (open-source framework)
+**Target Repository**: `@markmanai/aios-core` (open-source framework)
 
 **Contribution Types Supported**:
 - Expansion packs (new agents, tasks, workflows)
@@ -102,7 +102,7 @@ To help users contribute to the AIOS open-source project (`@synkra/aios-core`) b
    - Ensure naming conventions followed
 
 2. **Validate Repository State**
-   - Check if `@synkra/aios-core` repository is set as upstream
+   - Check if `@markmanai/aios-core` repository is set as upstream
    - Verify fork exists (or create one)
    - Ensure main branch is up-to-date
 
@@ -303,8 +303,8 @@ To help users contribute to the AIOS open-source project (`@synkra/aios-core`) b
   - **Validation**: Files at `contribution_path` exist
   - **Error**: "Files not found at {contribution_path}"
 
-- [ ] Fork of @synkra/aios-core exists
-  - **Validation**: `gh repo view {user}/@synkra/aios-core` succeeds
+- [ ] Fork of @markmanai/aios-core exists
+  - **Validation**: `gh repo view {user}/@markmanai/aios-core` succeeds
   - **Action**: If not found, create fork automatically
 
 - [ ] Main branch is up-to-date

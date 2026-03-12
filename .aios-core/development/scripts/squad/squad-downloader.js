@@ -18,14 +18,14 @@ const path = require('path');
  * @constant {string}
  */
 const REGISTRY_URL =
-  'https://raw.githubusercontent.com/SynkraAI/aios-squads/main/registry.json';
+  'https://raw.githubusercontent.com/MarkmanAi/aios-squads/main/registry.json';
 
 /**
  * GitHub API base URL for aios-squads contents
  * @constant {string}
  */
 const GITHUB_API_BASE =
-  'https://api.github.com/repos/SynkraAI/aios-squads/contents/packages';
+  'https://api.github.com/repos/MarkmanAi/aios-squads/contents/packages';
 
 /**
  * Default path for downloaded squads
@@ -145,7 +145,7 @@ class SquadDownloader {
           version: squad.version || 'latest',
           description: squad.description || '',
           type: 'official',
-          author: squad.author || 'SynkraAI',
+          author: squad.author || 'MarkmanAi',
         });
       }
     }

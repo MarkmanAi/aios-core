@@ -26,11 +26,11 @@ Before using AIOS, ensure you have:
 
 ```bash
 # New project (Greenfield)
-npx @synkra/aios-core init my-project
+npx @markmanai/aios-core init my-project
 
 # Existing project (Brownfield)
 cd existing-project
-npx @synkra/aios-core install
+npx @markmanai/aios-core install
 ```
 
 ### First Steps
@@ -241,7 +241,7 @@ A squad is a self-contained package containing:
 ```
 Level 1: LOCAL        --> ./squads/           (Private)
 Level 2: AIOS-SQUADS  --> github.com/MarkmanAi (Public/Free)
-Level 3: SYNKRA API   --> api.synkra.dev      (Marketplace)
+Level 3: MARKMANAI API   --> api.markmanai.com      (Marketplace)
 ```
 
 ### Using Squads

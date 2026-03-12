@@ -1,5 +1,5 @@
 /**
- * Jest configuration for @synkra/aios-install package
+ * Jest configuration for @markmanai/aios-install package
  */
 
 module.exports = {

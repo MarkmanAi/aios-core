@@ -4,7 +4,7 @@ const chalk = require('chalk');
 const inquirer = require('inquirer');
 
 /**
- * Approval workflow for Synkra AIOS framework
+ * Approval workflow for MarkmanAi AIOS framework
  * Manages approval process for high-impact modifications
  */
 class ApprovalWorkflow {

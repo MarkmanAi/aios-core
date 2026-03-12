@@ -6,85 +6,85 @@
 # Later patterns take precedence over earlier ones
 # See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 #
-# Owner: @SynkraAI (organization)
+# Owner: @MarkmanAi (organization)
 # All PRs require approval from an org member before merge.
 # This is a public open-source repository - no GitHub Teams needed.
 
 # ============================================
 # Default Owner (fallback)
 # ============================================
-* @SynkraAI
+* @MarkmanAi
 
 # ============================================
 # Framework Core (requires senior review)
 # ============================================
 # Agent definitions
-.aios-core/development/agents/ @SynkraAI
+.aios-core/development/agents/ @MarkmanAi
 
 # Task definitions
-.aios-core/development/tasks/ @SynkraAI
+.aios-core/development/tasks/ @MarkmanAi
 
 # Workflow definitions
-.aios-core/development/workflows/ @SynkraAI
+.aios-core/development/workflows/ @MarkmanAi
 
 # Templates
-.aios-core/product/templates/ @SynkraAI
-templates/ @SynkraAI
+.aios-core/product/templates/ @MarkmanAi
+templates/ @MarkmanAi
 
 # Core utilities
-.aios-core/core/ @SynkraAI
-.aios-core/cli/ @SynkraAI
+.aios-core/core/ @MarkmanAi
+.aios-core/cli/ @MarkmanAi
 
 # ============================================
 # Infrastructure
 # ============================================
 # CI/CD configurations
-.github/ @SynkraAI
+.github/ @MarkmanAi
 
 # Docker configurations
-.docker/ @SynkraAI
+.docker/ @MarkmanAi
 
 # Framework configuration
-.aios-core/core-config.yaml @SynkraAI
+.aios-core/core-config.yaml @MarkmanAi
 
 # Package management
-package.json @SynkraAI
-package-lock.json @SynkraAI
+package.json @MarkmanAi
+package-lock.json @MarkmanAi
 
 # ============================================
 # Documentation (more permissive)
 # ============================================
 # General docs
-docs/ @SynkraAI
+docs/ @MarkmanAi
 
 # Architecture decisions
-docs/architecture/ @SynkraAI
+docs/architecture/ @MarkmanAi
 
 # Framework standards
-docs/framework/ @SynkraAI
+docs/framework/ @MarkmanAi
 
 # User guides
-docs/guides/ @SynkraAI
+docs/guides/ @MarkmanAi
 
 # ============================================
 # Security-Sensitive Files
 # ============================================
 # This file
-.github/CODEOWNERS @SynkraAI
+.github/CODEOWNERS @MarkmanAi
 
 # Release workflows
-.github/workflows/semantic-release.yml @SynkraAI
-.github/workflows/npm-publish.yml @SynkraAI
-.github/workflows/release.yml @SynkraAI
+.github/workflows/semantic-release.yml @MarkmanAi
+.github/workflows/npm-publish.yml @MarkmanAi
+.github/workflows/release.yml @MarkmanAi
 
 # Security configurations
-security/ @SynkraAI
+security/ @MarkmanAi
 
 # Environment files (should not be committed, but protect pattern)
-.env* @SynkraAI
+.env* @MarkmanAi
 
 # Configuration files
-*.config.js @SynkraAI
-*.config.ts @SynkraAI
-tsconfig.json @SynkraAI
-eslint.config.* @SynkraAI
+*.config.js @MarkmanAi
+*.config.ts @MarkmanAi
+tsconfig.json @MarkmanAi
+eslint.config.* @MarkmanAi

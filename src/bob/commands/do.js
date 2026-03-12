@@ -78,7 +78,7 @@ async function runBobDo(userInput, options) {
         break;
 
       case 'onboarding':
-        console.log('Bob requires AIOS setup. Run: npx @synkra/aios-install');
+        console.log('Bob requires AIOS setup. Run: npx @markmanai/aios-install');
         break;
 
       case 'educational_mode_toggle': {

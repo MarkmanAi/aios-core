@@ -37,7 +37,7 @@ Define a comprehensive migration map documenting all breaking changes, deprecate
 
 | v2.0 Package         | v2.1 Package          | Action              |
 | -------------------- | --------------------- | ------------------- |
-| `@synkra/aios-core`  | `@aios/core`          | Update package.json |
+| `@markmanai/aios-core`  | `@aios/core`          | Update package.json |
 | `@expansion/etl`     | `@aios/squad-etl`     | Update imports      |
 | `@expansion/creator` | `@aios/squad-creator` | Update imports      |
 
@@ -102,7 +102,7 @@ aios workers use worker-name --task my-task
 
 ```bash
 # Step 1.1: Remove old packages
-npm uninstall @synkra/aios-core
+npm uninstall @markmanai/aios-core
 npm uninstall @expansion/etl @expansion/creator
 
 # Step 1.2: Install new packages
@@ -183,7 +183,7 @@ npx @aios/core validate
 npm test
 
 # Check for deprecated references
-grep -r "@synkra/aios-core" --include="*.json"
+grep -r "@markmanai/aios-core" --include="*.json"
 grep -r "expansion-pack" --include="*.md"
 ```
 

@@ -27,7 +27,7 @@ Instead, please report security vulnerabilities through one of these channels:
    - Fill out the form with details
 
 2. **Email**
-   - Send an email to: security@synkra.ai
+   - Send an email to: security@markmanai.com
    - Use subject line: `[SECURITY] Brief description`
 
 ### What to Include

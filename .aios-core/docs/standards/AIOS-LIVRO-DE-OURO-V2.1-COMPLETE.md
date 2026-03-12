@@ -53,7 +53,7 @@ Este documento é a **versão consolidada v2.1** que incorpora todas as mudança
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                     SYNKRA ORGANIZATION                                 │
+│                     MARKMANAI ORGANIZATION                                 │
 │                                                                         │
 │   PUBLIC REPOSITORIES (3)                                               │
 │   ═══════════════════════                                               │
@@ -703,7 +703,7 @@ $ aios workflow brownfield-integration --target=./existing-project
 ## Source Tree v2.1 (Current)
 
 ```
-@synkra/aios-core/                        # Root project
+@markmanai/aios-core/                        # Root project
 ├── .aios-core/                        # Framework layer
 │   ├── core/                          # Core module
 │   │   ├── config/                    # Configuration

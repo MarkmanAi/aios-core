@@ -1,5 +1,5 @@
 /**
- * Transaction Manager for Synkra AIOS
+ * Transaction Manager for MarkmanAi AIOS
  * Manages component operations with rollback support
  * @module transaction-manager
  */

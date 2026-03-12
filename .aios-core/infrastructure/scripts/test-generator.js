@@ -3,7 +3,7 @@ const path = require('path');
 const chalk = require('chalk');
 
 /**
- * Test generator for Synkra AIOS automated test generation
+ * Test generator for MarkmanAi AIOS automated test generation
  * Orchestrates test file creation using the template system
  */
 class TestGenerator {

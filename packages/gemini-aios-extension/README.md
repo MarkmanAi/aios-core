@@ -5,7 +5,7 @@ Brings MarkmanAi AIOS multi-agent orchestration to Gemini CLI.
 ## Installation
 
 ```bash
-gemini extensions install github.com/synkra/aios-core/packages/gemini-aios-extension
+gemini extensions install github.com/MarkmanAi/aios-core/packages/gemini-aios-extension
 ```
 
 Or manually copy to `~/.gemini/extensions/aios/`

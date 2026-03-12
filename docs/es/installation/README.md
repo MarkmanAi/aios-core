@@ -46,13 +46,13 @@ Este directorio contiene documentación completa de instalación y configuració
 ### Nueva Instalación
 
 ```bash
-npx @synkra/aios-core install
+npx @markmanai/aios-core install
 ```
 
 ### Actualización
 
 ```bash
-npx @synkra/aios-core install --force-upgrade
+npx @markmanai/aios-core install --force-upgrade
 ```
 
 ### ¿Tiene Problemas?
@@ -108,5 +108,5 @@ npx @synkra/aios-core install --force-upgrade
 
 ## Soporte
 
-- **Issues de GitHub**: [@synkra/aios-core/issues](https://github.com/MarkmanAi/aios-core/issues)
+- **Issues de GitHub**: [@markmanai/aios-core/issues](https://github.com/MarkmanAi/aios-core/issues)
 - **Documentación**: [docs/](../)

@@ -36,7 +36,7 @@ describe('requireAiosInstalled', () => {
     expect(() => requireAiosInstalled()).toThrow('process.exit called');
     expect(exitSpy).toHaveBeenCalledWith(1);
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Bob requires AIOS to be installed. Run: npx @synkra/aios-install',
+      'Bob requires AIOS to be installed. Run: npx @markmanai/aios-install',
     );
   });
 

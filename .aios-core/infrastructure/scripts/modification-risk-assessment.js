@@ -3,7 +3,7 @@ const path = require('path');
 const chalk = require('chalk');
 
 /**
- * Modification risk assessment for Synkra AIOS framework
+ * Modification risk assessment for MarkmanAi AIOS framework
  * Evaluates modification risks across multiple dimensions
  */
 class ModificationRiskAssessment {

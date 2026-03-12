@@ -46,7 +46,7 @@
 | `*migrate-squad` | squad-creator-migrate.md | ✅ Done | Migrate legacy format |
 | `*download-squad` | squad-creator-download.md | ⏳ Placeholder | Download from registry |
 | `*publish-squad` | squad-creator-publish.md | ⏳ Placeholder | Publish to aios-squads |
-| `*sync-squad-synkra` | squad-creator-sync-synkra.md | ⏳ Placeholder | Sync to marketplace |
+| `*sync-squad-markmanai` | squad-creator-sync-markmanai.md | ⏳ Placeholder | Sync to marketplace |
 
 ### Existing Scripts
 

@@ -60,7 +60,7 @@ function getMockGitHubData(): GitHubData {
       title: issue.title,
       state: issue.state,
       labels: issue.labels.map(l => ({ name: l })),
-      url: `https://github.com/synkra/aios-core/issues/${issue.number}`,
+      url: `https://github.com/MarkmanAi/aios-core/issues/${issue.number}`,
       createdAt: issue.createdAt,
       author: { login: issue.author },
     })),
@@ -68,7 +68,7 @@ function getMockGitHubData(): GitHubData {
       number: pr.number,
       title: pr.title,
       state: pr.state,
-      url: `https://github.com/synkra/aios-core/pull/${pr.number}`,
+      url: `https://github.com/MarkmanAi/aios-core/pull/${pr.number}`,
       createdAt: pr.createdAt,
       author: { login: pr.author },
       headRefName: `feat/story-${pr.storyId?.split('-')[1] || 'main'}`,
@@ -76,8 +76,8 @@ function getMockGitHubData(): GitHubData {
     })),
     repo: {
       name: 'aios-core',
-      owner: { login: 'synkra' },
-      url: 'https://github.com/synkra/aios-core',
+      owner: { login: 'MarkmanAi' },
+      url: 'https://github.com/MarkmanAi/aios-core',
     },
     updatedAt: new Date().toISOString(),
   };

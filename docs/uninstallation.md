@@ -43,7 +43,7 @@ This guide provides comprehensive instructions for uninstalling MarkmanAi AIOS f
 
 ```bash
 # Create complete backup
-npx @synkra/aios-core backup --complete
+npx @markmanai/aios-core backup --complete
 
 # Or manually backup important directories
 tar -czf aios-backup-$(date +%Y%m%d).tar.gz \
@@ -63,13 +63,13 @@ The fastest way to uninstall MarkmanAi AIOS:
 
 ```bash
 # Basic uninstall (preserves user data)
-npx @synkra/aios-core uninstall
+npx @markmanai/aios-core uninstall
 
 # Complete uninstall (removes everything)
-npx @synkra/aios-core uninstall --complete
+npx @markmanai/aios-core uninstall --complete
 
 # Uninstall with data preservation
-npx @synkra/aios-core uninstall --keep-data
+npx @markmanai/aios-core uninstall --keep-data
 ```
 
 ### Interactive Uninstall
@@ -77,7 +77,7 @@ npx @synkra/aios-core uninstall --keep-data
 For guided uninstallation:
 
 ```bash
-npx @synkra/aios-core uninstall --interactive
+npx @markmanai/aios-core uninstall --interactive
 ```
 
 This will prompt you for:
@@ -121,14 +121,14 @@ This will prompt you for:
 
 ```bash
 # Complete removal
-npx @synkra/aios-core uninstall --complete --no-backup
+npx @markmanai/aios-core uninstall --complete --no-backup
 ```
 
 ### Step 4: Remove Global Installation
 
 ```bash
 # Remove global npm package
-npm uninstall -g @synkra/aios-core
+npm uninstall -g @markmanai/aios-core
 
 # Remove npx cache
 npm cache clean --force
@@ -140,7 +140,7 @@ npm cache clean --force
 
 ```powershell
 # Remove AppData files
-Remove-Item -Recurse -Force "$env:APPDATA\@synkra/aios-core"
+Remove-Item -Recurse -Force "$env:APPDATA\@markmanai/aios-core"
 
 # Remove temp files
 Remove-Item -Recurse -Force "$env:TEMP\aios-*"
@@ -154,10 +154,10 @@ Remove-Item -Path "HKCU:\Software\MarkmanAi AIOS" -Recurse
 ```bash
 # Remove config files
 rm -rf ~/.aios
-rm -rf ~/.config/@synkra/aios-core
+rm -rf ~/.config/@markmanai/aios-core
 
 # Remove cache
-rm -rf ~/.cache/@synkra/aios-core
+rm -rf ~/.cache/@markmanai/aios-core
 
 # Remove temp files
 rm -rf /tmp/aios-*
@@ -169,13 +169,13 @@ rm -rf /tmp/aios-*
 
 ```bash
 # Remove only agents
-npx @synkra/aios-core uninstall agents
+npx @markmanai/aios-core uninstall agents
 
 # Remove only workflows
-npx @synkra/aios-core uninstall workflows
+npx @markmanai/aios-core uninstall workflows
 
 # Remove memory layer
-npx @synkra/aios-core uninstall memory-layer
+npx @markmanai/aios-core uninstall memory-layer
 
 # Remove specific agent
 *uninstall agent-name
@@ -288,7 +288,7 @@ fi
 
 # Stop all processes
 echo "Stopping all processes..."
-pkill -f "@synkra/aios-core" || true
+pkill -f "@markmanai/aios-core" || true
 pkill -f "aios-developer" || true
 
 # Remove project files
@@ -299,17 +299,17 @@ rm -rf workflows/
 rm -rf tasks/
 rm -rf templates/
 rm -rf Squads/
-rm -rf node_modules/@synkra/aios-core/
+rm -rf node_modules/@markmanai/aios-core/
 
 # Remove global files
 echo "Removing global files..."
-npm uninstall -g @synkra/aios-core
+npm uninstall -g @markmanai/aios-core
 
 # Remove user data
 echo "Removing user data..."
 rm -rf ~/.aios
-rm -rf ~/.config/@synkra/aios-core
-rm -rf ~/.cache/@synkra/aios-core
+rm -rf ~/.config/@markmanai/aios-core
+rm -rf ~/.cache/@markmanai/aios-core
 
 # Clean npm cache
 echo "Cleaning npm cache..."
@@ -317,9 +317,9 @@ npm cache clean --force
 
 # Remove from package.json
 echo "Updating package.json..."
-npm uninstall @synkra/aios-core/core
-npm uninstall @synkra/aios-core/memory
-npm uninstall @synkra/aios-core/meta-agent
+npm uninstall @markmanai/aios-core/core
+npm uninstall @markmanai/aios-core/memory
+npm uninstall @markmanai/aios-core/meta-agent
 
 echo "Uninstall complete!"
 ```
@@ -332,7 +332,7 @@ Write-Host "Cleaning MarkmanAi AIOS from Windows Registry..."
 
 # Remove from PATH
 $path = [Environment]::GetEnvironmentVariable("PATH", "User")
-$newPath = ($path.Split(';') | Where-Object { $_ -notmatch '@synkra/aios-core' }) -join ';'
+$newPath = ($path.Split(';') | Where-Object { $_ -notmatch '@markmanai/aios-core' }) -join ';'
 [Environment]::SetEnvironmentVariable("PATH", $newPath, "User")
 
 # Remove registry keys
@@ -352,10 +352,10 @@ Write-Host "Registry cleanup complete!"
 
 ```bash
 # Linux/macOS
-sudo npx @synkra/aios-core uninstall --complete
+sudo npx @markmanai/aios-core uninstall --complete
 
 # Windows (Run as Administrator)
-npx @synkra/aios-core uninstall --complete
+npx @markmanai/aios-core uninstall --complete
 ```
 
 #### 2. Process Still Running
@@ -364,11 +364,11 @@ npx @synkra/aios-core uninstall --complete
 # Force stop all processes
 # Linux/macOS
 killall -9 node
-killall -9 @synkra/aios-core
+killall -9 @markmanai/aios-core
 
 # Windows
 taskkill /F /IM node.exe
-taskkill /F /IM @synkra/aios-core.exe
+taskkill /F /IM @markmanai/aios-core.exe
 ```
 
 #### 3. Files Locked
@@ -405,12 +405,12 @@ pkill -9 -f aios || true
 # Remove all files
 rm -rf .aios* aios* *aios*
 rm -rf agents workflows tasks templates
-rm -rf node_modules/@synkra/aios-core
+rm -rf node_modules/@markmanai/aios-core
 rm -rf ~/.aios* ~/.config/aios* ~/.cache/aios*
 
 # Clean npm
 npm cache clean --force
-npm uninstall -g @synkra/aios-core
+npm uninstall -g @markmanai/aios-core
 
 echo "Force uninstall complete!"
 ```
@@ -437,7 +437,7 @@ ps aux | grep aios
 ```bash
 # Remove from .bashrc/.zshrc
 sed -i '/AIOS_/d' ~/.bashrc
-sed -i '/@synkra/aios-core/d' ~/.bashrc
+sed -i '/@markmanai/aios-core/d' ~/.bashrc
 
 # Remove from .env files
 find . -name ".env*" -exec sed -i '/AIOS_/d' {} \;
@@ -450,8 +450,8 @@ find . -name ".env*" -exec sed -i '/AIOS_/d' {} \;
 {
   "scripts": {
     // Remove these entries
-    "aios": "@synkra/aios-core",
-    "meta-agent": "@synkra/aios-core meta-agent"
+    "aios": "@markmanai/aios-core",
+    "meta-agent": "@markmanai/aios-core meta-agent"
   }
 }
 ```
@@ -492,7 +492,7 @@ If you want to reinstall MarkmanAi AIOS:
 
 3. **Fresh installation**
    ```bash
-   npx @synkra/aios-core@latest init my-project
+   npx @markmanai/aios-core@latest init my-project
    ```
 
 ### Restoring from Backup
@@ -542,7 +542,7 @@ If you encounter issues during uninstallation:
 3. **Emergency Support**
    ```bash
    # Generate uninstall report
-   npx @synkra/aios-core diagnose --uninstall > uninstall-report.log
+   npx @markmanai/aios-core diagnose --uninstall > uninstall-report.log
    ```
 
 ---

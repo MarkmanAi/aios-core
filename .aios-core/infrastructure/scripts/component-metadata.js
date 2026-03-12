@@ -1,5 +1,5 @@
 /**
- * Component Metadata Manager for Synkra AIOS
+ * Component Metadata Manager for MarkmanAi AIOS
  * Manages detailed metadata for all framework components
  * @module component-metadata
  */

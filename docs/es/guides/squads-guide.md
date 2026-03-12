@@ -52,7 +52,7 @@ Los Squads son equipos modulares de agentes de IA que extienden la funcionalidad
 ├─────────────────────────────────────────────────────────────┤
 │  Nivel 1: LOCAL        → ./squads/           (Privado)       │
 │  Nivel 2: AIOS-SQUADS  → github.com/MarkmanAi (Publico/Gratis)│
-│  Nivel 3: SYNKRA API   → api.synkra.dev      (Marketplace)   │
+│  Nivel 3: MARKMANAI API   → api.markmanai.com      (Marketplace)   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -553,14 +553,14 @@ Los Squads en `./squads/` estan automaticamente disponibles para tu proyecto.
 
 Esto crea un PR a [MarkmanAi/aios-squads](https://github.com/MarkmanAi/aios-squads).
 
-### Nivel 3: Marketplace de Synkra
+### Nivel 3: Marketplace de MarkmanAi
 
 ```bash
 # Configurar autenticacion
-export SYNKRA_API_TOKEN="your-token"
+export MARKMANAI_API_TOKEN="your-token"
 
 # Sincronizar al marketplace
-*sync-squad-synkra ./squads/my-squad --public
+*sync-squad-markmanai ./squads/my-squad --public
 ```
 
 ### Descargando Squads
@@ -634,7 +634,7 @@ El Cargador de Squad resuelve squads en este orden:
 1. Local     → ./squads/{name}/
 2. npm       → node_modules/@aios-squads/{name}/
 3. Workspace → ../{name}/ (monorepo)
-4. Registry  → api.synkra.dev/squads/{name}
+4. Registry  → api.markmanai.com/squads/{name}
 ```
 
 ### Uso Programatico
@@ -771,7 +771,7 @@ Si. El Cargador de Squad resuelve desde multiples fuentes. Los squads locales ti
 
 1. Actualizar version en `squad.yaml` (semver)
 2. Ejecutar `*validate-squad --strict`
-3. Re-publicar: `*publish-squad` o `*sync-squad-synkra`
+3. Re-publicar: `*publish-squad` o `*sync-squad-markmanai`
 
 ### Pueden los Squads depender de otros Squads?
 
@@ -786,7 +786,7 @@ dependencies:
 ### Como hago un Squad privado?
 
 - **Nivel 1**: Mantener en `./squads/` (sin commit) - agregar a `.gitignore`
-- **Nivel 3**: Sincronizar con bandera `--private`: `*sync-squad-synkra my-squad --private`
+- **Nivel 3**: Sincronizar con bandera `--private`: `*sync-squad-markmanai my-squad --private`
 
 ### Cual es la version minima de AIOS para Squads?
 

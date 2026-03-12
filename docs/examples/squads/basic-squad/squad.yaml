@@ -5,7 +5,7 @@ name: basic-squad
 version: 1.0.0
 description: A simple example squad demonstrating the minimum required structure
 
-author: AIOS Team <team@synkra.dev>
+author: AIOS Team <team@markmanai.com>
 license: MIT
 slashPrefix: basic
 

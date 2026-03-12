@@ -75,7 +75,7 @@ describe('SquadPublisher', () => {
 
   describe('Constants', () => {
     it('should export AIOS_SQUADS_REPO', () => {
-      expect(AIOS_SQUADS_REPO).toBe('SynkraAI/aios-squads');
+      expect(AIOS_SQUADS_REPO).toBe('MarkmanAi/aios-squads');
     });
 
     it('should export PublisherErrorCodes enum', () => {

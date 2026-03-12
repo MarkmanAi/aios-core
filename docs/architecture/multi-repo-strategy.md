@@ -58,7 +58,7 @@ MarkmanAi Organization
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                    SYNKRA ORGANIZATION                                   │
+│                    MARKMANAI ORGANIZATION                                   │
 │                                                                          │
 │   PUBLIC REPOSITORIES                                                    │
 │   ═══════════════════                                                    │

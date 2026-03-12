@@ -114,9 +114,9 @@ test_clean_installation() {
     fi
 
     # Run installer
-    log_info "Running: npx @synkraai/aios@latest init"
+    log_info "Running: npx @markmanai/aios@latest init"
 
-    if npx @synkraai/aios@latest init; then
+    if npx @markmanai/aios@latest init; then
         pass_test "Installation completed without errors"
     else
         fail_test "Installation failed with exit code $?"

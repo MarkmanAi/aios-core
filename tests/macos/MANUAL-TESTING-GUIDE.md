@@ -73,7 +73,7 @@ ls -la "$HOME/.aios.backup"*
 ### 2. Navigate to Test Directory
 
 ```bash
-cd path/to/@synkra/aios-core/tests/macos
+cd path/to/@markmanai/aios-core/tests/macos
 chmod +x *.sh
 ```
 
@@ -97,7 +97,7 @@ uname -m
 #### 2. Run Installer
 
 ```bash
-npx @synkraai/aios@latest init
+npx @markmanai/aios@latest init
 ```
 
 **Follow the wizard prompts:**
@@ -167,7 +167,7 @@ sysctl -n machdep.cpu.brand_string
 #### 2. Run Installer
 
 ```bash
-npx @synkraai/aios@latest init
+npx @markmanai/aios@latest init
 ```
 
 #### 3. Verify Native ARM Execution
@@ -451,7 +451,7 @@ pnpm --version
 
 ```bash
 # Time the full installation
-time npx @synkraai/aios@latest init
+time npx @markmanai/aios@latest init
 # Target: < 5 minutes (300 seconds)
 ```
 
@@ -572,11 +572,11 @@ aios health
 
 ```bash
 # Interrupt installation (Ctrl+C mid-install)
-npx @synkraai/aios@latest init
+npx @markmanai/aios@latest init
 # Press Ctrl+C after a few seconds
 
 # Re-run installation
-npx @synkraai/aios@latest init
+npx @markmanai/aios@latest init
 # Should detect partial state and resume/cleanup
 ```
 
@@ -621,7 +621,7 @@ node --version  # Should be 18+
 npm ping
 
 # Try with verbose logging
-npx @synkraai/aios@latest init --verbose
+npx @markmanai/aios@latest init --verbose
 ```
 
 #### Command Not Found

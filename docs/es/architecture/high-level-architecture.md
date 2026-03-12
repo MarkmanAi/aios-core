@@ -144,7 +144,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                    ORGANIZACIÓN SYNKRA                                  │
+│                    ORGANIZACIÓN MARKMANAI                                  │
 │                                                                         │
 │   REPOSITORIOS PÚBLICOS                                                 │
 │   ═════════════════════                                                 │
@@ -217,7 +217,7 @@
 ### Estructura Actual (v2.1)
 
 ```
-@synkra/aios-core/
+@markmanai/aios-core/
 ├── .aios-core/                    # Capa del framework
 │   ├── core/                      # Módulo core (fundación)
 │   │   ├── config/                # Gestión de configuración

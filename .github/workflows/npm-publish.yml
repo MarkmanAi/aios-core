@@ -102,8 +102,8 @@ jobs:
 
       - name: Create distribution archive
         run: |
-          mkdir -p dist/@synkra
-          tar -czf dist/@synkra/aios-core-${{ steps.package-version.outputs.version }}.tar.gz \
+          mkdir -p dist/@markmanai
+          tar -czf dist/@markmanai/aios-core-${{ steps.package-version.outputs.version }}.tar.gz \
             --exclude=node_modules \
             --exclude=.git \
             --exclude=dist \
@@ -258,9 +258,9 @@ jobs:
 
           ## 🔗 Links
 
-          * [GitHub Repository](https://github.com/SynkraAI/aios-core)
-          * [Documentation](https://github.com/SynkraAI/aios-core#readme)
-          * [Issues](https://github.com/SynkraAI/aios-core/issues)
+          * [GitHub Repository](https://github.com/MarkmanAi/aios-core)
+          * [Documentation](https://github.com/MarkmanAi/aios-core#readme)
+          * [Issues](https://github.com/MarkmanAi/aios-core/issues)
           EOF
 
       - name: Update release with notes

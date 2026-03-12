@@ -58,7 +58,7 @@ function resolveAiosCoreModule(modulePath) {
     throw new Error(
       `Cannot find AIOS Core module: ${modulePath}\n` +
         `Searched: ${aiosCoreModule}\n` +
-        'Please ensure @synkra/aios-core is installed correctly.'
+        'Please ensure @markmanai/aios-core is installed correctly.'
     );
   }
 
@@ -742,7 +742,7 @@ See .aios-core/user-guide.md for complete documentation.
     // Secondary: context-based framework location
     path.join(context.frameworkLocation, 'expansion-packs'),
     // Tertiary: installed in project's node_modules
-    path.join(context.projectRoot, 'node_modules', '@synkra/aios-core', 'expansion-packs'),
+    path.join(context.projectRoot, 'node_modules', '@markmanai/aios-core', 'expansion-packs'),
     path.join(context.projectRoot, 'node_modules', '@aios', 'fullstack', 'expansion-packs'),
   ];
 

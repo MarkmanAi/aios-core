@@ -11,7 +11,7 @@ How to contribute squads to the AIOS ecosystem.
 There are two ways to share your squad with the community:
 
 1. **aios-squads Repository** - Free, open-source squads on GitHub
-2. **Synkra Marketplace** - Premium squads via Synkra API
+2. **MarkmanAi Marketplace** - Premium squads via MarkmanAi API
 
 ## Quality Standards
 
@@ -165,11 +165,11 @@ This will:
 
 Timeline: Usually 2-5 business days.
 
-## Publishing to Synkra Marketplace
+## Publishing to MarkmanAi Marketplace
 
 ### Prerequisites
 
-1. Synkra account
+1. MarkmanAi account
 2. API token configured
 3. Squad validated
 
@@ -177,11 +177,11 @@ Timeline: Usually 2-5 business days.
 
 ```bash
 # 1. Configure token
-export SYNKRA_API_TOKEN="your-token"
+export MARKMANAI_API_TOKEN="your-token"
 
 # 2. Sync to marketplace
 @squad-creator
-*sync-squad-synkra ./squads/my-squad --public
+*sync-squad-markmanai ./squads/my-squad --public
 ```
 
 ### Visibility Options
@@ -212,7 +212,7 @@ Follow semantic versioning:
 # 4. Re-publish
 *publish-squad ./squads/my-squad
 # or
-*sync-squad-synkra ./squads/my-squad
+*sync-squad-markmanai ./squads/my-squad
 ```
 
 ## Code of Conduct

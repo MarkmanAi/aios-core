@@ -1,5 +1,5 @@
 /**
- * Interactive Elicitation Engine for Synkra AIOS
+ * Interactive Elicitation Engine for MarkmanAi AIOS
  * Handles progressive disclosure and contextual validation for component creation
  *
  * @module core/elicitation/elicitation-engine

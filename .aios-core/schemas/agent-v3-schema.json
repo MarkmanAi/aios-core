@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://synkra.dev/schemas/agent-v3-schema.json",
+  "$id": "https://markmanai.com/schemas/agent-v3-schema.json",
   "title": "AIOS Agent V3 Schema",
   "description": "Schema for AIOS agent definitions with Auto-Claude capabilities",
   "type": "object",

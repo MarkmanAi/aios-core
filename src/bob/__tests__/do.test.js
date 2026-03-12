@@ -131,7 +131,7 @@ describe('T2.5 — onboarding → install message', () => {
     await runBobDo('do something', { dryRun: false });
 
     expect(consoleLogSpy).toHaveBeenCalledWith(
-      expect.stringContaining('npx @synkra/aios-install'),
+      expect.stringContaining('npx @markmanai/aios-install'),
     );
   });
 });

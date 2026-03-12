@@ -119,7 +119,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
-- Manual installation process (use `npx @synkra/aios-core install` instead)
+- Manual installation process (use `npx @markmanai/aios-core install` instead)
 - `.bmad-core/` directory name (automatically migrated)
 
 ### Security
@@ -165,7 +165,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Quick upgrade:**
 
 ```bash
-npx @synkra/aios-core install --force-upgrade
+npx @markmanai/aios-core install --force-upgrade
 ```
 
 **Key changes:**

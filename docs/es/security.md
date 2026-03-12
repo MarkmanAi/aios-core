@@ -27,7 +27,7 @@ En su lugar, por favor reporta vulnerabilidades de seguridad a través de uno de
    - Completa el formulario con los detalles
 
 2. **Email**
-   - Envía un email a: security@synkra.ai
+   - Envía un email a: security@markmanai.com
    - Usa el asunto: `[SECURITY] Descripción breve`
 
 ### Qué Incluir

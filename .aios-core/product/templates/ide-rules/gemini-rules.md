@@ -117,7 +117,7 @@ Hooks can intercept these events:
 ### Extensions
 AIOS can be packaged as a Gemini CLI extension for easy installation:
 ```bash
-gemini extensions install github.com/synkra/aios-gemini-extension
+gemini extensions install github.com/MarkmanAi/aios-gemini-extension
 ```
 
 ## Workflow Execution

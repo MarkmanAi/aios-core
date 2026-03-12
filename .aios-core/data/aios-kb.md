@@ -86,7 +86,7 @@ AIOS transforms you into a "Vibe CEO" - directing a team of specialized AI agent
 
 ```bash
 # Interactive installation (recommended)
-npx @synkra/aios-core install
+npx @markmanai/aios-core install
 ```
 
 **Installation Steps**:
@@ -897,7 +897,7 @@ Expansion packs extend AIOS-Method beyond traditional software development into 
 3. **Install via CLI**:
 
    ```bash
-   npx @synkra/aios-core install
+   npx @markmanai/aios-core install
    # Select "Install expansion pack" option
    ```
 

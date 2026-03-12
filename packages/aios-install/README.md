@@ -1,11 +1,11 @@
-# @synkra/aios-install
+# @markmanai/aios-install
 
 NPX installer for AIOS - AI-Orchestrated System for Full Stack Development.
 
 ## Quick Start
 
 ```bash
-npx @synkra/aios-install
+npx @markmanai/aios-install
 ```
 
 That's it! The installer will guide you through setting up AIOS in less than 5 minutes.
@@ -23,13 +23,13 @@ That's it! The installer will guide you through setting up AIOS in less than 5 m
 ### Interactive Installation
 
 ```bash
-npx @synkra/aios-install
+npx @markmanai/aios-install
 ```
 
 ### Options
 
 ```bash
-npx @synkra/aios-install --help
+npx @markmanai/aios-install --help
 
 Options:
   -v, --version         Output the current version
@@ -46,7 +46,7 @@ Options:
 Preview the installation without making any changes:
 
 ```bash
-npx @synkra/aios-install --dry-run
+npx @markmanai/aios-install --dry-run
 ```
 
 ### Direct Profile Selection
@@ -54,8 +54,8 @@ npx @synkra/aios-install --dry-run
 Skip the profile question by specifying it directly:
 
 ```bash
-npx @synkra/aios-install --profile bob
-npx @synkra/aios-install --profile advanced
+npx @markmanai/aios-install --profile bob
+npx @markmanai/aios-install --profile advanced
 ```
 
 ## edmcp - Docker MCP Manager
@@ -109,8 +109,8 @@ If you have an existing AIOS installation, the installer will:
 
 ## Support
 
-- Documentation: https://github.com/SynkraAI/aios-core
-- Issues: https://github.com/SynkraAI/aios-core/issues
+- Documentation: https://github.com/MarkmanAi/aios-core
+- Issues: https://github.com/MarkmanAi/aios-core/issues
 
 ## License
 

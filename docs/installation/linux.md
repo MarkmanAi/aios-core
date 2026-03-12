@@ -391,7 +391,7 @@ Quick uninstall:
 rm -rf .aios-core .claude/commands/AIOS
 
 # Remove global installation
-rm -rf ~/.aios-core-source ~/.npm-global/lib/node_modules/@synkra
+rm -rf ~/.aios-core-source ~/.npm-global/lib/node_modules/@markmanai
 ```
 
 ---

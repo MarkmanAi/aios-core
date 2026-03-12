@@ -4,11 +4,11 @@
  * AIOS NPX Installer - Entry Point
  *
  * Usage:
- *   npx @synkra/aios-install          # Interactive installation
- *   npx @synkra/aios-install --dry-run # Preview what would be done
- *   npx @synkra/aios-install --version # Show version
+ *   npx @markmanai/aios-install          # Interactive installation
+ *   npx @markmanai/aios-install --dry-run # Preview what would be done
+ *   npx @markmanai/aios-install --version # Show version
  *
- * @package @synkra/aios-install
+ * @package @markmanai/aios-install
  */
 
 'use strict';

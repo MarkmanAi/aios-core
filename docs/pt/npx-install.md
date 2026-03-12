@@ -18,14 +18,14 @@ O MarkmanAi AIOS pode ser instalado via NPX para uma configuração rápida sem 
 
 ### Uso Correto
 
-Sempre execute `npx @synkra/aios-core install` **a partir do diretório do seu projeto**:
+Sempre execute `npx @markmanai/aios-core install` **a partir do diretório do seu projeto**:
 
 ```bash
 # Navegue primeiro para o seu projeto
 cd /path/to/your/project
 
 # Então execute o instalador
-npx @synkra/aios-core install
+npx @markmanai/aios-core install
 ```
 
 ### Erro Comum
@@ -35,11 +35,11 @@ npx @synkra/aios-core install
 ```bash
 # INCORRETO - Falhará com erro de diretório temporário do NPX
 cd ~
-npx @synkra/aios-core install
+npx @markmanai/aios-core install
 
 # CORRETO - Navegue primeiro para o projeto
 cd ~/my-project
-npx @synkra/aios-core install
+npx @markmanai/aios-core install
 ```
 
 ## Por Que Isso Importa
@@ -62,9 +62,9 @@ o AIOS de detectar sua IDE corretamente.
 
 Solução:
   cd /path/to/your/project
-  npx @synkra/aios-core install
+  npx @markmanai/aios-core install
 
-Veja: https://@synkra/aios-core.dev/docs/npx-install
+Veja: https://@markmanai/aios-core.dev/docs/npx-install
 ```
 
 ## Etapas de Instalação
@@ -83,7 +83,7 @@ O diretório do seu projeto deve conter:
 ### Etapa 2: Execute o Instalador
 
 ```bash
-npx @synkra/aios-core install
+npx @markmanai/aios-core install
 ```
 
 ### Etapa 3: Siga os Prompts Interativos
@@ -129,7 +129,7 @@ Usuários do Windows normalmente não encontram esse problema, mas padrões de d
    ```
 2. Execute o instalador novamente:
    ```bash
-   npx @synkra/aios-core install
+   npx @markmanai/aios-core install
    ```
 
 ### Diretório de Instalação Errado
@@ -151,9 +151,9 @@ Se sua IDE não for detectada após a instalação:
 Se você preferir não usar NPX, pode instalar globalmente:
 
 ```bash
-npm install -g @synkra/aios-core
+npm install -g @markmanai/aios-core
 cd /path/to/your/project
-@synkra/aios-core install
+@markmanai/aios-core install
 ```
 
 ## Detalhes Técnicos
@@ -184,8 +184,8 @@ const patterns = [
 ## Suporte
 
 Para ajuda adicional:
-- GitHub Issues: https://github.com/MarkmanAiinc/@synkra/aios-core/issues
-- Documentação: https://@synkra/aios-core.dev/docs
+- GitHub Issues: https://github.com/MarkmanAiinc/@markmanai/aios-core/issues
+- Documentação: https://@markmanai/aios-core.dev/docs
 - Referência da Story: 2.3 - NPX Installation Context Detection
 
 ---

@@ -12,7 +12,7 @@
 Esta análise compara profundamente duas metodologias de desenvolvimento orientado a especificações:
 
 - **GitHub Spec-Kit (SDD)** - Spec-Driven Development do GitHub
-- **MarkmanAi AIOS** - Agent-Driven Development da Synkra
+- **MarkmanAi AIOS** - Agent-Driven Development da MarkmanAi
 
 Ambas buscam melhorar a qualidade do software através de especificações rigorosas, mas com abordagens fundamentalmente diferentes.
 

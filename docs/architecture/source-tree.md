@@ -84,7 +84,7 @@ aios-core/                             # Root (brownfield project)
 │   └── squad/                         # Squad template for extensions (see docs/guides/squads-guide.md)
 │
 ├── bin/                               # CLI executables
-│   ├── @synkra/aios-core.js              # Main CLI entry point
+│   ├── @markmanai/aios-core.js              # Main CLI entry point
 │   └── aios-minimal.js                # Minimal CLI
 │
 ├── tools/                             # Build and utility tools

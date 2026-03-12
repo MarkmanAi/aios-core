@@ -2,17 +2,17 @@
 
 > 🌐 **EN** | [PT](../pt/api/squads-api.md) | [ES](../es/api/squads-api.md)
 
-REST API for syncing squads to Synkra and discovering marketplace squads.
+REST API for syncing squads to MarkmanAi and discovering marketplace squads.
 
 ## Overview
 
 The Squads API enables:
 
-- **Sync**: Push local squads to Synkra cloud
+- **Sync**: Push local squads to MarkmanAi cloud
 - **Marketplace**: Discover and browse public squads
 - **Management**: Update visibility, delete squads
 
-**Base URL**: `https://api.synkra.ai`
+**Base URL**: `https://api.markmanai.com`
 
 ## Authentication
 
@@ -30,13 +30,13 @@ Authorization: Bearer sk_your_api_key
 Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
 ```
 
-Get your API key from: https://synkra.ai/settings/api-keys
+Get your API key from: https://markmanai.com/settings/api-keys
 
 ## Endpoints
 
 ### Sync Squad
 
-Push a squad definition to Synkra.
+Push a squad definition to MarkmanAi.
 
 ```
 POST /api/squads/sync
@@ -60,7 +60,7 @@ POST /api/squads/sync
 **Example Request**:
 
 ```bash
-curl -X POST https://api.synkra.ai/api/squads/sync \
+curl -X POST https://api.markmanai.com/api/squads/sync \
   -H "Authorization: Bearer sk_your_api_key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -127,7 +127,7 @@ POST /api/squads/sync/batch
 **Example Request**:
 
 ```bash
-curl -X POST https://api.synkra.ai/api/squads/sync/batch \
+curl -X POST https://api.markmanai.com/api/squads/sync/batch \
   -H "Authorization: Bearer sk_your_api_key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -214,10 +214,10 @@ GET /api/squads
 
 ```bash
 # List all public squads
-curl https://api.synkra.ai/api/squads
+curl https://api.markmanai.com/api/squads
 
 # Search with filters
-curl "https://api.synkra.ai/api/squads?tags=devops,automation&search=deploy&official=true&limit=10"
+curl "https://api.markmanai.com/api/squads?tags=devops,automation&search=deploy&official=true&limit=10"
 ```
 
 **Success Response** (200):
@@ -272,7 +272,7 @@ GET /api/squads/mine
 **Example Request**:
 
 ```bash
-curl https://api.synkra.ai/api/squads/mine \
+curl https://api.markmanai.com/api/squads/mine \
   -H "Authorization: Bearer sk_your_api_key"
 ```
 
@@ -326,10 +326,10 @@ GET /api/squads/:id
 
 ```bash
 # By squad_id
-curl https://api.synkra.ai/api/squads/devops-squad
+curl https://api.markmanai.com/api/squads/devops-squad
 
 # By UUID
-curl https://api.synkra.ai/api/squads/550e8400-e29b-41d4-a716-446655440000
+curl https://api.markmanai.com/api/squads/550e8400-e29b-41d4-a716-446655440000
 ```
 
 **Success Response** (200):
@@ -403,7 +403,7 @@ PATCH /api/squads/:id
 **Example Request**:
 
 ```bash
-curl -X PATCH https://api.synkra.ai/api/squads/my-squad \
+curl -X PATCH https://api.markmanai.com/api/squads/my-squad \
   -H "Authorization: Bearer sk_your_api_key" \
   -H "Content-Type: application/json" \
   -d '{"isPublic": true}'
@@ -428,7 +428,7 @@ curl -X PATCH https://api.synkra.ai/api/squads/my-squad \
 
 ### Delete Squad
 
-Remove a squad from Synkra.
+Remove a squad from MarkmanAi.
 
 ```
 DELETE /api/squads/:id
@@ -445,7 +445,7 @@ DELETE /api/squads/:id
 **Example Request**:
 
 ```bash
-curl -X DELETE https://api.synkra.ai/api/squads/my-old-squad \
+curl -X DELETE https://api.markmanai.com/api/squads/my-old-squad \
   -H "Authorization: Bearer sk_your_api_key"
 ```
 
@@ -479,7 +479,7 @@ POST /api/squads/validate
 **Example Request**:
 
 ```bash
-curl -X POST https://api.synkra.ai/api/squads/validate \
+curl -X POST https://api.markmanai.com/api/squads/validate \
   -H "Content-Type: application/json" \
   -d '{
     "squadData": {
@@ -559,21 +559,21 @@ X-RateLimit-Reset: 1703577600
 
 ## CLI Integration
 
-The `*sync-squad-synkra` command uses this API:
+The `*sync-squad-markmanai` command uses this API:
 
 ```bash
 # Sync single squad
 @squad-creator
-*sync-squad-synkra ./squads/my-squad --public
+*sync-squad-markmanai ./squads/my-squad --public
 
 # Batch sync all squads
-*sync-squad-synkra ./squads/* --public
+*sync-squad-markmanai ./squads/* --public
 ```
 
 Configure API key:
 
 ```bash
-export SYNKRA_API_TOKEN="sk_your_api_key"
+export MARKMANAI_API_TOKEN="sk_your_api_key"
 ```
 
 ---
@@ -585,14 +585,14 @@ Import this collection into Postman or Insomnia:
 ```json
 {
   "info": {
-    "name": "Synkra Squads API",
-    "description": "REST API for Synkra Squad Marketplace",
+    "name": "MarkmanAi Squads API",
+    "description": "REST API for MarkmanAi Squad Marketplace",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
-      "value": "https://api.synkra.ai"
+      "value": "https://api.markmanai.com"
     },
     {
       "key": "apiKey",
@@ -738,7 +738,7 @@ Import this collection into Postman or Insomnia:
 }
 ```
 
-Save the JSON above as `synkra-squads-api.postman_collection.json` and import into Postman.
+Save the JSON above as `markmanai-squads-api.postman_collection.json` and import into Postman.
 
 ---
 

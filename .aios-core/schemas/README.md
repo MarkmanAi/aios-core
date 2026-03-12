@@ -398,6 +398,6 @@ node validate-v3-schema.js .aios-core/development/agents/dev.md --strict
 
 ---
 
-_AIOS V3 Schemas - Synkra Framework_
+_AIOS V3 Schemas - MarkmanAi Framework_
 _Created: 2026-01-28_
 _Updated: 2026-01-28 - Added status and known issues_
