@@ -1821,7 +1821,7 @@
       "dependencies": []
     },
     {
-      "name": "@synkra/aios-install",
+      "name": "@markmanai/aios-install",
       "type": "workspace",
       "directory": "packages\\aios-install",
       "entrypoint": "src/installer.js",

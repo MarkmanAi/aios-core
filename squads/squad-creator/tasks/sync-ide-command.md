@@ -382,7 +382,7 @@ Summary:
 - `*create-squad` - Criar novo squad
 - `*validate-squad` - Validar estrutura do squad
 - `*install-commands` - Instalar commands (versão anterior)
-- `*sync-squad-synkra` - Sincronizar para Synkra marketplace
+- `*sync-squad-markmanai` - Sincronizar para MarkmanAi marketplace
 
 ## Changelog
 

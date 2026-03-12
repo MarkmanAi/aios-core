@@ -8545,7 +8545,7 @@
       ".aios-core/development/tasks/squad-creator-extend.md",
       ".aios-core/development/tasks/squad-creator-download.md",
       ".aios-core/development/tasks/squad-creator-publish.md",
-      ".aios-core/development/tasks/squad-creator-sync-synkra.md"
+      ".aios-core/development/tasks/squad-creator-sync-markmanai.md"
     ],
     ".aios-core/development/agents/ux-design-expert.md": [
       ".aios-core/development/tasks/ux-user-research.md",
@@ -8753,7 +8753,7 @@
       ".aios-core/development/scripts/squad/squad-publisher.js"
     ],
     ".aios-core/development/tasks/squad-creator-sync-ide-command.md": [],
-    ".aios-core/development/tasks/squad-creator-sync-synkra.md": [],
+    ".aios-core/development/tasks/squad-creator-sync-markmanai.md": [],
     ".aios-core/development/tasks/squad-creator-validate.md": [],
     ".aios-core/development/tasks/sync-documentation.md": [],
     ".aios-core/development/tasks/tailwind-upgrade.md": [],

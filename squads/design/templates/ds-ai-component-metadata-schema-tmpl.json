@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://synkra.ai/schemas/design-system/component-metadata.schema.json",
+  "$id": "https://markmanai.com/schemas/design-system/component-metadata.schema.json",
   "title": "Design System Component Metadata",
   "type": "object",
   "required": [

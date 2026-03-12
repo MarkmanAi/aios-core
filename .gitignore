@@ -222,7 +222,7 @@ test-sample-*.md
 # PROPRIETARY/INTERNAL CONTENT (Story TD-5)
 # ============================================
 # Content that is NOT part of the public aios-core framework
-# These are SynkraAI-specific methodologies and business documents
+# These are MarkmanAi-specific methodologies and business documents
 
 # Proprietary Process Mapping Frameworks (Pedro Valério methodology)
 docs/standards/

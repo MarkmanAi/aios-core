@@ -641,4 +641,4 @@ Veja também:
 
 ---
 
-**[⬆ Voltar ao topo](#synkra-aios-framework-universal-de-agentes-ia-)**
+**[⬆ Voltar ao topo](#markmanaios-framework-universal-de-agentes-ia-)**

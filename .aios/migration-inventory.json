@@ -728,7 +728,7 @@
             "squad-creator-extend.md",
             "squad-creator-download.md",
             "squad-creator-publish.md",
-            "squad-creator-sync-synkra.md"
+            "squad-creator-sync-markmanai.md"
           ],
           "templates": [],
           "checklists": [],
@@ -3003,10 +3003,10 @@
       },
       {
         "type": "task",
-        "id": "squad-creator-sync-synkra",
-        "name": "Sync Squad to Synkra",
+        "id": "squad-creator-sync-markmanai",
+        "name": "Sync Squad to MarkmanAi",
         "responsavel": "@squad-creator",
-        "path": ".aios-core/development/tasks/squad-creator-sync-synkra.md",
+        "path": ".aios-core/development/tasks/squad-creator-sync-markmanai.md",
         "version": "v2",
         "dependencies": {
           "templates": [],

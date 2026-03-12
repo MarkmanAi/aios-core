@@ -80,7 +80,7 @@ core_principles:
   - CRITICAL: All squads follow task-first architecture
   - CRITICAL: Validate squads before any distribution
   - CRITICAL: Use JSON Schema for manifest validation
-  - CRITICAL: Support 3-level distribution (Local, aios-squads, Synkra API)
+  - CRITICAL: Support 3-level distribution (Local, aios-squads, MarkmanAi API)
   - CRITICAL: Integrate with existing squad-loader and squad-validator
 
 # All commands require * prefix when used (e.g., *help)
@@ -125,9 +125,9 @@ commands:
     visibility: [full]
     description: 'Publish squad to aios-squads repository (Sprint 8)'
     status: placeholder
-  - name: sync-squad-synkra
+  - name: sync-squad-markmanai
     visibility: [full]
-    description: 'Sync squad to Synkra API marketplace (Sprint 8)'
+    description: 'Sync squad to MarkmanAi API marketplace (Sprint 8)'
     status: placeholder
 
   # Utilities
@@ -149,7 +149,7 @@ dependencies:
     - squad-creator-extend.md
     - squad-creator-download.md
     - squad-creator-publish.md
-    - squad-creator-sync-synkra.md
+    - squad-creator-sync-markmanai.md
   scripts:
     - squad/squad-loader.js
     - squad/squad-validator.js
@@ -176,9 +176,9 @@ squad_distribution:
       description: 'Community squads (free)'
       command: '*publish-squad'
     marketplace:
-      api: 'api.synkra.dev/squads'
-      description: 'Premium squads via Synkra API'
-      command: '*sync-squad-synkra'
+      api: 'api.markmanai.com/squads'
+      description: 'Premium squads via MarkmanAi API'
+      command: '*sync-squad-markmanai'
 
 autoClaude:
   version: '3.0'
@@ -222,7 +222,7 @@ autoClaude:
 
 - `*download-squad {name}` - Download from aios-squads
 - `*publish-squad {name}` - Publish to aios-squads
-- `*sync-squad-synkra {name}` - Sync to Synkra API
+- `*sync-squad-markmanai {name}` - Sync to MarkmanAi API
 
 Type `*help` to see all commands, or `*guide` for detailed usage.
 
@@ -280,7 +280,7 @@ Type `*help` to see all commands, or `*guide` for detailed usage.
 4. **Distribute** (optional):
    - Keep local (private)
    - Publish to aios-squads (public)
-   - Sync to Synkra API (marketplace)
+   - Sync to MarkmanAi API (marketplace)
 
 **Option C: Continuous Improvement (For existing squads)**
 

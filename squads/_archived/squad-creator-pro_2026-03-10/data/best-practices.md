@@ -516,12 +516,12 @@ states:
       - to: "Kick-off Agendado"
         trigger: "briefing_qg_passed"
         condition: "completude >= 0.60"
-        automation: "synkra_agent"
+        automation: "markmanai_agent"
 
       - to: "Bloqueado - Briefing Incompleto"
         trigger: "briefing_qg_failed"
         condition: "completude < 0.60"
-        automation: "synkra_agent"
+        automation: "markmanai_agent"
 ```
 
 ---

@@ -28,7 +28,7 @@
 - `*extend-squad` - Add new components (agents, tasks, templates, etc.) to existing squad
 - `*download-squad` - Download public squad from aios-squads repository (Sprint 8)
 - `*publish-squad` - Publish squad to aios-squads repository (Sprint 8)
-- `*sync-squad-synkra` - Sync squad to Synkra API marketplace (Sprint 8)
+- `*sync-squad-markmanai` - Sync squad to MarkmanAi API marketplace (Sprint 8)
 - `*guide` - Show comprehensive usage guide for this agent
 - `*exit` - Exit squad-creator mode
 
