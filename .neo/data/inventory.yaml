@@ -210,9 +210,12 @@ knowledge_assets:
     3. The Art of Action — Stephen Bungay (governance | Sonnet L1/L2)
     4. High Output Management — Andrew Grove (governance | Sonnet L1/L2)
 
-  books_processed: 1
+  books_processed: 2
   # Incremented by Neo after each successful book pipeline completion
   # [1/4] Thinking in Systems — Donella H. Meadows (2026-03-11) ✅
+  # [2/4] Team Topologies — Skelton & Pais (2026-03-11) ✅
+  #   L1: 2 principles | L2: 25 frameworks, 37 heuristics, 46 anti_patterns, 33 triggers → org-design.md
+  #   L3: voice_dna + thinking_dna + contradictions → matthew-skelton-manuel-pais/
   #   L1: 2 principles → .neo/data/strategic-principles.md
   #   L2: 7 frameworks, 7 heuristics, 5 anti-patterns, 5 triggers → .neo/kb/strategic/systems-thinking.md
   #   L3: Voice DNA + Thinking DNA + Contradictions → squads/mmos-squad/minds/donella-h-meadows/
