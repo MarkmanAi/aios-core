@@ -207,7 +207,7 @@ def process(
     )
     committed_paths.append(l2_target)
 
-    # L3 -> MMOS minds directory
+    # L3 -> Person Knowledge Base
     if l3_results:
         l3_target = place_l3(
             l3_results=l3_results,
@@ -217,6 +217,25 @@ def process(
         # Add all files in the L3 target directory
         for f in l3_target.iterdir():
             committed_paths.append(f)
+
+        # Update PKB metadata and readiness gate
+        from knowledge_etl.kb.person_metadata import create_or_update
+        from knowledge_etl.kb.person_readiness import update_readiness
+        from datetime import date as _date
+
+        person_slug = slugify(metadata.get("author") or "Unknown")
+        create_or_update(
+            slug=person_slug,
+            name=metadata.get("author") or "Unknown",
+            source_info={
+                "slug": slug,
+                "type": "book",
+                "title": metadata.get("title", ""),
+                "etl_processed": True,
+                "processed_at": _date.today().isoformat(),
+            },
+        )
+        update_readiness(person_slug)
 
     # Git commit
     try:
@@ -474,6 +493,25 @@ def load(
             )
             for f in l3_target.iterdir():
                 committed_paths.append(f)
+
+            # Update PKB metadata and readiness gate
+            from knowledge_etl.kb.person_metadata import create_or_update
+            from knowledge_etl.kb.person_readiness import update_readiness
+            from datetime import date as _date
+
+            person_slug = slugify(metadata.get("author") or "Unknown")
+            create_or_update(
+                slug=person_slug,
+                name=metadata.get("author") or "Unknown",
+                source_info={
+                    "slug": book_slug,
+                    "type": "book",
+                    "title": metadata.get("title", ""),
+                    "etl_processed": True,
+                    "processed_at": _date.today().isoformat(),
+                },
+            )
+            update_readiness(person_slug)
 
     # Git commit
     if committed_paths:
