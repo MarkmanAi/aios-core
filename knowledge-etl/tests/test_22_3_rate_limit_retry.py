@@ -283,14 +283,16 @@ class TestAdaptiveMaxOutputReduce:
         )
 
     def test_reduce_max_tokens_uses_adaptive(self):
-        """call_structured in _reduce must use adaptive_max, not MAX_OUTPUT_REDUCE directly."""
+        """call_structured in _reduce_pass must use adaptive_max, not MAX_OUTPUT_REDUCE directly.
+        Updated for Story 22.4: _reduce() was replaced by _reduce_pass().
+        """
         from knowledge_etl.config import ETL_SRC
         source = (ETL_SRC / 'transform' / 'l2_frameworks.py').read_text(encoding='utf-8')
-        # adaptive_max must appear before the synthesize_frameworks tool call
-        reduce_block_start = source.find('def _reduce(')
+        # adaptive_max must appear inside _reduce_pass (which replaced _reduce in Story 22.4)
+        reduce_block_start = source.find('def _reduce_pass(')
         reduce_block = source[reduce_block_start:]
         assert 'max_tokens=adaptive_max' in reduce_block, (
-            '_reduce() must pass max_tokens=adaptive_max to call_structured'
+            '_reduce_pass() must pass max_tokens=adaptive_max to call_structured'
         )
 
 

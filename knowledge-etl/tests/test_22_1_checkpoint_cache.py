@@ -1,8 +1,9 @@
 """
 Tests for Story 22.1 — Checkpoint Integrity + Cache Validation.
+Updated for Story 22.4 — two-pass reduce replaces _reduce().
 
 Covers:
-  AC-1: _reduce() reads/writes checkpoint key "__reduce__"
+  AC-1 (22.4): _reduce_pass() reads/writes per-pass checkpoint keys (__reduce_a__, __reduce_b__)
   AC-2: extract_l2() rejects zero-framework cache files
   AC-3: extract_l1() rejects zero-principle cache files
   AC-4: Valid cache hits pass through unchanged (no regression)
@@ -12,12 +13,17 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 
 from knowledge_etl.transform.l1_principles import extract_l1
-from knowledge_etl.transform.l2_frameworks import _is_valid_reduce, _reduce, extract_l2
+from knowledge_etl.transform.l2_frameworks import (
+    L2ReducePassA,
+    L2ReducePassB,
+    _reduce_pass,
+    extract_l2,
+)
 
 
 # ─── Fixtures ─────────────────────────────────────────────────────────────────
@@ -69,59 +75,16 @@ def mock_checkpoint_valid_hit():
     return ckpt
 
 
-@pytest.fixture
-def mock_checkpoint_invalid_hit():
-    """Checkpoint with 0 frameworks (invalid — should not short-circuit)."""
-    ckpt = MagicMock()
-    ckpt.get_result.return_value = {"unified_frameworks": [], "core_frameworks": []}
-    return ckpt
+
+# ─── AC-1 (22.4): _reduce_pass() checkpoint behaviour ────────────────────────
 
 
-# ─── AC-1: _is_valid_reduce ───────────────────────────────────────────────────
-
-
-class TestIsValidReduce:
-    def test_valid_with_unified_frameworks(self):
-        result = {"unified_frameworks": [{"name": "CLD"}]}
-        assert _is_valid_reduce(result) is True
-
-    def test_valid_with_core_frameworks(self):
-        result = {"core_frameworks": [{"name": "DSRP"}]}
-        assert _is_valid_reduce(result) is True
-
-    def test_valid_when_both_present(self):
-        result = {"unified_frameworks": [{"name": "A"}], "core_frameworks": [{"name": "B"}]}
-        assert _is_valid_reduce(result) is True
-
-    def test_invalid_both_empty(self):
-        result = {"unified_frameworks": [], "core_frameworks": []}
-        assert _is_valid_reduce(result) is False
-
-    def test_invalid_missing_both_keys(self):
-        result = {"anti_patterns": [{"mistake": "x"}], "decision_heuristics": []}
-        assert _is_valid_reduce(result) is False
-
-    def test_invalid_parse_error_result(self):
-        result = {"parse_error": True, "raw": "...", "chapter_results": []}
-        assert _is_valid_reduce(result) is False
-
-    def test_invalid_raw_fallback_result(self):
-        result = {"raw_reduce": "some text", "chapter_results": []}
-        assert _is_valid_reduce(result) is False
-
-    def test_invalid_empty_dict(self):
-        assert _is_valid_reduce({}) is False
-
-
-# ─── AC-1: _reduce() checkpoint behaviour ─────────────────────────────────────
-
-
-class TestReduceCheckpoint:
+class TestReducePass:
     def test_checkpoint_hit_skips_api_call(
         self, mock_checkpoint_valid_hit, mock_llm_reduce, mock_cost_tracker, reduce_template
     ):
         """Valid checkpoint hit: llm.call must NOT be called."""
-        result = _reduce(
+        result = _reduce_pass(
             chapter_results=[],
             book_title="Thinking in Systems",
             author="Meadows",
@@ -129,6 +92,10 @@ class TestReduceCheckpoint:
             llm=mock_llm_reduce,
             cost_tracker=mock_cost_tracker,
             checkpoint=mock_checkpoint_valid_hit,
+            checkpoint_key="__reduce_a__",
+            cost_phase="l2_reduce_a",
+            output_schema=L2ReducePassA.model_json_schema(),
+            tool_name="synthesize_frameworks_a",
         )
 
         mock_llm_reduce.call_structured.assert_not_called()
@@ -138,7 +105,7 @@ class TestReduceCheckpoint:
         self, mock_checkpoint_miss, mock_llm_reduce, mock_cost_tracker, reduce_template
     ):
         """Cache miss: llm.call_structured must be invoked."""
-        _reduce(
+        _reduce_pass(
             chapter_results=[],
             book_title="Test Book",
             author="Author",
@@ -146,15 +113,19 @@ class TestReduceCheckpoint:
             llm=mock_llm_reduce,
             cost_tracker=mock_cost_tracker,
             checkpoint=mock_checkpoint_miss,
+            checkpoint_key="__reduce_a__",
+            cost_phase="l2_reduce_a",
+            output_schema=L2ReducePassA.model_json_schema(),
+            tool_name="synthesize_frameworks_a",
         )
 
         mock_llm_reduce.call_structured.assert_called_once()
 
-    def test_checkpoint_miss_calls_mark_done(
+    def test_pass_a_checkpoint_key(
         self, mock_checkpoint_miss, mock_llm_reduce, mock_cost_tracker, reduce_template
     ):
-        """After API call, result must be persisted via mark_done(__reduce__, ...)."""
-        _reduce(
+        """Pass A must persist result under __reduce_a__ key."""
+        _reduce_pass(
             chapter_results=[],
             book_title="Test Book",
             author="Author",
@@ -162,12 +133,36 @@ class TestReduceCheckpoint:
             llm=mock_llm_reduce,
             cost_tracker=mock_cost_tracker,
             checkpoint=mock_checkpoint_miss,
+            checkpoint_key="__reduce_a__",
+            cost_phase="l2_reduce_a",
+            output_schema=L2ReducePassA.model_json_schema(),
+            tool_name="synthesize_frameworks_a",
         )
 
         mock_checkpoint_miss.mark_done.assert_called_once()
-        key, result, *_ = mock_checkpoint_miss.mark_done.call_args[0]
-        assert key == "__reduce__"
-        assert "unified_frameworks" in result
+        key = mock_checkpoint_miss.mark_done.call_args[0][0]
+        assert key == "__reduce_a__"
+
+    def test_pass_b_checkpoint_key(
+        self, mock_checkpoint_miss, mock_llm_reduce, mock_cost_tracker, reduce_template
+    ):
+        """Pass B must persist result under __reduce_b__ key (distinct from Pass A)."""
+        _reduce_pass(
+            chapter_results=[],
+            book_title="Test Book",
+            author="Author",
+            reduce_template=reduce_template,
+            llm=mock_llm_reduce,
+            cost_tracker=mock_cost_tracker,
+            checkpoint=mock_checkpoint_miss,
+            checkpoint_key="__reduce_b__",
+            cost_phase="l2_reduce_b",
+            output_schema=L2ReducePassB.model_json_schema(),
+            tool_name="synthesize_frameworks_b",
+        )
+
+        key = mock_checkpoint_miss.mark_done.call_args[0][0]
+        assert key == "__reduce_b__"
 
     def test_mark_done_uses_correct_cost(
         self, mock_checkpoint_miss, mock_cost_tracker, reduce_template
@@ -178,7 +173,7 @@ class TestReduceCheckpoint:
             {"unified_frameworks": [{"name": "F"}]},
             MagicMock(cost_usd=0.123),
         )
-        _reduce(
+        _reduce_pass(
             chapter_results=[],
             book_title="T",
             author="A",
@@ -186,26 +181,14 @@ class TestReduceCheckpoint:
             llm=llm,
             cost_tracker=mock_cost_tracker,
             checkpoint=mock_checkpoint_miss,
+            checkpoint_key="__reduce_a__",
+            cost_phase="l2_reduce_a",
+            output_schema=L2ReducePassA.model_json_schema(),
+            tool_name="synthesize_frameworks_a",
         )
 
         kwargs = mock_checkpoint_miss.mark_done.call_args[1]
         assert kwargs.get("cost_usd") == pytest.approx(0.123)
-
-    def test_invalid_checkpoint_still_calls_api(
-        self, mock_checkpoint_invalid_hit, mock_llm_reduce, mock_cost_tracker, reduce_template
-    ):
-        """Checkpoint with 0 frameworks must NOT short-circuit — API must be called."""
-        _reduce(
-            chapter_results=[],
-            book_title="Test Book",
-            author="Author",
-            reduce_template=reduce_template,
-            llm=mock_llm_reduce,
-            cost_tracker=mock_cost_tracker,
-            checkpoint=mock_checkpoint_invalid_hit,
-        )
-
-        mock_llm_reduce.call_structured.assert_called_once()
 
 
 # ─── AC-2: L2 cache validation ────────────────────────────────────────────────
@@ -280,12 +263,13 @@ class TestL2CacheValidation:
         mock_llm_reduce.call_structured.assert_called()
 
     def test_invalid_cache_triggers_rerun(self, l2_env, mock_llm_reduce):
-        """Zero-framework cache must trigger a full re-run (reduce called)."""
+        """Zero-framework cache must trigger a full re-run (both reduce passes called)."""
         _make_l2_cache(l2_env, "test-book", {"unified_frameworks": [], "core_frameworks": []})
 
         _patched_extract_l2(l2_env, mock_llm_reduce)
 
-        mock_llm_reduce.call_structured.assert_called_once()
+        # Two-pass reduce: Pass A + Pass B = 2 call_structured invocations
+        assert mock_llm_reduce.call_structured.call_count == 2
 
     def test_valid_cache_returns_immediately(self, l2_env):
         """Valid cache (> 0 frameworks) must be returned without any API call."""
@@ -307,6 +291,58 @@ class TestL2CacheValidation:
         _patched_extract_l2(l2_env, llm)
 
         llm.call_structured.assert_not_called()
+
+
+# ─── AC-2 (22.4): Pass B failure behaviour ───────────────────────────────────
+
+
+class TestPassBFailure:
+    def test_pass_b_failure_preserves_pass_a(self, l2_env):
+        """Pass B exception must not abort pipeline — Pass A result must be preserved."""
+        call_count = 0
+
+        def side_effect(*args, **kwargs):
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:  # Pass A succeeds
+                return (
+                    {"unified_frameworks": [{"name": "CLD"}], "unified_heuristics": []},
+                    MagicMock(cost_usd=0.05),
+                )
+            raise RuntimeError("Simulated Pass B API failure")
+
+        llm = MagicMock()
+        llm.call_structured.side_effect = side_effect
+
+        result = _patched_extract_l2(l2_env, llm)
+
+        assert len(result["unified_frameworks"]) > 0
+        assert result["unified_anti_patterns"] == []
+        assert result["unified_trigger_questions"] == []
+
+    def test_pass_b_failure_does_not_lose_pass_a_to_disk(self, l2_env):
+        """final_frameworks.json must be written even when Pass B fails."""
+        call_count = 0
+
+        def side_effect(*args, **kwargs):
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                return (
+                    {"unified_frameworks": [{"name": "CLD"}], "unified_heuristics": []},
+                    MagicMock(cost_usd=0.05),
+                )
+            raise RuntimeError("Pass B down")
+
+        llm = MagicMock()
+        llm.call_structured.side_effect = side_effect
+
+        _patched_extract_l2(l2_env, llm)
+
+        output_file = l2_env["staging"] / "test-book" / "l2" / "final_frameworks.json"
+        assert output_file.exists()
+        data = json.loads(output_file.read_text())
+        assert len(data["unified_frameworks"]) > 0
 
 
 # ─── AC-3: L1 cache validation ────────────────────────────────────────────────
