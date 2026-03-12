@@ -527,5 +527,20 @@ def load(
     console.print(f"\n[green]Load complete for '{book_slug}'[/green]")
 
 
+@app.command()
+def aggregate(
+    slug: str = typer.Argument(..., help="Person slug (e.g. donella-h-meadows)"),
+) -> None:
+    """Compile profile/ for a person from all processed sources."""
+    from knowledge_etl.kb.profile_aggregator import aggregate as do_aggregate
+
+    try:
+        do_aggregate(slug)
+        typer.echo(f"✓ Profile aggregated for '{slug}'")
+    except ValueError as e:
+        typer.echo(f"✗ {e}", err=True)
+        raise typer.Exit(1)
+
+
 if __name__ == "__main__":
     app()
