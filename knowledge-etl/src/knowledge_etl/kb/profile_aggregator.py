@@ -88,6 +88,32 @@ def _merge_thinking_dna(extractions: list[dict]) -> dict:
     return merged
 
 
+def _normalize_contradictions(raw: object) -> list[dict]:
+    """
+    Normalize contradictions field to a list of dicts.
+
+    place_l3() stores contradictions as {"productive_contradictions": [...]}
+    (the raw L3 output). This function handles both that dict format and the
+    simpler list format used in synthetic/test extracted.json files.
+    """
+    if isinstance(raw, list):
+        return raw
+    if isinstance(raw, dict):
+        return raw.get("productive_contradictions", [])
+    return []
+
+
+def _extract_quote(pole: object) -> str:
+    """Extract a string quote from a pole field.
+
+    pole_a/pole_b in L3 output are dicts: {"claim": "...", "supporting_quote": "..."}.
+    In synthetic/test data they may already be strings.
+    """
+    if isinstance(pole, dict):
+        return pole.get("supporting_quote", "") or pole.get("claim", "")
+    return str(pole) if pole else ""
+
+
 def _compile_contradictions(extractions: list[dict]) -> list[dict]:
     """
     Compile intra-source contradictions and detect cross-source candidates.
@@ -97,7 +123,8 @@ def _compile_contradictions(extractions: list[dict]) -> list[dict]:
     all_contradictions: list[dict] = []
 
     for e in extractions:
-        for c in e.get("contradictions", []):
+        contradictions_list = _normalize_contradictions(e.get("contradictions", []))
+        for c in contradictions_list:
             entry = dict(c)
             entry["source"] = e.get("source_slug", "unknown")
             entry["type"] = entry.get("type", "intra_source")
@@ -107,7 +134,8 @@ def _compile_contradictions(extractions: list[dict]) -> list[dict]:
         topic_map: dict[str, list[dict]] = {}
         for e in extractions:
             source_slug = e.get("source_slug", "unknown")
-            for c in e.get("contradictions", []):
+            contradictions_list = _normalize_contradictions(e.get("contradictions", []))
+            for c in contradictions_list:
                 topic = c.get("topic", "").lower()
                 if topic:
                     topic_map.setdefault(topic, []).append({
@@ -126,9 +154,9 @@ def _compile_contradictions(extractions: list[dict]) -> list[dict]:
                             "type": "cross_source",
                             "tension": "high",
                             "source_a": a["source"],
-                            "quote_a": a["contradiction"].get("pole_a", ""),
+                            "quote_a": _extract_quote(a["contradiction"].get("pole_a")),
                             "source_b": b["source"],
-                            "quote_b": b["contradiction"].get("pole_b", ""),
+                            "quote_b": _extract_quote(b["contradiction"].get("pole_b")),
                         })
 
     return all_contradictions

@@ -157,6 +157,63 @@ def test_single_source_no_cross_source_contradictions(tmp_path):
     assert cross == [], "Expected no cross_source contradictions with 1 source"
 
 
+# ─── QA Fix: dict format from place_l3() ─────────────────────────────────────
+
+
+def test_contradictions_dict_format_from_place_l3(tmp_path):
+    """QA Fix: contradictions stored as dict by place_l3() must not crash."""
+    from knowledge_etl.kb.profile_aggregator import aggregate
+
+    # Exactly what place_l3() writes into extracted.json
+    extracted = {
+        "source_slug": "book-a",
+        "voice_dna": {},
+        "thinking_dna": {},
+        "contradictions": {
+            "productive_contradictions": [
+                {
+                    "tension": "Author advocates simplicity yet writes complex prose",
+                    "pole_a": {"claim": "Keep it simple", "supporting_quote": "Simplicity is key"},
+                    "pole_b": {"claim": "Nuance matters", "supporting_quote": "Complexity reveals truth"},
+                    "generative_insight": "Productive tension",
+                    "authenticity_signal": "Both stances appear genuinely held",
+                }
+            ]
+        },
+    }
+    source_dir = tmp_path / SLUG / "sources" / "books" / "book-a"
+    source_dir.mkdir(parents=True)
+    (source_dir / "extracted.json").write_text(
+        json.dumps(extracted), encoding="utf-8"
+    )
+
+    with (
+        patch("knowledge_etl.kb.profile_aggregator.PEOPLE_KB", tmp_path),
+        patch("knowledge_etl.kb.profile_aggregator.update_readiness"),
+    ):
+        aggregate(SLUG)  # Must not raise ValueError
+
+    contradictions = _read_json(tmp_path / SLUG / "profile" / "contradictions.json")
+    assert isinstance(contradictions, list)
+    intra = [c for c in contradictions if c.get("type") == "intra_source"]
+    assert len(intra) == 1
+    assert intra[0]["source"] == "book-a"
+
+
+def test_pole_dict_format_extracted_to_string(tmp_path):
+    """QA Fix: pole_a/pole_b as dicts (place_l3 format) are extracted to strings."""
+    from knowledge_etl.kb.profile_aggregator import _extract_quote
+
+    pole_dict = {"claim": "growth has limits", "supporting_quote": "You can't grow forever"}
+    assert _extract_quote(pole_dict) == "You can't grow forever"
+
+    pole_dict_no_quote = {"claim": "growth has limits"}
+    assert _extract_quote(pole_dict_no_quote) == "growth has limits"
+
+    assert _extract_quote("plain string") == "plain string"
+    assert _extract_quote(None) == ""
+
+
 # ─── AC-1: CLI error for unknown slug ────────────────────────────────────────
 
 
