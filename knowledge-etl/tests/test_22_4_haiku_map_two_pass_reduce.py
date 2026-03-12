@@ -99,23 +99,31 @@ def _patched_extract_l2(l2_env: dict, llm: MagicMock, book_slug: str = "test-boo
 
 class TestHaikuForMap:
     def test_default_model_l2_map_constant_exists(self):
-        """DEFAULT_MODEL_L2_MAP must be defined in config as 'haiku' alias."""
+        """DEFAULT_MODEL_L2_MAP must be defined in config and resolve to a valid model.
+        Reverted to 'sonnet' after AC-4 failure — constant retained for architectural separation.
+        """
         from knowledge_etl.config import DEFAULT_MODEL_L2_MAP, MODELS
-        assert DEFAULT_MODEL_L2_MAP == "haiku"
         assert DEFAULT_MODEL_L2_MAP in MODELS
 
-    def test_default_model_l2_map_is_haiku_model_id(self):
-        """DEFAULT_MODEL_L2_MAP must resolve to the haiku model ID."""
+    def test_default_model_l2_map_reverted_to_sonnet(self):
+        """DEFAULT_MODEL_L2_MAP reverted to 'sonnet' after AC-4 quality check failed.
+        Live run on thinking-in-systems: Haiku extracted 3/7 frameworks (43%) — below
+        the 80% threshold (need >= 6). Stock-and-Flow, Balancing Loop, Reinforcing Loop
+        were all missed. Sonnet is required for reliable MAP extraction.
+        """
         from knowledge_etl.config import DEFAULT_MODEL_L2_MAP, MODELS
-        assert MODELS[DEFAULT_MODEL_L2_MAP] == "claude-haiku-4-5-20251001"
+        assert DEFAULT_MODEL_L2_MAP == "sonnet"
+        assert MODELS[DEFAULT_MODEL_L2_MAP] == "claude-sonnet-4-6"
 
     def test_default_model_l2_remains_sonnet(self):
         """DEFAULT_MODEL_L2 (for REDUCE) must remain 'sonnet' — unchanged by this story."""
         from knowledge_etl.config import DEFAULT_MODEL_L2
         assert DEFAULT_MODEL_L2 == "sonnet"
 
-    def test_extract_chapter_uses_haiku(self, tmp_path, prompt_template):
-        """_extract_chapter() must call llm.call_structured with DEFAULT_MODEL_L2_MAP (haiku)."""
+    def test_extract_chapter_uses_default_model_l2_map(self, tmp_path, prompt_template):
+        """_extract_chapter() must call llm.call_structured with DEFAULT_MODEL_L2_MAP.
+        Note: reverted to 'sonnet' after AC-4 failure — constant still used for separation of concerns.
+        """
         from knowledge_etl.config import DEFAULT_MODEL_L2_MAP
 
         chapter_file = tmp_path / "01-intro.md"

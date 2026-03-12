@@ -46,7 +46,7 @@ MODELS: dict[str, str] = {
 # Which model handles each extraction level (can be overridden via CLI)
 DEFAULT_MODEL_L1 = "sonnet"   # Principle extraction — structured, constrained
 DEFAULT_MODEL_L2 = "sonnet"   # Framework extraction — structured (REDUCE phase)
-DEFAULT_MODEL_L2_MAP = "haiku"  # L2 MAP phase — mechanically simple extraction, cost-optimized
+DEFAULT_MODEL_L2_MAP = "sonnet"  # L2 MAP phase — reverted to sonnet (AC-4 failed: Haiku 43% < 80% threshold)
 DEFAULT_MODEL_L3 = "opus"     # DNA extraction — nuanced authorial voice
 DEFAULT_MODEL_VALIDATE = "haiku"   # Faithfulness check — simple verification
 DEFAULT_MODEL_DEDUP = "haiku"      # Semantic dedup assist — classification only
