@@ -14,6 +14,7 @@ from rich.console import Console
 from knowledge_etl.config import (
     CHECKPOINTS,
     DEFAULT_MODEL_L1,
+    PROMPT_OVERHEAD_TOKENS,
     STUFF_THRESHOLD_TOKENS,
     MODELS,
 )
@@ -53,7 +54,8 @@ def assess(full_text_path: Path, llm: LLMClient) -> dict:
         content=text,
     )
 
-    strategy = "stuff" if token_count < STUFF_THRESHOLD_TOKENS else "map-reduce"
+    effective_tokens = token_count + PROMPT_OVERHEAD_TOKENS
+    strategy = "stuff" if effective_tokens < STUFF_THRESHOLD_TOKENS else "map-reduce"
 
     # Rough cost estimate (L1 + L2 + L3 with cache)
     estimated_cost = _estimate_cost(token_count, strategy)

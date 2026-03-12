@@ -16,11 +16,16 @@ from knowledge_etl.transform.l3_authorial import _refine_thinking, _refine_voice
 @pytest.fixture
 def mock_llm():
     llm = MagicMock()
-    llm.call.return_value = (
-        '{"voice_dna": {"writing_style_patterns": ["pattern1"], '
-        '"signature_vocabulary": ["test"], "sentence_structure": "short declarative", '
-        '"rhetorical_devices": [], "pedagogical_approach": "example-first", '
-        '"exemplar_quotes": []}, "chapter_observations": "first chapter"}',
+    llm.call_structured.return_value = (
+        {
+            "writing_style_patterns": ["pattern1"],
+            "signature_vocabulary": ["test"],
+            "sentence_structure": "short declarative",
+            "rhetorical_devices": [],
+            "pedagogical_approach": "example-first",
+            "exemplar_quotes": [],
+            "chapter_observations": "first chapter",
+        },
         MagicMock(cost_usd=0.01),
     )
     return llm
@@ -93,8 +98,8 @@ class TestRefineVoiceCache:
             book_content=book_content,
         )
 
-        mock_llm.call.assert_called_once()
-        _, kwargs = mock_llm.call.call_args
+        mock_llm.call_structured.assert_called_once()
+        _, kwargs = mock_llm.call_structured.call_args
         assert kwargs["book_content"] == book_content
 
     def test_passes_none_when_no_book_content(
@@ -106,7 +111,7 @@ class TestRefineVoiceCache:
         chapter_file,
         voice_template,
     ):
-        """When book_content is None (map-reduce), llm.call() receives None."""
+        """When book_content is None (map-reduce), llm.call_structured() receives None."""
         _refine_voice(
             chapter_paths=[chapter_file],
             book_title="Test Book",
@@ -120,8 +125,8 @@ class TestRefineVoiceCache:
             book_content=None,
         )
 
-        mock_llm.call.assert_called_once()
-        _, kwargs = mock_llm.call.call_args
+        mock_llm.call_structured.assert_called_once()
+        _, kwargs = mock_llm.call_structured.call_args
         assert kwargs["book_content"] is None
 
     def test_default_book_content_is_none(
@@ -146,7 +151,7 @@ class TestRefineVoiceCache:
             l3_dir=tmp_path,
         )
 
-        _, kwargs = mock_llm.call.call_args
+        _, kwargs = mock_llm.call_structured.call_args
         assert kwargs["book_content"] is None
 
 
@@ -164,11 +169,15 @@ class TestRefineThinkingCache:
     ):
         """When book_content is provided, llm.call() receives it."""
         llm = MagicMock()
-        llm.call.return_value = (
-            '{"thinking_dna": {"primary_reasoning_pattern": "dialectical", '
-            '"favorite_argumentative_move": "reframe", "mental_models": [], '
-            '"epistemic_style": "assertive", "favorite_analogies": [], '
-            '"exemplar_reasoning_quote": "test"}, "chapter_observations": "ch1"}',
+        llm.call_structured.return_value = (
+            {
+                "primary_reasoning_pattern": "dialectical",
+                "favorite_argumentative_move": "reframe",
+                "mental_models": [],
+                "epistemic_style": "assertive",
+                "favorite_analogies": [],
+                "exemplar_reasoning_quote": "test",
+            },
             MagicMock(cost_usd=0.01),
         )
         book_content = "Full book text."
@@ -186,8 +195,8 @@ class TestRefineThinkingCache:
             book_content=book_content,
         )
 
-        llm.call.assert_called_once()
-        _, kwargs = llm.call.call_args
+        llm.call_structured.assert_called_once()
+        _, kwargs = llm.call_structured.call_args
         assert kwargs["book_content"] == book_content
 
     def test_passes_none_for_map_reduce(
@@ -200,8 +209,8 @@ class TestRefineThinkingCache:
     ):
         """map-reduce strategy: book_content=None."""
         llm = MagicMock()
-        llm.call.return_value = (
-            '{"thinking_dna": {}, "chapter_observations": ""}',
+        llm.call_structured.return_value = (
+            {"primary_reasoning_pattern": "", "mental_models": []},
             MagicMock(cost_usd=0.01),
         )
 
@@ -218,7 +227,7 @@ class TestRefineThinkingCache:
             book_content=None,
         )
 
-        _, kwargs = llm.call.call_args
+        _, kwargs = llm.call_structured.call_args
         assert kwargs["book_content"] is None
 
 
@@ -234,9 +243,8 @@ class TestExtractL3StrategyRouting:
         full_text.write_text("Full book content.", encoding="utf-8")
 
         llm = MagicMock()
-        llm.call.return_value = (
-            '{"voice_dna": {}, "chapter_observations": "", '
-            '"thinking_dna": {}, "productive_contradictions": []}',
+        llm.call_structured.return_value = (
+            {"productive_contradictions": [], "writing_style_patterns": []},
             MagicMock(cost_usd=0.01),
         )
         cost_tracker = MagicMock()
@@ -269,8 +277,8 @@ class TestExtractL3StrategyRouting:
                 strategy="stuff",
             )
 
-        # All llm.call invocations should have book_content = "Full book content."
-        for c in llm.call.call_args_list:
+        # With no chapters, only the contradictions call fires (which uses book_content).
+        for c in llm.call_structured.call_args_list:
             _, kwargs = c
             assert kwargs.get("book_content") == "Full book content."
 
@@ -282,9 +290,8 @@ class TestExtractL3StrategyRouting:
         full_text.write_text("Full book content.", encoding="utf-8")
 
         llm = MagicMock()
-        llm.call.return_value = (
-            '{"voice_dna": {}, "chapter_observations": "", '
-            '"thinking_dna": {}, "productive_contradictions": []}',
+        llm.call_structured.return_value = (
+            {"productive_contradictions": [], "writing_style_patterns": []},
             MagicMock(cost_usd=0.01),
         )
         cost_tracker = MagicMock()
@@ -316,10 +323,7 @@ class TestExtractL3StrategyRouting:
                 strategy="map-reduce",
             )
 
-        # Only the contradictions call uses book_content (always). Voice/thinking = None.
-        # With no chapters, only the contradictions llm.call fires.
-        for c in llm.call.call_args_list:
+        # With no chapters, only the contradictions call fires (always uses book_content).
+        for c in llm.call_structured.call_args_list:
             _, kwargs = c
-            # contradictions always uses book_content; voice/thinking use None for map-reduce
-            # Since no chapters, only contradictions call happens
             assert kwargs.get("book_content") == "Full book content."  # contradictions

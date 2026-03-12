@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import json
 import re
-import time
 from pathlib import Path
 from typing import Any, Literal
 
@@ -151,8 +150,7 @@ def extract_l2(
             chapter_pages=chapter_pages,
         )
 
-        console.print(f"  [cyan]L2:[/cyan] {chapter_key} (waiting 65s for rate limit...)")
-        time.sleep(200)
+        console.print(f"  [cyan]L2:[/cyan] {chapter_key}")
         result, usage = llm.call_structured(
             model=model,
             system_prompt=system,
@@ -231,15 +229,15 @@ def _reduce(
         .replace("{{JSON_ARRAY_OF_CHAPTER_RESULTS}}", chapters_json)
     )
 
-    console.print("[cyan]L2 Reduce:[/cyan] waiting 200s for rate limit...")
-    time.sleep(200)
+    adaptive_max = min(32_768, max(MAX_OUTPUT_REDUCE, len(chapter_results) * 2_000))
+    console.print("[cyan]L2 Reduce:[/cyan] Cross-chapter synthesis")
     result, usage = llm.call_structured(
         model=DEFAULT_MODEL_L2,
         system_prompt=reduce_system,
         task_prompt=task_prompt,
         output_schema=L2ReduceResult.model_json_schema(),
         tool_name="synthesize_frameworks",
-        max_tokens=MAX_OUTPUT_REDUCE,
+        max_tokens=adaptive_max,
     )
     cost_tracker.record("l2_reduce", usage)
 

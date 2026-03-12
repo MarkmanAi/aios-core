@@ -27,9 +27,9 @@ from knowledge_etl.transform.l2_frameworks import _is_valid_reduce, _reduce, ext
 def mock_llm_reduce():
     """LLM that returns a valid reduce result."""
     llm = MagicMock()
-    llm.call.return_value = (
-        '{"unified_frameworks": [{"name": "CLD", "type": "explicit", '
-        '"description": "Causal loop diagrams", "source_quote": "quote"}]}',
+    llm.call_structured.return_value = (
+        {"unified_frameworks": [{"name": "CLD", "type": "explicit",
+          "description": "Causal loop diagrams", "source_quote": "quote"}]},
         MagicMock(cost_usd=0.05),
     )
     return llm
@@ -131,13 +131,13 @@ class TestReduceCheckpoint:
             checkpoint=mock_checkpoint_valid_hit,
         )
 
-        mock_llm_reduce.call.assert_not_called()
+        mock_llm_reduce.call_structured.assert_not_called()
         assert result["unified_frameworks"][0]["name"] == "CLD"
 
     def test_checkpoint_miss_calls_api(
         self, mock_checkpoint_miss, mock_llm_reduce, mock_cost_tracker, reduce_template
     ):
-        """Cache miss: llm.call must be invoked."""
+        """Cache miss: llm.call_structured must be invoked."""
         _reduce(
             chapter_results=[],
             book_title="Test Book",
@@ -148,7 +148,7 @@ class TestReduceCheckpoint:
             checkpoint=mock_checkpoint_miss,
         )
 
-        mock_llm_reduce.call.assert_called_once()
+        mock_llm_reduce.call_structured.assert_called_once()
 
     def test_checkpoint_miss_calls_mark_done(
         self, mock_checkpoint_miss, mock_llm_reduce, mock_cost_tracker, reduce_template
@@ -174,8 +174,8 @@ class TestReduceCheckpoint:
     ):
         """mark_done must pass cost_usd from usage, not a hardcoded value."""
         llm = MagicMock()
-        llm.call.return_value = (
-            '{"unified_frameworks": [{"name": "F"}]}',
+        llm.call_structured.return_value = (
+            {"unified_frameworks": [{"name": "F"}]},
             MagicMock(cost_usd=0.123),
         )
         _reduce(
@@ -205,7 +205,7 @@ class TestReduceCheckpoint:
             checkpoint=mock_checkpoint_invalid_hit,
         )
 
-        mock_llm_reduce.call.assert_called_once()
+        mock_llm_reduce.call_structured.assert_called_once()
 
 
 # ─── AC-2: L2 cache validation ────────────────────────────────────────────────
@@ -276,8 +276,8 @@ class TestL2CacheValidation:
         _patched_extract_l2(l2_env, mock_llm_reduce)
 
         # After detection of invalid cache, the file was deleted then re-created
-        # (the reduce wrote a new one). The key check: llm.call was invoked.
-        mock_llm_reduce.call.assert_called()
+        # (the reduce wrote a new one). The key check: llm.call_structured was invoked.
+        mock_llm_reduce.call_structured.assert_called()
 
     def test_invalid_cache_triggers_rerun(self, l2_env, mock_llm_reduce):
         """Zero-framework cache must trigger a full re-run (reduce called)."""
@@ -285,7 +285,7 @@ class TestL2CacheValidation:
 
         _patched_extract_l2(l2_env, mock_llm_reduce)
 
-        mock_llm_reduce.call.assert_called_once()
+        mock_llm_reduce.call_structured.assert_called_once()
 
     def test_valid_cache_returns_immediately(self, l2_env):
         """Valid cache (> 0 frameworks) must be returned without any API call."""
@@ -295,7 +295,7 @@ class TestL2CacheValidation:
         llm = MagicMock()
         result = _patched_extract_l2(l2_env, llm)
 
-        llm.call.assert_not_called()
+        llm.call_structured.assert_not_called()
         assert result["unified_frameworks"][0]["name"] == "CLD"
 
     def test_valid_cache_via_core_frameworks(self, l2_env):
@@ -306,7 +306,7 @@ class TestL2CacheValidation:
         llm = MagicMock()
         _patched_extract_l2(l2_env, llm)
 
-        llm.call.assert_not_called()
+        llm.call_structured.assert_not_called()
 
 
 # ─── AC-3: L1 cache validation ────────────────────────────────────────────────
@@ -389,7 +389,7 @@ class TestL1CacheValidation:
         llm = MagicMock()
         result = _patched_extract_l1(l1_env, llm)
 
-        llm.call.assert_not_called()
+        llm.call_structured.assert_not_called()
         assert len(result) == 1
         assert result[0]["principle"] == "Think in systems"
 

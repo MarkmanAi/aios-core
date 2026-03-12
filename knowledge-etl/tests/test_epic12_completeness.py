@@ -53,15 +53,15 @@ class TestThinkingDNASchema:
         from knowledge_etl.transform.l3_authorial import _refine_thinking
 
         llm = MagicMock()
-        llm.call.return_value = (
-            json.dumps({
+        llm.call_structured.return_value = (
+            {
                 "primary_reasoning_pattern": "dialectical",
                 "favorite_argumentative_move": "reframe",
                 "mental_models": [],
                 "epistemic_style": "assertive",
                 "favorite_analogies": [],
                 "exemplar_reasoning_quote": "The map is not the territory.",
-            }),
+            },
             MagicMock(cost_usd=0.01),
         )
         cost_tracker = MagicMock()
@@ -155,22 +155,22 @@ class TestL1ReducePass:
 
         llm = MagicMock()
         # Map call returns principles
-        map_response = json.dumps({
+        map_result = {
             "principles": [
                 {"principle": "P1", "action": "A1", "attribution": "Author",
                  "source_quote": "Q1", "chapter_ref": "Ch1"}
             ]
-        })
+        }
         # Reduce call returns curated list
-        reduce_response = json.dumps({
+        reduce_result = {
             "principles": [
                 {"principle": "P1 compressed", "action": "A1", "attribution": "Author",
                  "source_quote": "Q1", "chapter_ref": "Ch1"}
             ]
-        })
-        llm.call.side_effect = [
-            (map_response, MagicMock(cost_usd=0.01)),
-            (reduce_response, MagicMock(cost_usd=0.005)),
+        }
+        llm.call_structured.side_effect = [
+            (map_result, MagicMock(cost_usd=0.01)),
+            (reduce_result, MagicMock(cost_usd=0.005)),
         ]
         cost_tracker = MagicMock()
         checkpoint = MagicMock()
@@ -222,8 +222,8 @@ class TestL1ReducePass:
 
         llm = MagicMock()
         usage = MagicMock(cost_usd=0.003)
-        llm.call.return_value = (
-            json.dumps({"principles": []}),
+        llm.call_structured.return_value = (
+            {"principles": []},
             usage,
         )
         cost_tracker = MagicMock()
@@ -253,15 +253,15 @@ class TestL1ReducePass:
         llm = MagicMock()
         result = _reduce_l1([], "T", "A", llm, MagicMock())
         assert result == []
-        llm.call.assert_not_called()
+        llm.call_structured.assert_not_called()
 
     def test_stuff_strategy_unaffected(self, tmp_path):
         """AC7: STUFF strategy does NOT call _reduce_l1."""
         from knowledge_etl.transform.l1_principles import _extract_stuff
 
         llm = MagicMock()
-        llm.call.return_value = (
-            json.dumps({"principles": [{"principle": "P1"}]}),
+        llm.call_structured.return_value = (
+            {"principles": [{"principle": "P1"}]},
             MagicMock(cost_usd=0.01),
         )
         cost_tracker = MagicMock()
@@ -289,8 +289,8 @@ class TestL1ReducePass:
         )
 
         # Only 1 LLM call (stuff), no reduce
-        assert llm.call.call_count == 1
-        cost_tracker.record.assert_called_once_with("l1_stuff", llm.call.return_value[1])
+        assert llm.call_structured.call_count == 1
+        cost_tracker.record.assert_called_once_with("l1_stuff", llm.call_structured.return_value[1])
 
 
 # ─── Story 12.4: Config Drift ────────────────────────────────────────────────

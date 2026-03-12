@@ -1,9 +1,9 @@
 # Story Backlog — Tech Debt & Follow-ups
 
 > **Last Updated**: 2026-03-11
-> **Source**: PO Validation + QA Review — Epics 12, 13 (13.2 tech debt added) + QA Review PR #9 Story 13.10 + QA Review Story 20.1 + QA Review Story 21.2
+> **Source**: PO Validation + QA Review — Epics 12, 13 (13.2 tech debt added) + QA Review PR #9 Story 13.10 + QA Review Story 20.1 + QA Review Story 21.2 + QA Review Story 22.3
 > **Managed by**: @po (Pax)
-> **Updated**: 2026-03-11 — [21.2-F1], [21.2-F2] registered by @qa — Story 21.2 follow-ups (LOW)
+> **Updated**: 2026-03-11 — [22.3-F1], [22.3-F2], [22.3-F3] registered by @qa — Story 22.3 follow-ups (LOW)
 
 ---
 
@@ -11,16 +11,16 @@
 
 | Status | Count |
 |--------|-------|
-| TODO | 7 |
+| TODO | 10 |
 | IN PROGRESS | 0 |
 | DONE | 14 |
-| Total | 21 |
+| Total | 24 |
 
 | Priority | Count |
 |----------|-------|
 | HIGH | 0 |
 | MEDIUM | 0 |
-| LOW | 7 |
+| LOW | 10 |
 
 ---
 
@@ -107,6 +107,36 @@
   Qualquer approach deve ser acompanhado de teste unitário que valide o limite de retenção.
 - **Esforço estimado**: 2 horas
 
+#### [22.3-F1] Strengthen `test_rate_limit_imports_are_present` assertion
+- **Status**: TODO
+- **Priority**: LOW
+- **Source**: QA Review — Story 22.3 (2026-03-11)
+- **File**: `knowledge-etl/tests/test_22_3_rate_limit_retry.py`
+- **Story**: 22.3 — Rate Limit Retry with Backoff
+- **Issue**: The test assertion uses `hasattr(llm_module, 'RateLimitError') or RateLimitError is not None`. The `or RateLimitError is not None` branch is always truthy, so the test can never fail even if the import is removed from `llm.py`. The test confirms the module loads but does not strictly verify the module-level namespace attribute.
+- **Fix**: Replace with a strict `assert hasattr(llm_module, 'RateLimitError')` and `assert hasattr(llm_module, 'before_sleep_log')` (no `or` fallback).
+- **Estimated effort**: 5 min
+
+#### [22.3-F2] Document assess cache invalidation procedure for post-22.3 re-assessment
+- **Status**: TODO
+- **Priority**: LOW
+- **Source**: QA Review — Story 22.3 (2026-03-11)
+- **File**: `knowledge-etl/src/knowledge_etl/transform/assess.py`
+- **Story**: 22.3 — Rate Limit Retry with Backoff
+- **Issue**: `assess.py` caches strategy results in `checkpoints/{book-slug}/assess.json`. Books assessed before 22.3 (without `PROMPT_OVERHEAD_TOKENS`) have cached strategies that bypass the new threshold logic on re-run. A book with 177k tokens cached as `stuff` would remain `stuff` even after 22.3 deployment.
+- **Fix**: Add a comment in `assess.py` at the cache-hit return block: `# Cache may predate PROMPT_OVERHEAD_TOKENS (Story 22.3). Delete assess.json to force re-assessment.` Optionally, add a `--force-assess` CLI flag to `transform` command that skips the assess cache.
+- **Estimated effort**: 15 min (comment only) or 1h (CLI flag)
+
+#### [22.3-F3] Add explicit AC-6 test class for no-regression on small book runs
+- **Status**: TODO
+- **Priority**: LOW
+- **Source**: QA Review — Story 22.3 (2026-03-11)
+- **File**: `knowledge-etl/tests/test_22_3_rate_limit_retry.py`
+- **Story**: 22.3 — Rate Limit Retry with Backoff
+- **Issue**: AC-6 (no `RateLimitError` on a normal small-book run) has no dedicated test class. Coverage is implicit via the 108-test suite pass. A unit test that mocks a successful `call()` with no `RateLimitError` and asserts `messages.create` is called exactly once would make AC-6 explicit and regression-proof.
+- **Fix**: Add `class TestNormalRunNoRateLimit` with one test: mock `messages.create` to succeed on first call → assert `call_count == 1` and no tenacity sleep was triggered.
+- **Estimated effort**: 20 min
+
 #### [13.10-T2] Handle additional resume actions explicitly in `resume.js`
 - **Status**: TODO
 - **Source**: CodeRabbit PR #9 — Nitpick
@@ -192,4 +222,5 @@
 *Updated: 2026-03-08 — [13.10-T1], [13.10-T2] registered by @qa — CodeRabbit nitpicks from PR #9 (Story 13.10)*
 *Updated: 2026-03-08 — Epic 13 CLOSED: 12/12 stories Done. All 13.x stories archived to docs/stories/completed/ by @po*
 *Updated: 2026-03-11 — [20.1-T1], [20.1-T2] registered by @qa — Story 20.1 follow-ups (LOW)*
-*Updated: 2026-03-11 — [21.2-F1], [21.2-F2] registered by @qa — Story 21.2 follow-ups (LOW): edge case author=None + limpeza de backups*
+*Updated: 2026-03-11 — [21.2-F1], [21.2-F2] registered by @qa — Story 21.2 follow-ups (LOW): edge case author=None + limpeza de backups
+*Updated: 2026-03-11 — [22.3-F1], [22.3-F2], [22.3-F3] registered by @qa — Story 22.3 follow-ups (LOW): test assertion gap + assess cache doc + AC-6 test coverage*

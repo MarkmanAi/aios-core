@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import json
 import re
-import time
 from pathlib import Path
 from typing import Type
 
@@ -208,8 +207,7 @@ def _refine_voice(
             prior_profile=prior_profile,
         )
 
-        console.print(f"  [cyan]L3 Voice:[/cyan] {chapter_key} (waiting 65s for rate limit...)")
-        time.sleep(200)
+        console.print(f"  [cyan]L3 Voice:[/cyan] {chapter_key}")
         result, usage = llm.call_structured(
             model=model,
             system_prompt=system,
@@ -277,8 +275,7 @@ def _refine_thinking(
             prior_profile=prior_profile,
         )
 
-        console.print(f"  [cyan]L3 Thinking:[/cyan] {chapter_key} (waiting 65s for rate limit...)")
-        time.sleep(200)
+        console.print(f"  [cyan]L3 Thinking:[/cyan] {chapter_key}")
         result, usage = llm.call_structured(
             model=model,
             system_prompt=system,
@@ -326,8 +323,7 @@ def _extract_contradictions(
         .replace("{{FULL_BOOK_TEXT}}", "[See cached book content]")
     )
 
-    console.print("  [cyan]L3 Contradictions:[/cyan] full book (waiting 300s for rate limit...)")
-    time.sleep(300)
+    console.print("  [cyan]L3 Contradictions:[/cyan] full book")
     result, usage = llm.call_structured(
         model=model,
         system_prompt=system,

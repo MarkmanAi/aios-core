@@ -56,6 +56,10 @@ DEFAULT_MODEL_DEDUP = "haiku"      # Semantic dedup assist — classification on
 # Books over → MAP-REDUCE by chapter
 STUFF_THRESHOLD_TOKENS = 180_000
 
+# Overhead from system prompt + tool schema tokens — added to raw book token count
+# to avoid false STUFF classifications for large books near the threshold.
+PROMPT_OVERHEAD_TOKENS = 3_000
+
 # Max output tokens per extraction pass
 MAX_OUTPUT_L1 = 4_096
 MAX_OUTPUT_L2 = 8_192

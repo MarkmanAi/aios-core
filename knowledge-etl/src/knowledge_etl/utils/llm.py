@@ -5,14 +5,25 @@ This is the single point of contact with the Claude API across the pipeline.
 
 from __future__ import annotations
 
+import logging
 import os
 from typing import Any
 
 import anthropic
+from anthropic import RateLimitError
 from dotenv import load_dotenv
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import (
+    before_sleep_log,
+    retry,
+    retry_if_exception,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from knowledge_etl.config import MODELS
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -104,6 +115,13 @@ class LLMClient:
         self.client = anthropic.Anthropic(api_key=api_key)
 
     @retry(
+        retry=retry_if_exception_type(RateLimitError),
+        wait=wait_exponential(multiplier=2, min=15, max=120),
+        stop=stop_after_attempt(8),
+        before_sleep=before_sleep_log(logger, logging.WARNING),
+    )
+    @retry(
+        retry=retry_if_exception(lambda e: not isinstance(e, RateLimitError)),
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=4, max=30),
         reraise=True,
@@ -183,6 +201,13 @@ class LLMClient:
         return text, usage
 
     @retry(
+        retry=retry_if_exception_type(RateLimitError),
+        wait=wait_exponential(multiplier=2, min=15, max=120),
+        stop=stop_after_attempt(8),
+        before_sleep=before_sleep_log(logger, logging.WARNING),
+    )
+    @retry(
+        retry=retry_if_exception(lambda e: not isinstance(e, RateLimitError)),
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=4, max=30),
         reraise=True,
