@@ -10,10 +10,10 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 |----------|------|-------------|---------|------|-------|
 | 🔴 HIGH   | 0    | 0           | 0       | 0    | 0     |
 | 🟡 MEDIUM | 0    | 0           | 0       | 0    | 0     |
-| 🟢 LOW    | 0    | 0           | 0       | 2    | 2     |
-| **Total** | **0** | **0**      | **0**   | **2** | **2** |
+| 🟢 LOW    | 3    | 0           | 0       | 2    | 5     |
+| **Total** | **3** | **0**      | **0**   | **2** | **5** |
 
-*Last updated: 2026-03-08 — 9 items archived to `docs/qa/backlog-archive-2026-03.md`*
+*Last updated: 2026-03-12 — +3 LOW items from QA review Story 21.5*
 
 ---
 
@@ -30,6 +30,42 @@ Centralized backlog for follow-ups, technical debt, and optimizations identified
 ---
 
 ## 🟢 LOW Priority
+
+#### [21.5-QA-1] Remove unused `Path` import in gap_detector.py
+
+- **Source**: QA Review — Story 21.5 (gate: `docs/qa/gates/21.5-pkb-gap-detector.yml`)
+- **Priority**: 🟢 LOW
+- **Effort**: ~2 min
+- **Status**: 🔵 TODO
+- **Assignee**: Dev
+- **File**: `knowledge-etl/src/knowledge_etl/kb/gap_detector.py:8`
+- **Description**: `from pathlib import Path` imported but `Path` never referenced directly. All path operations derive from `PEOPLE_KB` (already a `Path` object). Remove to keep imports clean.
+
+---
+
+#### [21.5-QA-2] Remove unused `gd` alias in test_noop_when_metadata_absent
+
+- **Source**: QA Review — Story 21.5 (gate: `docs/qa/gates/21.5-pkb-gap-detector.yml`)
+- **Priority**: 🟢 LOW
+- **Effort**: ~2 min
+- **Status**: 🔵 TODO
+- **Assignee**: Dev
+- **File**: `knowledge-etl/tests/test_gap_detector.py` — `test_noop_when_metadata_absent`
+- **Description**: `import knowledge_etl.kb.gap_detector as gd` inside test function but `gd` never used. Dead import — remove the line.
+
+---
+
+#### [21.5-QA-3] Move inline detect_and_write imports in cli.py to block-level
+
+- **Source**: QA Review — Story 21.5 (gate: `docs/qa/gates/21.5-pkb-gap-detector.yml`)
+- **Priority**: 🟢 LOW
+- **Effort**: ~10 min
+- **Status**: 🔵 TODO
+- **Assignee**: Dev
+- **Files**: `knowledge-etl/src/knowledge_etl/cli.py` — `process()` e `load()` commands
+- **Description**: `detect_and_write` é importado inline dentro do bloco `if l3_results:`. Consistente com o padrão existente do arquivo, mas mover para top-level melhoraria legibilidade. Não urgente.
+
+---
 
 #### [13.12-N1] Add `initialValue: false` to `confirm()` in bob switch
 

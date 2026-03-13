@@ -237,6 +237,9 @@ def process(
         )
         update_readiness(person_slug)
 
+        from knowledge_etl.kb.gap_detector import detect_and_write
+        detect_and_write(person_slug)
+
     # Git commit
     try:
         git_add_and_commit(
@@ -512,6 +515,9 @@ def load(
                 },
             )
             update_readiness(person_slug)
+
+            from knowledge_etl.kb.gap_detector import detect_and_write
+            detect_and_write(person_slug)
 
     # Git commit
     if committed_paths:

@@ -59,6 +59,9 @@ def aggregate(slug: str) -> None:
 
     update_readiness(slug)
 
+    from knowledge_etl.kb.gap_detector import detect_and_write
+    detect_and_write(slug)
+
 
 def _merge_voice_dna(extractions: list[dict]) -> dict:
     """Merge voice_dna from all sources. Lists: concat without duplicates. Strings: last wins."""
