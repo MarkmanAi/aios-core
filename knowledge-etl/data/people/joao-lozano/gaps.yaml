@@ -1,0 +1,21 @@
+slug: joao-lozano
+gaps:
+- id: GAP-001
+  type: no_sources
+  description: Nenhuma fonte processada — PKB vazia
+  impact: BLOCKS_all_tiers — impossível avançar sem fontes
+  priority: critica
+  suggestion: Processar ao menos 1 livro ou entrevista via knowledge-etl process
+- id: GAP-002
+  type: missing_source_type
+  description: Apenas fontes do tipo 'book' — voice e ritmo de fala ausentes
+  impact: L4 (communication_patterns) — padrões de fala não capturáveis de livros
+  priority: alta
+  suggestion: Buscar entrevistas ou talks em vídeo/podcast
+- id: GAP-003
+  type: no_contradiction_candidates
+  description: Nenhuma contradição candidata identificada — L8 ficará empobrecido
+  impact: L8 (gold_layer) — camada mais crítica do pipeline MMOS
+  priority: alta
+  suggestion: Adicionar fontes de épocas distintas da carreira da pessoa
+blocks_tier_progression: true

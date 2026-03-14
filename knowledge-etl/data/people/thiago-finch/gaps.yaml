@@ -1,0 +1,22 @@
+slug: thiago-finch
+gaps:
+- id: GAP-001
+  type: single_source_only
+  description: Apenas 1 fonte — P3 requer triangulação com 3+ fontes independentes
+  impact: P3 triangulation risk — BLOCKS tier_3
+  priority: critica
+  suggestion: Buscar ao menos 2 fontes adicionais distintas (artigos, entrevistas,
+    etc.)
+- id: GAP-002
+  type: missing_source_type
+  description: Apenas fontes do tipo 'book' — voice e ritmo de fala ausentes
+  impact: L4 (communication_patterns) — padrões de fala não capturáveis de livros
+  priority: alta
+  suggestion: Buscar entrevistas ou talks em vídeo/podcast
+- id: GAP-003
+  type: no_contradiction_candidates
+  description: Nenhuma contradição candidata identificada — L8 ficará empobrecido
+  impact: L8 (gold_layer) — camada mais crítica do pipeline MMOS
+  priority: alta
+  suggestion: Adicionar fontes de épocas distintas da carreira da pessoa
+blocks_tier_progression: true

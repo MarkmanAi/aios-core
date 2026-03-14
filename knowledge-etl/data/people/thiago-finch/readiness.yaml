@@ -1,0 +1,22 @@
+current_tier: 3
+tiers:
+- tier: 0
+  name: raw
+  condition: At least 1 source collected in sources/
+  passed: true
+- tier: 1
+  name: extracted
+  condition: ETL ran on at least 1 source
+  passed: true
+- tier: 2
+  name: profile_ready
+  condition: profile/ exists + apex >= threshold
+  threshold:
+    mind_clone: 70
+    governance_advisor: 55
+  passed: true
+- tier: 3
+  name: production_ready
+  condition: sources_count >= 3 AND tier_2 passed
+  passed: true
+mmos_cleared: true

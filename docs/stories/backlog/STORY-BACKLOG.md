@@ -1,9 +1,9 @@
 # Story Backlog — Tech Debt & Follow-ups
 
-> **Last Updated**: 2026-03-11
-> **Source**: PO Validation + QA Review — Epics 12, 13 (13.2 tech debt added) + QA Review PR #9 Story 13.10 + QA Review Story 20.1 + QA Review Story 21.2 + QA Review Story 22.3
+> **Last Updated**: 2026-03-13
+> **Source**: PO Validation + QA Review — Epics 12, 13 (13.2 tech debt added) + QA Review PR #9 Story 13.10 + QA Review Story 20.1 + QA Review Story 21.2 + QA Review Story 22.3 + QA Review Story 21.6
 > **Managed by**: @po (Pax)
-> **Updated**: 2026-03-11 — [22.3-F1], [22.3-F2], [22.3-F3] registered by @qa — Story 22.3 follow-ups (LOW)
+> **Updated**: 2026-03-13 — [21.6-F1], [21.6-F2] registered by @qa — Story 21.6 follow-ups (LOW)
 
 ---
 
@@ -11,16 +11,16 @@
 
 | Status | Count |
 |--------|-------|
-| TODO | 10 |
+| TODO | 12 |
 | IN PROGRESS | 0 |
 | DONE | 14 |
-| Total | 24 |
+| Total | 26 |
 
 | Priority | Count |
 |----------|-------|
 | HIGH | 0 |
 | MEDIUM | 0 |
-| LOW | 10 |
+| LOW | 12 |
 
 ---
 
@@ -127,6 +127,26 @@
 - **Fix**: Add a comment in `assess.py` at the cache-hit return block: `# Cache may predate PROMPT_OVERHEAD_TOKENS (Story 22.3). Delete assess.json to force re-assessment.` Optionally, add a `--force-assess` CLI flag to `transform` command that skips the assess cache.
 - **Estimated effort**: 15 min (comment only) or 1h (CLI flag)
 
+#### [21.6-F1] Revisar AC-3 para aceitar `sources_count: 0` em minds sem fontes no MMOS
+- **Status**: TODO
+- **Priority**: LOW
+- **Source**: QA Review — Story 21.6 (2026-03-13)
+- **File**: `docs/stories/active/21.6.story.md` — AC-3
+- **Story**: 21.6 — PKB Migration: Production Minds
+- **Issue**: AC-3 especifica `sources_count >= 1`, mas 5 minds de produção (jeff-patton, cagan-patton, brad-frost, pedro-valerio, joao-lozano) não possuem arquivos `.md` em `squads/mmos-squad/minds/{slug}/sources/`, resultando em `sources_count: 0`. O script está correto — calcula o count real, conforme exigido pelas veto conditions ("dinamicamente, não hardcoded"). O `gaps.yaml` detecta `no_sources` para essas minds. A discrepância é de dados MMOS, não de implementação. O AC deve ser atualizado para documentar a realidade: `sources_count = contagem real (pode ser 0 se MMOS não tiver fontes)`.
+- **Fix**: Atualizar AC-3 na story 21.6 para substituir `>= 1` por `>= 0 (contagem real; pode ser 0 para minds sem arquivos em sources/ no MMOS)`. Considerar também documentar no `migration_report.md` quais minds têm `sources_count: 0` como alerta para o operador.
+- **Esforço estimado**: 15 min (atualização de AC + nota no report)
+
+#### [21.6-F2] Normalizar formato do `migration_report.md` para suportar unicode (✓/✗)
+- **Status**: TODO
+- **Priority**: LOW
+- **Source**: QA Review — Story 21.6 (2026-03-13)
+- **File**: `knowledge-etl/scripts/migrate_production_minds.py` — `_write_report()` e `main()`
+- **Story**: 21.6 — PKB Migration: Production Minds
+- **Issue**: AC-8 especifica formato `✓ kent-beck — tier: 3, sources: 5, mmos_cleared: true`, mas o script usa `[OK]`/`[ERR]` no report e `OK`/`ERR` no stdout. O motivo foi limitação de encoding do console Windows (cp1252 não suporta `✓`/`✗` em `print()`). O `migration_report.md` em si é um arquivo markdown e poderia usar unicode normalmente — apenas o `print()` para stdout precisa de fallback ASCII.
+- **Fix**: Separar o encoding de stdout do conteúdo do arquivo: usar `✓`/`✗` diretamente em `_write_report()` (arquivo markdown, encoding UTF-8 explícito) e manter `[OK]`/`[ERR]` apenas no `print()` de stdout (console Windows). Isso alinha o report ao formato especificado no AC sem quebrar o console Windows.
+- **Esforço estimado**: 15 min
+
 #### [22.3-F3] Add explicit AC-6 test class for no-regression on small book runs
 - **Status**: TODO
 - **Priority**: LOW
@@ -224,3 +244,4 @@
 *Updated: 2026-03-11 — [20.1-T1], [20.1-T2] registered by @qa — Story 20.1 follow-ups (LOW)*
 *Updated: 2026-03-11 — [21.2-F1], [21.2-F2] registered by @qa — Story 21.2 follow-ups (LOW): edge case author=None + limpeza de backups
 *Updated: 2026-03-11 — [22.3-F1], [22.3-F2], [22.3-F3] registered by @qa — Story 22.3 follow-ups (LOW): test assertion gap + assess cache doc + AC-6 test coverage*
+*Updated: 2026-03-13 — [21.6-F1], [21.6-F2] registered by @qa — Story 21.6 follow-ups (LOW): AC-3 sources_count clarification + migration_report unicode format*

@@ -1,0 +1,15 @@
+slug: marty-cagan
+gaps:
+- id: GAP-001
+  type: missing_source_type
+  description: Apenas fontes do tipo 'book' — voice e ritmo de fala ausentes
+  impact: L4 (communication_patterns) — padrões de fala não capturáveis de livros
+  priority: alta
+  suggestion: Buscar entrevistas ou talks em vídeo/podcast
+- id: GAP-002
+  type: no_contradiction_candidates
+  description: Nenhuma contradição candidata identificada — L8 ficará empobrecido
+  impact: L8 (gold_layer) — camada mais crítica do pipeline MMOS
+  priority: alta
+  suggestion: Adicionar fontes de épocas distintas da carreira da pessoa
+blocks_tier_progression: false

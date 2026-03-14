@@ -1,0 +1,100 @@
+[
+  {
+    "id": 1,
+    "topic": "Overview",
+    "type": "intra_source",
+    "source": "mmos_analysis_layer8",
+    "migrated": true
+  },
+  {
+    "id": 2,
+    "topic": "Marty Cagan's Paradoxes",
+    "type": "intra_source",
+    "source": "mmos_analysis_layer8",
+    "migrated": true
+  },
+  {
+    "id": 3,
+    "topic": "Paradox 1: Outcomes Are Simple Conceptually But Hard in Practice",
+    "type": "intra_source",
+    "source": "mmos_analysis_layer8",
+    "migrated": true
+  },
+  {
+    "id": 4,
+    "topic": "Paradox 2: Teams Empowered Through Constraint",
+    "type": "intra_source",
+    "source": "mmos_analysis_layer8",
+    "migrated": true
+  },
+  {
+    "id": 5,
+    "topic": "Paradox 3: Discovery Creates Unpredictability Yet Enables Faster Outcomes",
+    "type": "intra_source",
+    "source": "mmos_analysis_layer8",
+    "migrated": true
+  },
+  {
+    "id": 6,
+    "topic": "Paradox 4: Leaders Believe They Focus While Maintaining 10x Too Many Priorities",
+    "type": "intra_source",
+    "source": "mmos_analysis_layer8",
+    "migrated": true
+  },
+  {
+    "id": 7,
+    "topic": "Jeff Patton's Paradoxes",
+    "type": "intra_source",
+    "source": "mmos_analysis_layer8",
+    "migrated": true
+  },
+  {
+    "id": 8,
+    "topic": "Paradox 1: Documents Necessary But Insufficient",
+    "type": "intra_source",
+    "source": "mmos_analysis_layer8",
+    "migrated": true
+  },
+  {
+    "id": 9,
+    "topic": "Paradox 2: Discovery and Delivery Run Simultaneously (Dual Not Sequential)",
+    "type": "intra_source",
+    "source": "mmos_analysis_layer8",
+    "migrated": true
+  },
+  {
+    "id": 10,
+    "topic": "Paradox 3: Simple Idea Produces Profound Improvements",
+    "type": "intra_source",
+    "source": "mmos_analysis_layer8",
+    "migrated": true
+  },
+  {
+    "id": 11,
+    "topic": "Paradox 4: Collaboration Requires Structure",
+    "type": "intra_source",
+    "source": "mmos_analysis_layer8",
+    "migrated": true
+  },
+  {
+    "id": 12,
+    "topic": "Combo Paradox (Unique to Integration)",
+    "type": "intra_source",
+    "source": "mmos_analysis_layer8",
+    "migrated": true
+  },
+  {
+    "id": 13,
+    "topic": "Strategy Requires Constraint; Decomposition Requires Exploration",
+    "type": "intra_source",
+    "source": "mmos_analysis_layer8",
+    "migrated": true
+  },
+  {
+    "id": 14,
+    "topic": "Why Paradoxes Matter",
+    "type": "intra_source",
+    "source": "mmos_analysis_layer8",
+    "migrated": true
+  }
+]
