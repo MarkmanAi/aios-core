@@ -60,7 +60,7 @@
       "Edit(bin/**)",
       "Write(.neo/**)",
       "Write(.aios-core/**)",
-      "Write(.claude/**)",
+      "Write(.claude/settings.local.json)",
       "Write(src/**)",
       "Write(docs/**)",
       "Write(squads/**)",

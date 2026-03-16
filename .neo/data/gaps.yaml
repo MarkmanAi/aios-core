@@ -422,7 +422,7 @@ summary:
     mind_incomplete: 3      # MIND-006 (high) + MIND-008,009 (medium)
     mind_unconfirmed: 2     # MIND-012 (napoleon_hill) + MIND-013 (adriano_de_marqui)
     principle_at_risk: 0
-    squad_incomplete: 1     # ORG-002 (design dept)
+    squad_incomplete: 0     # ORG-002 resolved 2026-03-09
 
   resolved_this_check: []   # No gaps resolved in 2026-03-09 check
 
