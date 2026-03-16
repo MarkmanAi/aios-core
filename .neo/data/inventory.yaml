@@ -160,12 +160,13 @@ infrastructure:
 # ------------------------------------------------------------
 departments:
 
-  squads: 4
+  squads: 5
   names:
     - mmos-squad            # squads/mmos-squad/
     - squad-creator         # squads/squad-creator/
     - ralph                 # squads/ralph/ — autonomous loop orchestrator (Epic 14, 2026-03-08)
     - design                # squads/design/ — Design System Squad v2.1.0 (import 2026-03-09, formally positioned by Neo 2026-03-09)
+    - sop-factory           # squads/sop-factory/ — SOP lifecycle management, 6 agents, 10 tasks, 3 workflows (import 2026-03-15)
 
   pro_modules: 0
   pro_module_names: []

@@ -236,6 +236,11 @@
 | **squad-creator** | `squads/squad-creator/` | Squad Chief | 5 | 48 |
 | **ralph** | `squads/ralph/` | Ralph | 1 | 7 |
 | **design** | `squads/design/` | Design Chief | 8 | 89 |
+| **sop-factory** | `squads/sop-factory/` | sop-chief (Deming) | 6 | 10 |
+
+> **design squad** — Agent files at `.claude/commands/Design/agents/` (8 agents: design-chief, brad-frost, dave-malouf, dan-mall, ds-token-architect, ds-foundations-lead, storybook-expert, nano-banana-generator). Tasks at `squads/design/tasks/` (89 tasks). Note: `squads/design/agents/` intentionally absent — agents registered via `.claude/commands/Design/` IDE sync pattern.
+
+> **sop-factory v1.0.0** — 5th department, imported 2026-03-15. SOP lifecycle: creation, extraction, analysis, audit, ML format conversion. Methodologies: Deming, Gawande, Juran, Toyota/TPS, ISO 9001, FDA/GMP, Six Sigma. Entry point: `.claude/agents/sop-chief.md`. Agents: sop-chief (Deming), sop-analyst, sop-creator, sop-ml-architect, sop-extractor (Ohno), sop-auditor (Crosby). P1 ✅ creator → auditor validates. Reports to: aios-master. Validates: @qa + @architect.
 
 > **squad-creator v4.0.0** — Unified squad (2026-03-10 fusion). Absorbed squad-creator-pro capabilities: 5 agents, 48 tasks, 20 workflows, 8 configs, 31 data files, 25 scripts (with tests), minds/ heuristics, benchmarks, assessments. squad-creator-pro archived → `squads/_archived/squad-creator-pro_2026-03-10/`. Stub at `squads/squad-creator-pro/README.md`.
 

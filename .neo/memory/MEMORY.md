@@ -23,6 +23,12 @@ DELEGATIONS:  [YYYY-MM-DD] TASK: ___ | DELEGATED_TO: ___ | STATUS: pending|compl
 
 ## Decisions
 
+- [2026-03-15] DECISION: Import sop-factory as 5th department | REASON: AIOS had 195+ tasks with no dedicated SOP quality management system — no grading, benchmarking, ML-format conversion, or batch audit. sop-factory fills this gap with industrial-grade methodology (Deming, ISO 9001, FDA/GMP, Six Sigma, Toyota/TPS). Source: AIOX Team zip. 7-principle validation: P1 ✅ P2 ✅ P3 ✅. Entry point: .claude/agents/sop-chief.md. aiox-core dependency removed. sop-extractor name conflict resolved (squad-scoped). | ORG IMPACT: departments 4→5. squads/sop-factory/ created. inventory.yaml updated.
+
+- [2026-03-15] EPIC CLOSED: Epic 16 — SYNAPSE Memory Intelligence: Store Completion | STORIES: 16.1 (memory-writer.js) + 16.2 (SelfLearner→Writer integration) + 16.3 (heuristic persistence) + 16.4 (Neo SYNAPSE domain) + 16.5 (integration test — full cycle) | RESULT: Write stack complete. SelfLearner→MemoryWriter→Stores→MemoryRetriever cycle closed. 395 tests passing. Neo agent-neo domain active. | GAP: Code never pushed (@devops not activated). Memory stores empty (.aios/memories/ doesn't exist). SelfLearner.run() has no production trigger. | ORG IMPACT: Infrastructure ready — functionally NOT operational. Epic 24 briefing created.
+
+- [2026-03-15] DECISION: Create Epic 24 briefing — SYNAPSE Operational Activation | REASON: Post-Epic-16 audit revealed 3 critical operational gaps: (P1) no trigger for SelfLearner.run() — precompact hook only calls extractSessionDigest(); (P3) unclear if memory injection reaches agents at activation; (P4) Epic 16 code never pushed. | BRIEFING: docs/stories/briefs/epic-24-briefing.md | NEXT: @architect evaluates P1+P3 architectural decisions → Neo approves board positioning → @sm creates stories | ORG IMPACT: SYNAPSE remains dormant until Epic 24 delivers. Estimated 4-5 stories.
+
 - [2026-03-11] EPIC CLOSED: Epic 22 — Knowledge-ETL Pipeline Reliability, Quality & Cost Optimization | STORIES: 22.1 (checkpoint integrity) + 22.2 (structured output tool_use) + 22.3 (rate limit retry + remove sleeps) + 22.4 (two-pass reduce) | RESULTS: (1) Zero parse failures — all LLM calls use tool_use API. (2) Pipeline wall-clock ~4x faster: ~40min dead sleeps → actual API time ~8-10min. (3) Two-pass reduce quality +60%: 8 unified_frameworks vs 5 single-pass. (4) Haiku MAP quality check FAILED (43%) — reverted to Sonnet, constant retained for future re-eval. (5) 117/117 tests passing. | TEST SUITE EVOLUTION: 66 (22.1) → 88 (22.2) → 108 (22.3) → 117 (22.4). | ORG IMPACT: knowledge-etl pipeline reliability ~60% → ~99% on future runs. Pipeline ready for books 3+4 (Bungay, Grove).
 
 - [2026-03-11] DECISION: Create Epic 22 — Knowledge-ETL Pipeline Reliability | REASON: Team Topologies run (2026-03-11) expôs 4 falhas sistêmicas: reduce sem checkpoint, cache inválido aceito silenciosamente, sleeps fixos de 40min, parse failures por regex frágil. Briefing criado em docs/stories/briefs/epic-22-briefing.md. 4 stories criadas por @sm. | STORIES: 22.1 (checkpoint integrity), 22.2 (structured output), 22.3 (retry + token budget), 22.4 (haiku MAP + 2-pass reduce) | EXEC ORDER: 22.1 ∥ 22.3 → 22.2 → 22.4 | ORG IMPACT: pipeline reliability sobe de ~60% para ~99% em runs futuras. Custo L2 estimado -73%.
@@ -98,6 +104,14 @@ DELEGATIONS:  [YYYY-MM-DD] TASK: ___ | DELEGATED_TO: ___ | STATUS: pending|compl
 ---
 
 ## New Members Approved
+
+- [2026-03-15] TYPE: squad | NAME: sop-factory | ROLE: SOP Lifecycle Management | DEPT: 5th department | APPROVED_BY: neo
+  - Path: squads/sop-factory/ | Source: AIOX Team v1.0.0
+  - Leader: sop-chief (Deming) | Entry point: .claude/agents/sop-chief.md
+  - Agents (6): sop-chief, sop-analyst, sop-creator, sop-ml-architect, sop-extractor (Ohno), sop-auditor (Crosby)
+  - Assets: 10 tasks | 3 workflows | 5 templates | 3 checklists | 3 data files
+  - P1 ✅ P2 ✅ P3 ✅ | Reports to: aios-master | Validates: @qa + @architect
+  - aiox-core dep: REMOVED | sop-extractor conflict: resolved (squad-scoped, no .claude/agents/ clash)
 
 - [2026-03-09] TYPE: agent | NAME: synapse (Syn) | ROLE: SYNAPSE Pipeline Operator | DEPT: Level 5 Operations | APPROVED_BY: neo
   - Path: .aios-core/development/agents/synapse.md
