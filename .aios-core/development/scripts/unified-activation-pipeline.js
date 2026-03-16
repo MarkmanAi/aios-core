@@ -48,6 +48,7 @@ const { PermissionMode } = require('../../core/permissions');
 const GreetingPreferenceManager = require('./greeting-preference-manager');
 const ContextDetector = require('../../core/session/context-detector');
 const WorkflowNavigator = require('./workflow-navigator');
+const { MemoryLoader } = require('../../core/synapse/memory/memory-loader');
 
 /**
  * Per-loader timeout (ms). If any single loader exceeds this, it falls back to defaults.
@@ -136,6 +137,7 @@ class UnifiedActivationPipeline {
       projectStatus,
       gitConfig,
       permissionData,
+      memoryResult,
     ] = await Promise.all([
       this._safeLoad('AgentConfigLoader', () => {
         const loader = new AgentConfigLoader(agentId);
@@ -151,6 +153,10 @@ class UnifiedActivationPipeline {
         const mode = new PermissionMode(this.projectRoot);
         await mode.load();
         return { mode: mode.currentMode, badge: mode.getBadge() };
+      }),
+      this._safeLoad('MemoryLoader', () => {
+        const loader = new MemoryLoader(this.projectRoot);
+        return loader.loadForAgent(agentId, { budget: 2000, layers: [1, 2] });
       }),
     ]);
 
@@ -181,6 +187,7 @@ class UnifiedActivationPipeline {
       sessionType,
       workflowState,
       userProfile,
+      memories: memoryResult?.memories || [],
       // Legacy context fields for backward compatibility with GreetingBuilder
       conversationHistory: options.conversationHistory || [],
       lastCommands: sessionContext?.lastCommands || [],

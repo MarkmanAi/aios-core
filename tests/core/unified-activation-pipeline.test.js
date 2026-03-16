@@ -224,6 +224,16 @@ jest.mock('../../.aios-core/infrastructure/scripts/performance-tracker', () => (
   trackConfigLoad: jest.fn(),
 }));
 
+// Mock MemoryLoader
+jest.mock('../../.aios-core/core/synapse/memory/memory-loader', () => ({
+  MemoryLoader: jest.fn().mockImplementation(() => ({
+    loadForAgent: jest.fn().mockResolvedValue({
+      memories: [],
+      metadata: { agent: 'dev', count: 0, tokensUsed: 0, budget: 2000, tiers: ['hot'] },
+    }),
+  })),
+}));
+
 // --- Require modules AFTER mocks ---
 const { UnifiedActivationPipeline, ALL_AGENT_IDS } = require('../../.aios-core/development/scripts/unified-activation-pipeline');
 const { AgentConfigLoader } = require('../../.aios-core/development/scripts/agent-config-loader');
@@ -232,6 +242,7 @@ const { loadProjectStatus } = require('../../.aios-core/infrastructure/scripts/p
 const GitConfigDetector = require('../../.aios-core/infrastructure/scripts/git-config-detector');
 const { PermissionMode } = require('../../.aios-core/core/permissions');
 const { globalConfigCache } = require('../../.aios-core/core/config/config-cache');
+const { MemoryLoader } = require('../../.aios-core/core/synapse/memory/memory-loader');
 
 // ============================================================
 // Tests
@@ -239,6 +250,7 @@ const { globalConfigCache } = require('../../.aios-core/core/config/config-cache
 
 describe('UnifiedActivationPipeline', () => {
   let pipeline;
+  let mockLoadForAgent;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -279,6 +291,14 @@ describe('UnifiedActivationPipeline', () => {
       detectSessionType: jest.fn().mockReturnValue('new'),
     }));
 
+    mockLoadForAgent = jest.fn().mockResolvedValue({
+      memories: [],
+      metadata: { agent: 'dev', count: 0, tokensUsed: 0, budget: 2000, tiers: ['hot'] },
+    });
+    MemoryLoader.mockImplementation(() => ({
+      loadForAgent: mockLoadForAgent,
+    }));
+
     pipeline = new UnifiedActivationPipeline();
   });
 
@@ -316,7 +336,7 @@ describe('UnifiedActivationPipeline', () => {
     const expectedContextKeys = [
       'agent', 'config', 'session', 'projectStatus', 'gitConfig',
       'permissions', 'preference', 'sessionType', 'workflowState',
-      'userProfile', 'conversationHistory', 'lastCommands',
+      'userProfile', 'memories', 'conversationHistory', 'lastCommands',
       'previousAgent', 'sessionMessage', 'workflowActive', 'sessionStory',
     ];
 
@@ -864,7 +884,44 @@ describe('UnifiedActivationPipeline', () => {
   });
 
   // -----------------------------------------------------------
-  // 19. ALL_AGENT_IDS constant
+  // 19. MemoryLoader integration (Story 24.2)
+  // -----------------------------------------------------------
+  describe('MemoryLoader integration', () => {
+    it('should call MemoryLoader.loadForAgent with correct agentId and params', async () => {
+      await pipeline.activate('dev');
+
+      expect(MemoryLoader).toHaveBeenCalledWith(pipeline.projectRoot);
+      expect(mockLoadForAgent).toHaveBeenCalledWith('dev', { budget: 2000, layers: [1, 2] });
+    });
+
+    it('should populate enrichedContext.memories when MemoryLoader returns data', async () => {
+      mockLoadForAgent.mockResolvedValue({
+        memories: ['memory1', 'memory2'],
+        metadata: { count: 2 },
+      });
+
+      const result = await pipeline.activate('dev');
+      expect(result.context.memories).toEqual(['memory1', 'memory2']);
+    });
+
+    it('should set enrichedContext.memories to [] when MemoryLoader returns null', async () => {
+      mockLoadForAgent.mockResolvedValue(null);
+
+      const result = await pipeline.activate('dev');
+      expect(result.context.memories).toEqual([]);
+    });
+
+    it('should complete pipeline normally when MemoryLoader throws', async () => {
+      mockLoadForAgent.mockRejectedValue(new Error('Memory store unavailable'));
+
+      const result = await pipeline.activate('dev');
+      expect(result.greeting).toBeTruthy();
+      expect(result.context.memories).toEqual([]);
+    });
+  });
+
+  // -----------------------------------------------------------
+  // 20. ALL_AGENT_IDS constant
   // -----------------------------------------------------------
   describe('ALL_AGENT_IDS', () => {
     it('should contain exactly 12 agents', () => {
