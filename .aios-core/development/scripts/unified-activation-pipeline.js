@@ -441,6 +441,7 @@ class UnifiedActivationPipeline {
       sessionType: 'new',
       workflowState: null,
       userProfile: 'advanced',
+      memories: [],
       conversationHistory: [],
       lastCommands: [],
       previousAgent: null,
