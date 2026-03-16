@@ -25,11 +25,15 @@ const path = require('path');
 const EXTRACTOR_REL = '../../.aios-core/core/synapse/memory/session-digest/extractor';
 const EXTRACTOR_PATH = path.resolve(__dirname, EXTRACTOR_REL);
 
+const SELF_LEARNER_REL = '../../.aios-core/core/synapse/memory/self-learner';
+const SELF_LEARNER_PATH = path.resolve(__dirname, SELF_LEARNER_REL);
+
 // Fire-and-forget: setImmediate defers execution until AFTER this script returns.
 // Claude Code receives control back well within the 50ms budget.
 setImmediate(async () => {
   try {
     const { extractSessionDigest } = require(EXTRACTOR_PATH);
+    const SelfLearner = require(SELF_LEARNER_PATH);
 
     // Claude Code passes hook context via stdin (JSON) for PreCompact hooks
     let hookContext = {};
@@ -53,10 +57,11 @@ setImmediate(async () => {
       metadata: hookContext.metadata || {},
     };
 
-    await extractSessionDigest(context);
+    await extractSessionDigest(context);       // writes digest to .aios/session-digests/
+    await SelfLearner.run(context.projectDir); // reads digest → MemoryWriter.write()
   } catch (err) {
     // Silent failure — never block compact
-    process.stderr.write(`[SYNAPSE] Digest error: ${err.message}\n`);
+    process.stderr.write(`[SYNAPSE] Pipeline error: ${err.message}\n`);
   }
 });
 
