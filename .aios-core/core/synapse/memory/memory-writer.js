@@ -64,6 +64,8 @@ class MemoryWriter {
     this.memoriesDir = path.join(this.projectDir, '.aios', 'memories');
     this.indexDir = path.join(this.projectDir, '.aios', 'session-digests', 'index');
     this.masterIndexPath = path.join(this.indexDir, 'master.json');
+    // Serializes concurrent _patchMasterIndex calls on this instance (Fix: TOCTOU on master.json)
+    this._indexWriteQueue = Promise.resolve();
   }
 
   /**
@@ -284,20 +286,43 @@ class MemoryWriter {
   }
 
   /**
-   * Determine the next sequence number by scanning existing files in dir.
+   * Atomically claim the next available sequence slot using exclusive file creation.
+   *
+   * Uses the O_EXCL / 'wx' flag so two concurrent callers cannot claim the same
+   * slot — the second caller gets EEXIST and moves to the next number.
+   * This eliminates the TOCTOU race where a directory scan + length+1 would assign
+   * the same sequence to two concurrent writers.
+   *
+   * The claimed slot is an empty placeholder file; write() overwrites it with real
+   * content immediately after. If write() fails, the empty placeholder remains (a
+   * "wasted" slot) but no data is overwritten.
    *
    * @private
    */
   async _nextSeq(dir, tier, safeAgentId, dateStr) {
     try {
       await fs.mkdir(dir, { recursive: true });
-      const files = await fs.readdir(dir);
-      const prefix = `${tier}-${safeAgentId}-${dateStr}-`;
-      const existing = files.filter((f) => f.startsWith(prefix) && f.endsWith('.yaml'));
-      return String(existing.length + 1).padStart(3, '0');
     } catch (_) {
+      // If mkdir fails (e.g., dir exists as a file), write() will handle the downstream error
       return '001';
     }
+    const prefix = `${tier}-${safeAgentId}-${dateStr}-`;
+    for (let n = 1; n <= 9999; n++) {
+      const seq = String(n).padStart(3, '0');
+      const candidatePath = path.join(dir, `${prefix}${seq}.yaml`);
+      try {
+        // 'wx': exclusive create — fails with EEXIST if file already exists (atomic on POSIX + Windows)
+        const fh = await fs.open(candidatePath, 'wx');
+        await fh.close();
+        return seq; // slot claimed; write() overwrites placeholder with real content
+      } catch (err) {
+        if (err.code === 'EEXIST') continue;
+        // ENOTDIR or other error (e.g., dir is actually a file) — return seq so write() fails gracefully
+        return seq;
+      }
+    }
+    // Exhausted sequential range — use timestamp suffix as fallback
+    return String(Date.now()).slice(-6);
   }
 
   // ─── Private: YAML Generation ──────────────────────────────────────────────
@@ -449,6 +474,12 @@ class MemoryWriter {
         const filePath = path.join(dir, file);
         try {
           const raw = await fs.readFile(filePath, 'utf8');
+          // Guard: verify memory_type in frontmatter matches before comparing body text.
+          // pattern and general share the same Pattern: "text" body format — without this
+          // check, a general memory with the same text as a pattern would be falsely
+          // detected as a duplicate, silently discarding the second write.
+          const fm = this._parseFrontmatter(raw);
+          if (!fm || fm.memory_type !== memoryType) continue;
           const extracted = this._extractBodyText(raw, memoryType);
           if (extracted && this._normalizeText(extracted) === normalizedText) {
             return filePath;
@@ -559,12 +590,30 @@ class MemoryWriter {
   // ─── Private: Master Index ─────────────────────────────────────────────────
 
   /**
-   * Patch master.json: read → remove any entry with same id → append → write.
-   * Atomic read-merge-write (no overwrite-from-scratch).
+   * Patch master.json: read → upsert entry → write.
+   *
+   * Serializes all patches via an instance-level Promise queue so concurrent
+   * write() calls cannot interleave their read-modify-write operations and
+   * silently drop each other's index entries.
    *
    * @private
    */
   async _patchMasterIndex(entry) {
+    // Each patch is queued; if a previous patch failed, the next one still runs.
+    this._indexWriteQueue = this._indexWriteQueue.then(
+      () => this._patchMasterIndexLocked(entry),
+      () => this._patchMasterIndexLocked(entry), // recover from previous failure
+    );
+    return this._indexWriteQueue;
+  }
+
+  /**
+   * Internal (serialized) implementation of the master index patch.
+   * Called only via _patchMasterIndex's queue — never directly.
+   *
+   * @private
+   */
+  async _patchMasterIndexLocked(entry) {
     await fs.mkdir(this.indexDir, { recursive: true });
 
     // master.json must be a dict { [id]: entry } — format expected by MemoryIndexManager.search()
@@ -578,16 +627,21 @@ class MemoryWriter {
       } else if (parsed && typeof parsed === 'object') {
         index = parsed;
       }
-    } catch (_) {
-      // File doesn't exist or is malformed — start fresh
+    } catch (err) {
+      if (err.code !== 'ENOENT') {
+        // File exists but is malformed — warn explicitly (silent reset was masking corruption)
+        console.warn(`[MemoryWriter] master.json malformed, starting fresh: ${err.message}`);
+      }
+      // ENOENT: file not yet created — start with empty index (expected on first write)
     }
 
     // Upsert entry (idempotent)
     index[entry.id] = entry;
 
-    await fs.writeFile(this.masterIndexPath, JSON.stringify(index, null, 2), {
-      encoding: 'utf8',
-    });
+    // Atomic write via temp file + rename — prevents partial-write corruption
+    const tmpPath = `${this.masterIndexPath}.${process.pid}.tmp`;
+    await fs.writeFile(tmpPath, JSON.stringify(index, null, 2), { encoding: 'utf8' });
+    await fs.rename(tmpPath, this.masterIndexPath);
 
     // Patch by-agent/{agent}.json — required for MemoryIndexManager.search() agent filter
     const byAgentDir = path.join(this.indexDir, 'by-agent');
@@ -601,7 +655,9 @@ class MemoryWriter {
     } catch (_) { /* file not found — start with empty array */ }
     if (!agentIds.includes(entry.id)) {
       agentIds.push(entry.id);
-      await fs.writeFile(agentFile, JSON.stringify(agentIds, null, 2), { encoding: 'utf8' });
+      const agentTmp = `${agentFile}.${process.pid}.tmp`;
+      await fs.writeFile(agentTmp, JSON.stringify(agentIds, null, 2), { encoding: 'utf8' });
+      await fs.rename(agentTmp, agentFile);
     }
   }
 

@@ -309,6 +309,81 @@ describe('MemoryWriter', () => {
     });
   });
 
+  // ─── Fix: TOCTOU race condition in _nextSeq (CodeRabbit CRITICAL) ───────────
+
+  describe('_nextSeq() — concurrent write safety (CodeRabbit fix)', () => {
+    it('should not assign the same sequence to two concurrent writes', async () => {
+      // Launch two concurrent writes — without the O_EXCL fix, both would read
+      // an empty dir, compute seq=1, and overwrite each other.
+      const [r1, r2] = await Promise.all([
+        writer.write('dev', { type: 'pattern', text: 'concurrent pattern A' }, 'session', { skipIndex: true }),
+        writer.write('dev', { type: 'pattern', text: 'concurrent pattern B' }, 'session', { skipIndex: true }),
+      ]);
+
+      expect(r1.filePath).not.toBeNull();
+      expect(r2.filePath).not.toBeNull();
+      // Each write must land in a different file — no silent overwrite
+      expect(r1.filePath).not.toBe(r2.filePath);
+
+      // Both files must exist and have the correct content
+      const raw1 = await fs.readFile(r1.filePath, 'utf8');
+      const raw2 = await fs.readFile(r2.filePath, 'utf8');
+      expect(raw1).toContain('concurrent pattern A');
+      expect(raw2).toContain('concurrent pattern B');
+    });
+  });
+
+  // ─── Fix: _findDuplicate ignores memory_type (CodeRabbit MAJOR) ──────────────
+
+  describe('_findDuplicate() — memory_type isolation (CodeRabbit fix)', () => {
+    it('should NOT treat pattern and general as duplicates even with the same text', async () => {
+      const sameText = 'shared text that appears in both types';
+
+      const r1 = await writer.write('dev', { type: 'pattern', text: sameText }, 'session', { skipIndex: true });
+      const r2 = await writer.write('dev', { type: 'general', text: sameText }, 'session', { skipIndex: true });
+
+      // Different memory_type → must NOT be treated as duplicate
+      expect(r2.filePath).not.toBe(r1.filePath);
+      expect(r2.filePath).not.toBeNull();
+
+      // Verify correct types persisted
+      const fm1 = parseFrontmatter(await fs.readFile(r1.filePath, 'utf8'));
+      const fm2 = parseFrontmatter(await fs.readFile(r2.filePath, 'utf8'));
+      expect(fm1.memory_type).toBe('pattern');
+      expect(fm2.memory_type).toBe('general');
+    });
+
+    it('should still detect duplicates for same text AND same memory_type', async () => {
+      const r1 = await writer.write('dev', { type: 'general', text: 'same general text' }, 'session', { skipIndex: true });
+      const r2 = await writer.write('dev', { type: 'general', text: 'same general text' }, 'session', { skipIndex: true });
+
+      // Same type + same text → duplicate detected (no new file)
+      expect(r2.filePath).toBe(r1.filePath);
+    });
+  });
+
+  // ─── Fix: _patchMasterIndex concurrent writes (CodeRabbit MAJOR) ─────────────
+
+  describe('_patchMasterIndex() — concurrent serialization (CodeRabbit fix)', () => {
+    it('should preserve all entries when multiple writes patch master.json concurrently', async () => {
+      // Fire 5 concurrent writes — without the Promise queue fix, concurrent
+      // read-modify-write would cause some entries to overwrite others.
+      const texts = ['entry A', 'entry B', 'entry C', 'entry D', 'entry E'];
+      const results = await Promise.all(
+        texts.map((text) => writer.write('dev', { type: 'pattern', text }, 'session')),
+      );
+
+      const raw = await fs.readFile(writer.masterIndexPath, 'utf8');
+      const index = JSON.parse(raw);
+      const ids = Object.keys(index);
+
+      // All 5 entries must be present — none dropped by race condition
+      for (const r of results) {
+        expect(ids).toContain(r.id);
+      }
+    });
+  });
+
   // ─── AC-7: Error handling ──────────────────────────────────────────────────
 
   describe('write() — error handling (AC-7)', () => {
