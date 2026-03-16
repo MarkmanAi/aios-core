@@ -33,7 +33,7 @@ const SELF_LEARNER_PATH = path.resolve(__dirname, SELF_LEARNER_REL);
 setImmediate(async () => {
   try {
     const { extractSessionDigest } = require(EXTRACTOR_PATH);
-    const SelfLearner = require(SELF_LEARNER_PATH);
+    const { SelfLearner } = require(SELF_LEARNER_PATH);
 
     // Claude Code passes hook context via stdin (JSON) for PreCompact hooks
     let hookContext = {};
@@ -57,8 +57,9 @@ setImmediate(async () => {
       metadata: hookContext.metadata || {},
     };
 
-    await extractSessionDigest(context);       // writes digest to .aios/session-digests/
-    await SelfLearner.run(context.projectDir); // reads digest → MemoryWriter.write()
+    await extractSessionDigest(context);                    // writes digest to .aios/session-digests/
+    const learner = new SelfLearner(context.projectDir);
+    await learner.run();                                    // reads digest → MemoryWriter.write()
   } catch (err) {
     // Silent failure — never block compact
     process.stderr.write(`[SYNAPSE] Pipeline error: ${err.message}\n`);

@@ -8,6 +8,10 @@
  *
  * Strategy: spy on setImmediate to capture the async callback, then invoke it
  * directly — avoids timer flakiness and gives full control over execution order.
+ *
+ * API shape (from self-learner.js):
+ *   module.exports = { SelfLearner, createSelfLearner, ... }
+ *   class SelfLearner { constructor(projectDir) {...}; async run(options={}) {...} }
  */
 
 const path = require('path');
@@ -22,6 +26,7 @@ const SELF_LEARNER_PATH = path.join(ROOT, '.aios-core', 'core', 'synapse', 'memo
 describe('synapse-precompact.js — SelfLearner chaining (Story 24.1)', () => {
   let mockExtractSessionDigest;
   let mockSelfLearnerRun;
+  let MockSelfLearnerConstructor;
   let capturedCallback;
 
   beforeEach(() => {
@@ -30,12 +35,18 @@ describe('synapse-precompact.js — SelfLearner chaining (Story 24.1)', () => {
     mockExtractSessionDigest = jest.fn().mockResolvedValue(undefined);
     mockSelfLearnerRun = jest.fn().mockResolvedValue(undefined);
 
+    // Mock SelfLearner as a constructor that returns an instance with run()
+    // Matches actual API: module.exports = { SelfLearner, ... }; run() is instance method
+    MockSelfLearnerConstructor = jest.fn().mockImplementation(() => ({
+      run: mockSelfLearnerRun,
+    }));
+
     // doMock (not mock) — must be called AFTER resetModules, not hoisted
     jest.doMock(EXTRACTOR_PATH, () => ({
       extractSessionDigest: mockExtractSessionDigest,
     }));
     jest.doMock(SELF_LEARNER_PATH, () => ({
-      run: mockSelfLearnerRun,
+      SelfLearner: MockSelfLearnerConstructor,
     }));
 
     // Capture the setImmediate callback to control execution timing in tests
@@ -59,27 +70,31 @@ describe('synapse-precompact.js — SelfLearner chaining (Story 24.1)', () => {
 
   // ─── T2.2: sequence ─────────────────────────────────────────────────────────
 
-  it('calls extractSessionDigest and SelfLearner.run in sequence', async () => {
+  it('calls extractSessionDigest then instantiates SelfLearner and calls run()', async () => {
     requireHook();
     expect(capturedCallback).not.toBeNull();
 
     await capturedCallback();
 
     expect(mockExtractSessionDigest).toHaveBeenCalledTimes(1);
+    expect(MockSelfLearnerConstructor).toHaveBeenCalledTimes(1);
     expect(mockSelfLearnerRun).toHaveBeenCalledTimes(1);
 
-    // extractSessionDigest must fire before SelfLearner.run
+    // extractSessionDigest must fire before SelfLearner instantiation
     const [extractOrder] = mockExtractSessionDigest.mock.invocationCallOrder;
-    const [selfLearnerOrder] = mockSelfLearnerRun.mock.invocationCallOrder;
-    expect(extractOrder).toBeLessThan(selfLearnerOrder);
+    const [constructOrder] = MockSelfLearnerConstructor.mock.invocationCallOrder;
+    expect(extractOrder).toBeLessThan(constructOrder);
   });
 
-  it('passes projectDir to SelfLearner.run', async () => {
+  // ─── T2.2b: projectDir passed via constructor ────────────────────────────────
+
+  it('passes projectDir to SelfLearner constructor and calls run() with no args', async () => {
     requireHook();
     await capturedCallback();
 
-    // With no CLAUDE_HOOK_INPUT, hookContext.projectDir is undefined → falls back to process.cwd()
-    expect(mockSelfLearnerRun).toHaveBeenCalledWith(process.cwd());
+    // projectDir (from cwd fallback) goes into constructor, not run()
+    expect(MockSelfLearnerConstructor).toHaveBeenCalledWith(process.cwd());
+    expect(mockSelfLearnerRun).toHaveBeenCalledWith();
   });
 
   // ─── T2.3: SelfLearner error swallowed ──────────────────────────────────────
@@ -100,7 +115,7 @@ describe('synapse-precompact.js — SelfLearner chaining (Story 24.1)', () => {
 
   // ─── T2.4: extractor error stops chain ──────────────────────────────────────
 
-  it('does not call SelfLearner when extractSessionDigest fails', async () => {
+  it('does not instantiate SelfLearner when extractSessionDigest fails', async () => {
     mockExtractSessionDigest.mockRejectedValue(new Error('Digest failure'));
     jest.spyOn(process.stderr, 'write').mockImplementation(() => {});
 
@@ -108,6 +123,7 @@ describe('synapse-precompact.js — SelfLearner chaining (Story 24.1)', () => {
     await capturedCallback();
 
     expect(mockExtractSessionDigest).toHaveBeenCalledTimes(1);
+    expect(MockSelfLearnerConstructor).not.toHaveBeenCalled();
     expect(mockSelfLearnerRun).not.toHaveBeenCalled();
   });
 });

@@ -1,0 +1,81 @@
+schema: 1
+story: "24.1"
+story_title: "SelfLearner Trigger — Extend synapse-precompact.js to chain SelfLearner.run()"
+gate: FAIL
+status_reason: >
+  Critical API mismatch: hook calls SelfLearner.run() on the module export object instead of
+  a class instance. Results in TypeError silenced by catch — SelfLearner never executes at runtime.
+  AC-2 is not functionally met despite tests passing (tests mock the wrong API shape).
+reviewer: "Quinn (Test Architect)"
+updated: "2026-03-16T00:00:00Z"
+
+top_issues:
+  - id: CR-24.1-1
+    severity: high
+    title: "Wrong API usage — SelfLearner.run() called on exports object, not class instance"
+    file: ".claude/hooks/synapse-precompact.js"
+    line: 36-61
+    description: >
+      self-learner.js exports { SelfLearner, createSelfLearner, ... } — not the class directly.
+      run() is an instance method, not static. Current code: `const SelfLearner = require(path);
+      await SelfLearner.run(projectDir)` throws TypeError at runtime, silently caught.
+    fix: >
+      const { SelfLearner } = require(SELF_LEARNER_PATH);
+      const learner = new SelfLearner(context.projectDir);
+      await learner.run();
+    suggested_owner: dev
+
+  - id: CR-24.1-2
+    severity: high
+    title: "Unit tests mock wrong API shape — mask the runtime bug"
+    file: "tests/unit/hooks/synapse-precompact.test.js"
+    line: 37-39
+    description: >
+      Mock returns { run: fn } which matches the (incorrect) hook usage.
+      Tests pass but do not validate the actual module API. Must use
+      named export + constructor pattern to match reality.
+    fix: >
+      const MockSelfLearner = jest.fn().mockImplementation(() => ({ run: mockSelfLearnerRun }));
+      jest.doMock(SELF_LEARNER_PATH, () => ({ SelfLearner: MockSelfLearner }));
+      // Add: expect(MockSelfLearner).toHaveBeenCalledWith(process.cwd())
+    suggested_owner: dev
+
+waiver:
+  active: false
+
+quality_score: 60
+
+expires: "2026-03-30T00:00:00Z"
+
+evidence:
+  tests_reviewed: 4
+  risks_identified: 1
+  trace:
+    ac_covered: [1, 3, 4]
+    ac_gaps: [2]
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: "Path traversal guard unchanged and correct. No new surface."
+  performance:
+    status: PASS
+    notes: "setImmediate pattern preserved. SelfLearner instantiation is lightweight."
+  reliability:
+    status: FAIL
+    notes: "SelfLearner never executes at runtime — TypeError silenced. Core purpose broken."
+  maintainability:
+    status: PASS
+    notes: "Code structure is clean. Constants follow existing pattern. Once fixed, highly maintainable."
+
+recommendations:
+  immediate:
+    - action: "Fix destructured import: const { SelfLearner } = require(SELF_LEARNER_PATH)"
+      refs: [".claude/hooks/synapse-precompact.js:36"]
+    - action: "Fix instantiation and call: new SelfLearner(context.projectDir).run()"
+      refs: [".claude/hooks/synapse-precompact.js:61"]
+    - action: "Update test mock to reflect named export + constructor pattern"
+      refs: ["tests/unit/hooks/synapse-precompact.test.js:37-39"]
+    - action: "Add constructor assertion: expect(MockSelfLearner).toHaveBeenCalledWith(process.cwd())"
+      refs: ["tests/unit/hooks/synapse-precompact.test.js"]
+  future: []
