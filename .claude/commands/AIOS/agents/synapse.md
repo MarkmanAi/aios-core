@@ -73,6 +73,7 @@ persona:
     - Never modify pipeline files directly — observe and report
     - Cache management via clearCache() only when explicitly requested
     - Graceful degradation — if SYNAPSE not initialized, say so clearly
+    - "*learn = failsafe recovery trigger for SelfLearner.run() — use when hook did not fire or for targeted diagnostics"
 
 # All commands require * prefix when used (e.g., *synapse-status)
 commands:
@@ -82,11 +83,15 @@ commands:
 
   - name: synapse-status
     visibility: [full, quick, key]
-    description: 'Show active SYNAPSE domains, current bracket, and loaded memory count'
+    description: 'Show active SYNAPSE domains, memory count, and learning pipeline state (pending digests, memories written)'
     handler: |
       # *synapse-status handler
       #
       # Reads .aios/active-domains.md and displays a summary.
+      # Also shows SYNAPSE learning pipeline state:
+      #   - Pending digests count (files in .aios/session-digests/)
+      #   - Total memories written (files in .aios/memories/shared/)
+      #   - Last run timestamp (from SelfLearner stats)
       # If file does not exist, reports "SYNAPSE not initialized".
       #
       # Implementation:
@@ -103,6 +108,95 @@ commands:
       #   console.log('Active Domains:', status.activeDomains.join(', '));
       #   console.log('Updated:', status.updatedAt);
       #   console.log('Memory entries (approx):', status.memoryCount);
+      #
+      #   // Learning pipeline state
+      #   const path = require('path');
+      #   const fs = require('fs');
+      #   const digestsDir = path.join(projectDir, '.aios/session-digests');
+      #   const memoriesDir = path.join(projectDir, '.aios/memories/shared');
+      #   const digestFiles = fs.existsSync(digestsDir)
+      #     ? fs.readdirSync(digestsDir).filter(f => f.endsWith('.yaml'))
+      #     : [];
+      #   const memoryFiles = fs.existsSync(memoriesDir)
+      #     ? fs.readdirSync(memoriesDir).filter(f => f.endsWith('.yaml') || f.endsWith('.md'))
+      #     : null;
+      #
+      #   if (memoryFiles === null) {
+      #     console.log('Memory stores: not initialized (run *learn to initialize)');
+      #   } else {
+      #     console.log('Pending digests:', digestFiles.length);
+      #     console.log('Memories written:', memoryFiles.length);
+      #   }
+
+  # SOP: Primary trigger = PreCompact hook (automated, fires on every compaction).
+  # *learn = Secondary trigger — recovery when hook did not fire, or targeted diagnostics.
+  - name: learn
+    visibility: [full, quick]
+    description: 'Manually trigger learning cycle — process pending digests or a specific digest by ID'
+    args:
+      - name: digest-id
+        required: false
+        description: 'Specific digest ID to process. If omitted, processes all pending digests.'
+    handler: |
+      # *learn [digest-id?] handler
+      #
+      # Recovery + diagnostic trigger for SelfLearner.run().
+      # Primary trigger is the PreCompact hook — use *learn only for recovery or diagnostics.
+      #
+      # Without argument — process all pending digests:
+      #   1. Read .aios/session-digests/ for pending .yaml files
+      #   2. Call createSelfLearner(projectDir).run() to process them
+      #   3. Report: "Processed N digest(s). M memories written."
+      #   4. If no digests: "No pending digests found."
+      #   5. If SelfLearner returns error: report clearly — do NOT silently fail
+      #
+      # With argument — process specific digest:
+      #   1. Verify .aios/session-digests/{digest-id}.yaml exists
+      #   2. If not found: "Digest not found: {digest-id}"
+      #   3. If found: Call createSelfLearner(projectDir).run() — processes all pending (includes specified digest)
+      #   4. Report: "Processed digest {digest-id}. N memories written."
+      #
+      # Implementation:
+      #   const { createSelfLearner } = require('.aios-core/core/synapse');
+      #   const path = require('path');
+      #   const fs = require('fs');
+      #   const digestsDir = path.join(projectDir, '.aios/session-digests');
+      #
+      #   if (digestId) {
+      #     const digestPath = path.join(digestsDir, `${digestId}.yaml`);
+      #     if (!fs.existsSync(digestPath)) {
+      #       console.log(`Digest not found: ${digestId}`);
+      #       return;
+      #     }
+      #   } else {
+      #     const files = fs.existsSync(digestsDir)
+      #       ? fs.readdirSync(digestsDir).filter(f => f.endsWith('.yaml'))
+      #       : [];
+      #     if (files.length === 0) {
+      #       console.log('No pending digests found.');
+      #       return;
+      #     }
+      #   }
+      #
+      #   const learner = createSelfLearner(projectDir);
+      #   const result = await learner.run({ verbose: false });
+      #
+      #   if (result.error) {
+      #     console.error(`Learning failed: ${result.error}`);
+      #     return;
+      #   }
+      #   if (result.skipped) {
+      #     console.log(`Learning skipped: ${result.reason}`);
+      #     return;
+      #   }
+      #
+      #   const memoriesWritten = (result.stats?.memories_written_session || 0)
+      #     + (result.stats?.memories_written_daily || 0);
+      #   if (digestId) {
+      #     console.log(`Processed digest ${digestId}. ${memoriesWritten} memories written.`);
+      #   } else {
+      #     console.log(`Processed ${result.digestsProcessed} digest(s). ${memoriesWritten} memories written.`);
+      #   }
 
   - name: synapse-diagnose
     visibility: [full, quick]
@@ -202,7 +296,9 @@ autoClaude:
 
 ## Quick Commands
 
-- `*synapse-status` — Show active domains and memory count
+- `*synapse-status` — Show active domains, memory count, and learning pipeline state
+- `*learn` — Manually trigger learning cycle (process all pending digests)
+- `*learn {digest-id}` — Process a specific digest by ID
 - `*synapse-diagnose` — Full diagnostic + cache reset
 - `*synapse-inject {agentId}` — Run injection pipeline for agent
 - `*help` — All commands
@@ -228,5 +324,3 @@ ManifestParser.parse()
 
 ---
 *AIOS Agent - synapse.md*
----
-*AIOS Agent - Synced from .aios-core/development/agents/synapse.md*
