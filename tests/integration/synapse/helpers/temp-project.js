@@ -17,9 +17,17 @@ function createTempProject() {
   const digestsDir = path.join(tempDir, '.aios', 'session-digests');
   fs.mkdirSync(digestsDir, { recursive: true });
 
+  // Rewrite timestamps to today so confidence stays above threshold regardless of when tests run.
+  // The confidence formula penalizes recency; fixtures older than ~8 days fall below 0.9.
+  const baseTime = Date.now();
   const files = fs.readdirSync(FIXTURES_DIR).filter(f => f.endsWith('.yaml'));
-  for (const file of files) {
-    fs.copyFileSync(path.join(FIXTURES_DIR, file), path.join(digestsDir, file));
+  for (let i = 0; i < files.length; i++) {
+    const src = path.join(FIXTURES_DIR, files[i]);
+    const content = fs.readFileSync(src, 'utf8');
+    // Each fixture gets a timestamp 1 hour apart, ending 1 hour before "now"
+    const ts = new Date(baseTime - (files.length - i) * 60 * 60 * 1000).toISOString();
+    const updated = content.replace(/^(timestamp:\s*")[^"]*(")/m, `$1${ts}$2`);
+    fs.writeFileSync(path.join(digestsDir, files[i]), updated);
   }
 
   return tempDir;

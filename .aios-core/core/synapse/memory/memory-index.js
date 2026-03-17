@@ -444,6 +444,20 @@ class MemoryIndexManager {
         this.indexes.byTier[tier] = JSON.parse(content);
       }
 
+      // Reconstruct byTier from masterIndex when by-tier/ files are missing.
+      // MemoryWriter only patches master.json and by-agent/ — not by-tier/.
+      // Without this, tier-filtered searches return 0 results for MemoryWriter-written memories.
+      const totalTierEntries = Object.values(this.indexes.byTier)
+        .reduce((sum, arr) => sum + arr.length, 0);
+      if (totalTierEntries === 0 && Object.keys(this.masterIndex).length > 0) {
+        for (const [id, entry] of Object.entries(this.masterIndex)) {
+          const tier = entry.tier || 'cold';
+          if (this.indexes.byTier[tier]) {
+            this.indexes.byTier[tier].push(id);
+          }
+        }
+      }
+
     } catch (error) {
       console.warn('[MemoryIndex] Index load failed, will rebuild:', error.message);
       await this.buildIndex();
