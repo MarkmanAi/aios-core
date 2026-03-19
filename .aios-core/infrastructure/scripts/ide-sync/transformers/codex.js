@@ -64,10 +64,11 @@ function transform(agentData) {
   const icon = agent.icon || '🤖';
   const whenToUse = agent.whenToUse || 'Use this agent for specific tasks';
 
-  const skillName = `${icon} ${name} — ${title}`;
+  const skillName = `${icon} ${name} — ${title}`.replace(/"/g, '\\"');
+  const whenToUseInline = whenToUse.replace(/\n+/g, ' ').trim().replace(/"/g, '\\"');
 
   // YAML frontmatter required by Codex
-  let content = `---\nname: "${skillName}"\ndescription: "${whenToUse}"\n---\n\n`;
+  let content = `---\nname: "${skillName}"\ndescription: "${whenToUseInline}"\n---\n\n`;
 
   // Heading
   content += `# ${skillName} (@${agentData.id})\n\n`;
