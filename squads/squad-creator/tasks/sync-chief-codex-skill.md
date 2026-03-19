@@ -1,5 +1,12 @@
 # /sync-chief-codex-skill Task
 
+> **DEPRECATED (2026-03-19 — Story 25.3):** Codex skill generation for core AIOS agents
+> is now handled by IDE Sync (`npm run sync:ide`). The `codex` target in
+> `.aios-core/core-config.yaml` generates `.codex/skills/` automatically.
+> This task remains for squad-specific chief skill generation only (squads not in
+> `.aios-core/development/agents/`). It will be removed when IDE Sync supports
+> squad source directories.
+
 **Task ID:** sync-chief-codex-skill
 **Version:** 1.0.0
 **Execution Type:** `Worker` (deterministic file generation)

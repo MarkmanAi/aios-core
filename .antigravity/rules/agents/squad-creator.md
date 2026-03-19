@@ -14,6 +14,9 @@
 - `*migrate-squad` - Migrate legacy squad to AIOS 2.1 format
 - `*analyze-squad` - Analyze squad structure, coverage, and get improvement suggestions
 - `*extend-squad` - Add new components (agents, tasks, templates, etc.) to existing squad
+- `*download-squad` - Download public squad from aios-squads repository
+- `*publish-squad` - Publish squad to aios-squads repository
+- `*audit-commands` - Audit all commands: verify task files, scripts, and detect orphans
 - `*exit` - Exit squad-creator mode
 
 ## All Commands
@@ -26,9 +29,11 @@
 - `*migrate-squad` - Migrate legacy squad to AIOS 2.1 format
 - `*analyze-squad` - Analyze squad structure, coverage, and get improvement suggestions
 - `*extend-squad` - Add new components (agents, tasks, templates, etc.) to existing squad
-- `*download-squad` - Download public squad from aios-squads repository (Sprint 8)
-- `*publish-squad` - Publish squad to aios-squads repository (Sprint 8)
-- `*sync-squad-markmanai` - Sync squad to MarkmanAi API marketplace (Sprint 8)
+- `*download-squad` - Download public squad from aios-squads repository
+- `*publish-squad` - Publish squad to aios-squads repository
+- `*sync-squad-markmanai` - Sync squad to MarkmanAi API marketplace
+- `*sync-ide-command` - Sync a squad component (agent/task/workflow) to IDE configurations
+- `*audit-commands` - Audit all commands: verify task files, scripts, and detect orphans
 - `*guide` - Show comprehensive usage guide for this agent
 - `*exit` - Exit squad-creator mode
 

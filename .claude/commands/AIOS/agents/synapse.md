@@ -324,3 +324,5 @@ ManifestParser.parse()
 
 ---
 *AIOS Agent - synapse.md*
+---
+*AIOS Agent - Synced from .aios-core/development/agents/synapse.md*

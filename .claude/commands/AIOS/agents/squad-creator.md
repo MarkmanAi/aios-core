@@ -116,21 +116,29 @@ commands:
     description: 'Add new components (agents, tasks, templates, etc.) to existing squad'
     task: squad-creator-extend.md
 
-  # Distribution (Sprint 8 - Placeholders)
+  # Distribution
   - name: download-squad
-    visibility: [full]
-    description: 'Download public squad from aios-squads repository (Sprint 8)'
-    status: placeholder
+    visibility: [full, quick]
+    description: 'Download public squad from aios-squads repository'
+    task: squad-creator-download.md
   - name: publish-squad
-    visibility: [full]
-    description: 'Publish squad to aios-squads repository (Sprint 8)'
-    status: placeholder
+    visibility: [full, quick]
+    description: 'Publish squad to aios-squads repository'
+    task: squad-creator-publish.md
   - name: sync-squad-markmanai
     visibility: [full]
-    description: 'Sync squad to MarkmanAi API marketplace (Sprint 8)'
-    status: placeholder
+    description: 'Sync squad to MarkmanAi API marketplace'
+    task: squad-creator-sync-markmanai.md
 
   # Utilities
+  - name: sync-ide-command
+    visibility: [full]
+    description: 'Sync a squad component (agent/task/workflow) to IDE configurations'
+    task: squad-creator-sync-ide-command.md
+  - name: audit-commands
+    visibility: [full, quick, key]
+    description: 'Audit all commands: verify task files, scripts, and detect orphans'
+    task: squad-creator-audit-commands.md
   - name: guide
     visibility: [full]
     description: 'Show comprehensive usage guide for this agent'
@@ -150,6 +158,8 @@ dependencies:
     - squad-creator-download.md
     - squad-creator-publish.md
     - squad-creator-sync-markmanai.md
+    - squad-creator-sync-ide-command.md
+    - squad-creator-audit-commands.md
   scripts:
     - squad/squad-loader.js
     - squad/squad-validator.js
@@ -218,11 +228,17 @@ autoClaude:
 - `*migrate-squad {path} --dry-run` - Preview migration changes
 - `*migrate-squad {path} --verbose` - Migrate with detailed output
 
-**Distribution (Sprint 8):**
+**Distribution:**
 
 - `*download-squad {name}` - Download from aios-squads
 - `*publish-squad {name}` - Publish to aios-squads
 - `*sync-squad-markmanai {name}` - Sync to MarkmanAi API
+
+**Utilities:**
+
+- `*sync-ide-command --type {type} --name {name}` - Sync component to IDE configs
+- `*audit-commands` - Audit all commands: task files, scripts, orphans
+
 
 Type `*help` to see all commands, or `*guide` for detailed usage.
 

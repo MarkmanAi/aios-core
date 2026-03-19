@@ -30,6 +30,7 @@ const claudeCodeTransformer = require('./transformers/claude-code');
 const cursorTransformer = require('./transformers/cursor');
 const windsurfTransformer = require('./transformers/windsurf');
 const antigravityTransformer = require('./transformers/antigravity');
+const codexTransformer = require('./transformers/codex');
 
 // ANSI colors for output
 const colors = {
@@ -117,9 +118,26 @@ function getTransformer(format) {
     'condensed-rules': cursorTransformer,
     'xml-tagged-markdown': windsurfTransformer,
     'cursor-style': antigravityTransformer,
+    'codex-skill': codexTransformer,
   };
 
   return transformers[format] || claudeCodeTransformer;
+}
+
+/**
+ * Filter agents based on IDE target filter config.
+ * Delegates filter logic to the transformer when it exports a filter function.
+ * @param {object[]} agents - All parsed agents
+ * @param {object} ideConfig - IDE configuration (may include filter field)
+ * @param {object} transformer - Transformer module for this IDE
+ * @returns {object[]} - Filtered agent list
+ */
+function applyFilter(agents, ideConfig, transformer) {
+  if (!ideConfig.filter) return agents;
+  if (ideConfig.filter === 'chiefs-only' && typeof transformer.isChiefAgent === 'function') {
+    return agents.filter((a) => !a.error && transformer.isChiefAgent(a));
+  }
+  return agents;
 }
 
 /**
@@ -146,13 +164,16 @@ function syncIde(agents, ideConfig, ideName, projectRoot, options) {
 
   const transformer = getTransformer(ideConfig.format);
 
-  // Ensure target directory exists
+  // Ensure base target directory exists
   if (!options.dryRun) {
     fs.ensureDirSync(result.targetDir);
   }
 
+  // Apply agent filter (e.g. chiefs-only for Codex target)
+  const agentsToSync = applyFilter(agents, ideConfig, transformer);
+
   // Transform and write each agent
-  for (const agent of agents) {
+  for (const agent of agentsToSync) {
     // Skip agents with fatal errors (no YAML block found or failed parse with no fallback)
     if (agent.error && agent.error === 'Failed to parse YAML') {
       result.errors.push({
@@ -175,6 +196,8 @@ function syncIde(agents, ideConfig, ideName, projectRoot, options) {
       const targetPath = path.join(result.targetDir, filename);
 
       if (!options.dryRun) {
+        // Support directory-based output (e.g. dev/SKILL.md creates dev/ subdir)
+        fs.ensureDirSync(path.dirname(targetPath));
         fs.writeFileSync(targetPath, content, 'utf8');
       }
 
@@ -339,7 +362,10 @@ async function commandValidate(options) {
     const transformer = getTransformer(ideConfig.format);
     const expectedFiles = [];
 
-    for (const agent of agents) {
+    // Apply filter before building expected files (mirrors syncIde behavior)
+    const agentsToValidate = applyFilter(agents, ideConfig, transformer);
+
+    for (const agent of agentsToValidate) {
       if (agent.error) continue;
 
       try {
