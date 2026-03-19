@@ -1,6 +1,6 @@
 # MarkmanAi AIOS Constitution
 
-> **Version:** 1.0.0 | **Ratified:** 2025-01-30 | **Last Amended:** 2025-01-30
+> **Version:** 1.1.0 | **Ratified:** 2025-01-30 | **Last Amended:** 2026-03-19
 
 Este documento define os princípios fundamentais e inegociáveis do MarkmanAi AIOS. Todos os agentes, tasks, e workflows DEVEM respeitar estes princípios. Violações são bloqueadas automaticamente via gates.
 
@@ -125,6 +125,28 @@ import { useStore } from '../../../stores/feature/store'
 
 ---
 
+### VII. Runtime Governance (MUST)
+
+All execution runtimes operating in this repository are subject to the same Constitution.
+
+**Rules:**
+- MUST: Every runtime MUST respect all principles (I-VI) regardless of technology
+- MUST: Runtime-specific configuration MUST enforce Constitution constraints
+- MUST: Only one runtime actively edits files at a time
+- MUST: Runtime configuration files MUST be version-controlled and reviewed
+- Example: `git push` forbidden in Codex rules mirrors Agent Authority in Art. II
+
+**Current Runtimes:**
+
+| Runtime | Config Location | Instruction File |
+|---------|----------------|------------------|
+| Claude Code | `.claude/` | `.claude/CLAUDE.md` |
+| Codex CLI | `.codex/` | `AGENTS.md` (root) |
+
+**Gate:** Operational — enforced via runtime configuration files, not automated gate
+
+---
+
 ## Governance
 
 ### Amendment Process
@@ -167,5 +189,5 @@ import { useStore } from '../../../stores/feature/store'
 
 ---
 
-*MarkmanAi AIOS Constitution v1.0.0*
+*MarkmanAi AIOS Constitution v1.1.0*
 *CLI First | Agent-Driven | Quality First*

@@ -1,0 +1,17 @@
+# AIOS Command Rules — Governed by AIOS Constitution v1.1.0
+# Enforces Art. II (Agent Authority) and Art. V (Quality First)
+
+# --- FORBIDDEN: Destructive / authority-violating operations ---
+prefix_rule(prefix="git push", decision="forbidden", reason="Constitution Art. II: only @devops has git push authority")
+prefix_rule(prefix="rm -rf", decision="forbidden", reason="Recursive deletion is forbidden — use targeted file removal")
+prefix_rule(prefix="npm publish", decision="forbidden", reason="Constitution Art. II: only @devops has publish authority")
+
+# --- PROMPT: Requires human confirmation ---
+prefix_rule(prefix="git rebase", decision="prompt", reason="History rewrite risk — requires human confirmation")
+prefix_rule(prefix="git reset", decision="prompt", reason="Uncommitted work loss risk — requires human confirmation")
+
+# --- ALLOW: Safe validation commands ---
+prefix_rule(prefix="npm test", decision="allow")
+prefix_rule(prefix="npm run lint", decision="allow")
+prefix_rule(prefix="npm run typecheck", decision="allow")
+prefix_rule(prefix="npm run build", decision="allow")
