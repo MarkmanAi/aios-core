@@ -7,6 +7,7 @@ const claudeCode = require('../../.aios-core/infrastructure/scripts/ide-sync/tra
 const cursor = require('../../.aios-core/infrastructure/scripts/ide-sync/transformers/cursor');
 const windsurf = require('../../.aios-core/infrastructure/scripts/ide-sync/transformers/windsurf');
 const antigravity = require('../../.aios-core/infrastructure/scripts/ide-sync/transformers/antigravity');
+const codex = require('../../.aios-core/infrastructure/scripts/ide-sync/transformers/codex');
 
 describe('IDE Transformers', () => {
   // Sample agent data for testing
@@ -210,8 +211,85 @@ describe('IDE Transformers', () => {
     });
   });
 
+  describe('codex transformer', () => {
+    it('should generate YAML frontmatter with name and description', () => {
+      const result = codex.transform(sampleAgent);
+      expect(result).toMatch(/^---\n/);
+      expect(result).toContain('name: "💻 Dex — Full Stack Developer"');
+      expect(result).toContain('description: "Use for code implementation"');
+      expect(result).toMatch(/---\n\n/);
+    });
+
+    it('should include whenToUse in When to Use section', () => {
+      const result = codex.transform(sampleAgent);
+      expect(result).toContain('## When to Use');
+      expect(result).toContain('Use for code implementation');
+    });
+
+    it('should include Quick Commands section with quick-visible commands only', () => {
+      const result = codex.transform(sampleAgent);
+      expect(result).toContain('## Quick Commands');
+      expect(result).toContain('`*help`');
+      expect(result).toContain('`*develop`');
+      // debug is visibility: full only — should NOT appear
+      expect(result).not.toContain('`*debug`');
+    });
+
+    it('should include sync footer', () => {
+      const result = codex.transform(sampleAgent);
+      expect(result).toContain('AIOS Skill - Synced from .aios-core/development/agents/dev.md');
+    });
+
+    it('should return directory-based filename', () => {
+      expect(codex.getFilename(sampleAgent)).toBe('dev/SKILL.md');
+    });
+
+    it('should have correct format identifier', () => {
+      expect(codex.format).toBe('codex-skill');
+    });
+
+    it('should handle agent with no commands gracefully', () => {
+      const noCommands = { ...sampleAgent, commands: [] };
+      const result = codex.transform(noCommands);
+      expect(result).not.toContain('## Quick Commands');
+      expect(result).toContain('## When to Use');
+    });
+  });
+
+  describe('codex isChiefAgent filter', () => {
+    it('should include core agents by ID', () => {
+      const coreIds = ['dev', 'qa', 'architect', 'sm', 'po', 'pm', 'analyst',
+        'data-engineer', 'ux-design-expert', 'devops', 'synapse', 'aios-master'];
+      for (const id of coreIds) {
+        expect(codex.isChiefAgent({ id, yaml: {}, agent: {} })).toBe(true);
+      }
+    });
+
+    it('should include agent with -chief suffix', () => {
+      expect(codex.isChiefAgent({ id: 'copy-chief', yaml: {}, agent: {} })).toBe(true);
+      expect(codex.isChiefAgent({ id: 'design-chief', yaml: {}, agent: {} })).toBe(true);
+    });
+
+    it('should include agent with -master suffix', () => {
+      expect(codex.isChiefAgent({ id: 'aios-master', yaml: {}, agent: {} })).toBe(true);
+    });
+
+    it('should include agent with isChief YAML flag at top level', () => {
+      expect(codex.isChiefAgent({ id: 'custom', yaml: { isChief: true }, agent: {} })).toBe(true);
+    });
+
+    it('should include agent with isOrchestrator YAML flag inside agent block', () => {
+      expect(codex.isChiefAgent({ id: 'custom', yaml: {}, agent: { isOrchestrator: true } })).toBe(true);
+    });
+
+    it('should exclude non-chief non-core agents', () => {
+      expect(codex.isChiefAgent({ id: 'squad-creator', yaml: {}, agent: {} })).toBe(false);
+      expect(codex.isChiefAgent({ id: 'random-helper', yaml: {}, agent: {} })).toBe(false);
+    });
+  });
+
   describe('all transformers', () => {
-    const transformers = [claudeCode, cursor, windsurf, antigravity];
+    const transformers = [claudeCode, cursor, windsurf, antigravity, codex];
 
     it('should handle agent with minimal data', () => {
       const minimal = {
@@ -233,10 +311,11 @@ describe('IDE Transformers', () => {
       }
     });
 
-    it('should return valid filename for all', () => {
+    it('should return filename containing agent id for all', () => {
       for (const transformer of transformers) {
         const filename = transformer.getFilename(sampleAgent);
-        expect(filename).toBe('dev.md');
+        expect(typeof filename).toBe('string');
+        expect(filename).toContain('dev');
       }
     });
 
