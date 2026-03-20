@@ -81,9 +81,9 @@ async function collectQAMetrics(): Promise<QAMetrics> {
 
   // Load gotchas
   const gotchasPath = path.join(aiosDir, 'gotchas.json');
-  const gotchas = await loadJsonFile<{ gotchas?: Array<{ category?: string }> }>(gotchasPath, {
-    gotchas: [],
-  });
+  const gotchas = await loadJsonFile<{
+    gotchas?: Array<{ category?: string; createdAt?: string }>;
+  }>(gotchasPath, { gotchas: [] });
   const gotchasList = gotchas.gotchas || [];
 
   // Load QA feedback
@@ -138,7 +138,7 @@ async function collectQAMetrics(): Promise<QAMetrics> {
 
   // Recent gotchas (last 7 days)
   const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  const recentGotchas = gotchasList.filter((g: { createdAt?: string }) => {
+  const recentGotchas = gotchasList.filter((g) => {
     if (!g.createdAt) return false;
     return new Date(g.createdAt).getTime() > weekAgo;
   }).length;

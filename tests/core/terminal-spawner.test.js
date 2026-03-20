@@ -354,9 +354,22 @@ describe('TerminalSpawner', () => {
 describe('pm.sh Script', () => {
   const { execSync } = require('child_process');
   const scriptPath = TerminalSpawner.getScriptPath();
+  const bashScriptPath = scriptPath.replace(/\\/g, '/');
+  const hasBash = (() => {
+    try {
+      execSync('bash --version', { stdio: 'ignore' });
+      return true;
+    } catch {
+      return false;
+    }
+  })();
+
+  const runBash = (args) =>
+    execSync(`bash "${bashScriptPath}" ${args}`, { encoding: 'utf8', timeout: 15000 });
 
   test('should display help with --help flag', () => {
-    const result = execSync(`bash "${scriptPath}" --help`, { encoding: 'utf8' });
+    if (!hasBash) return;
+    const result = runBash('--help');
     expect(result).toContain('AIOS Multi-Modal Orchestration Script');
     expect(result).toContain('Usage:');
     expect(result).toContain('Arguments:');
@@ -364,14 +377,16 @@ describe('pm.sh Script', () => {
   });
 
   test('should display version with --version flag', () => {
-    const result = execSync(`bash "${scriptPath}" --version`, { encoding: 'utf8' });
+    if (!hasBash) return;
+    const result = runBash('--version');
     expect(result).toContain('version');
     expect(result).toMatch(/\d+\.\d+\.\d+/);
   });
 
   test('should fail with missing arguments', () => {
+    if (!hasBash) return;
     try {
-      execSync(`bash "${scriptPath}"`, { encoding: 'utf8', stdio: 'pipe' });
+      runBash('');
       fail('Should have thrown an error');
     } catch (error) {
       expect(error.status).toBe(1);
@@ -379,8 +394,9 @@ describe('pm.sh Script', () => {
   });
 
   test('should fail with only agent argument', () => {
+    if (!hasBash) return;
     try {
-      execSync(`bash "${scriptPath}" dev`, { encoding: 'utf8', stdio: 'pipe' });
+      runBash('dev');
       fail('Should have thrown an error');
     } catch (error) {
       expect(error.status).toBe(1);
@@ -388,11 +404,9 @@ describe('pm.sh Script', () => {
   });
 
   test('should fail with non-existent context file', () => {
+    if (!hasBash) return;
     try {
-      execSync(`bash "${scriptPath}" dev develop --context /nonexistent/file.json`, {
-        encoding: 'utf8',
-        stdio: 'pipe',
-      });
+      runBash('dev develop --context /nonexistent/file.json');
       fail('Should have thrown an error');
     } catch (error) {
       expect(error.status).toBe(1);

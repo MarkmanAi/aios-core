@@ -2,6 +2,7 @@
  * Info CLI Unit Tests
  *
  * Tests for the worker info command functionality.
+ * Validation marker: Story 25.6 integration run.
  *
  * @story 2.8-2.9 - Discovery CLI Info & List
  */

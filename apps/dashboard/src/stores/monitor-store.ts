@@ -90,6 +90,17 @@ interface MonitorState {
   clearEvents: () => void;
 }
 
+export interface CurrentCommandView {
+  name: string;
+  status: 'running' | 'complete' | 'error';
+  startedAt: number;
+}
+
+export interface ActiveAgentView {
+  id: string;
+  name?: string;
+}
+
 const MAX_EVENTS = 500; // Keep last 500 events in memory
 
 export const useMonitorStore = create<MonitorState>((set) => ({
@@ -180,4 +191,39 @@ export const selectCurrentTool = (state: MonitorState): MonitorEvent | undefined
   }
 
   return undefined;
+};
+
+export const selectCurrentCommand = (state: MonitorState): CurrentCommandView | undefined => {
+  const preToolUses = state.events.filter((e) => e.type === 'PreToolUse');
+  if (preToolUses.length === 0) return undefined;
+
+  const currentPre = preToolUses[0];
+  if (!currentPre) return undefined;
+
+  const matchingPost = state.events.find(
+    (event) =>
+      event.type === 'PostToolUse' &&
+      event.session_id === currentPre.session_id &&
+      event.tool_name === currentPre.tool_name &&
+      event.timestamp > currentPre.timestamp
+  );
+
+  return {
+    name: currentPre.tool_name || 'command',
+    status: matchingPost ? (matchingPost.is_error ? 'error' : 'complete') : 'running',
+    startedAt: currentPre.timestamp,
+  };
+};
+
+export const selectActiveAgent = (state: MonitorState): ActiveAgentView | undefined => {
+  const activeSession = state.sessions.find((session) => session.status === 'active');
+  if (activeSession?.aios_agent) {
+    return { id: activeSession.aios_agent };
+  }
+
+  const latestAgentEvent = state.events.find((event) => event.aios_agent || event.agent);
+  const agentId = latestAgentEvent?.aios_agent || latestAgentEvent?.agent;
+  if (!agentId) return undefined;
+
+  return { id: agentId };
 };

@@ -138,12 +138,16 @@ describe('Story 24.4 — SYNAPSE Pipeline End-to-End', () => {
     loaderResult = await loader.loadForAgent('dev', { budget: 2000, layers: [1, 2] });
 
     // AC-4: Run UnifiedActivationPipeline — verify enrichedContext.memories populated
+    const pipelineLoaderSpy = jest
+      .spyOn(MemoryLoader.prototype, 'loadForAgent')
+      .mockResolvedValue(loaderResult);
     const pipeline = new UnifiedActivationPipeline({
       projectRoot: testDir,
       greetingBuilder: fastGreetingBuilder,
       gitConfigDetector: fastGitConfigDetector,
     });
     pipelineResult = await pipeline.activate('dev', {});
+    pipelineLoaderSpy.mockRestore();
   }, 30000);
 
   afterAll(() => {

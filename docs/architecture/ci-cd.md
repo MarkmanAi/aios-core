@@ -124,6 +124,20 @@ For branch protection on `main`:
 3. `CI / Jest Tests`
 4. `CI / Validation Summary`
 
+## Build Gate Standardization (Epic 25 / Story 25.6)
+
+To align local validation with governance and monorepo ergonomics, AIOS now treats the root build command as canonical:
+
+- **Canonical local build command:** `npm run build` (repository root)
+- **Root implementation:** delegates to dashboard build (`npm --prefix apps/dashboard run build`)
+- **Secondary command:** `npm run build:dashboard` (explicit app build)
+
+### CI Behavior
+
+- PR validation remains centered on `ci.yml` required checks (lint, typecheck, test).
+- Build verification continues in extended pipelines (for example `test.yml` on `main` pushes).
+- This preserves PR cost optimization while keeping a consistent local build gate command.
+
 ## Troubleshooting
 
 ### Workflow not running?

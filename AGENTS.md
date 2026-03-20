@@ -24,7 +24,8 @@ Run all validation commands after any code change:
 npm test                # Jest — must pass with no failures
 npm run lint            # ESLint — must pass with no errors
 npm run typecheck       # TypeScript — must pass with no errors
-npm run build           # Build — must complete successfully
+npm run build           # Canonical root build (monorepo) — must complete successfully
+# Root build delegates to apps/dashboard build (see package.json and docs/architecture/ci-cd.md)
 ```
 
 ---

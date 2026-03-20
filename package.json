@@ -33,6 +33,8 @@
     "test:health-check": "mocha tests/health-check/**/*.test.js --timeout 30000",
     "lint": "eslint . --cache --cache-location .eslintcache",
     "typecheck": "tsc --noEmit",
+    "build": "npm --prefix apps/dashboard run build",
+    "build:dashboard": "npm --prefix apps/dashboard run build",
     "release": "semantic-release",
     "release:test": "semantic-release --dry-run --no-ci || echo 'Config test complete - authentication errors are expected locally'",
     "generate:manifest": "node scripts/generate-install-manifest.js",

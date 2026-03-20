@@ -176,14 +176,18 @@ describe('Integration - Task 8.3: Local NPX Execution', () => {
       // Given
       const binPath = path.join(PKG_DIR, 'bin/aios-install.js');
 
-      // When
-      const result = execSync(`node "${binPath}" --invalid-flag 2>&1 || true`, {
-        encoding: 'utf8',
-        timeout: 10000,
-      });
-
-      // Then
-      expect(result).toContain('error');
+      // When/Then
+      try {
+        execSync(`node "${binPath}" --invalid-flag`, {
+          encoding: 'utf8',
+          timeout: 10000,
+          stdio: 'pipe',
+        });
+        fail('Should have failed with invalid flag');
+      } catch (error) {
+        const output = `${error.stdout || ''}${error.stderr || ''}`.toLowerCase();
+        expect(output).toContain('error');
+      }
     });
   });
 
